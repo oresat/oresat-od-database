@@ -1,0 +1,58 @@
+{
+  "objects": [
+    {
+      "name": "sw_version",
+      "data_type": "str",
+      "description": "software version",
+      "access_type": "const"
+    },
+    {
+      "name": "num_of_images",
+      "data_type": "uint8",
+      "description": "number of images to capture, 0 for endless"
+    },
+    {
+      "name": "camera_delay_ms",
+      "data_type": "uint32",
+      "description": "delay between captures in ms"
+    },
+    {
+      "name": "camera_status",
+      "data_type": "uint8",
+      "description": "the camera status"
+    },
+    {
+      "name": "camera_temperature",
+      "data_type": "int8",
+      "description": "the camera temperature in celsius",
+      "access_type": "ro"
+    },
+    {
+      "name": "tec_status",
+      "data_type": "bool",
+      "description": "the tec controller status"
+    },
+    {
+      "name": "tec_target_temperature",
+      "data_type": "int8",
+      "description": "the tec target temperature in celsius"
+    },
+    {
+      "name": "tec_saturated",
+      "data_type": "bool",
+      "description": "the tec is saturated",
+      "access_type": "ro"
+    }
+  ],
+  "publish": {
+    "0x1": {
+      "fields": [
+        "camera_status",
+        "camera_temperature",
+        "tec_status",
+        "tec_saturated"
+      ],
+      "delay_ms": 10000
+    }
+  }
+}

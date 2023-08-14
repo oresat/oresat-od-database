@@ -1,0 +1,107 @@
+{
+  "objects": [
+    {
+      "name": "sw_version",
+      "data_type": "str",
+      "description": "software version",
+      "access_type": "const"
+    },
+    {
+      "name": "satellite_id",
+      "data_type": "uint8",
+      "description": "the unique oresat satellite id",
+      "access_type": "const"
+    },
+    {
+      "name": "beacon_revision",
+      "data_type": "uint8",
+      "description": "the beacon revision number",
+      "access_type": "const"
+    },
+    {
+      "name": "status",
+      "data_type": "uint8",
+      "description": "the c3 state",
+      "access_type": "ro"
+    },
+    {
+      "name": "unix_time",
+      "data_type": "uint32",
+      "description": "unix time in seconds for beacon",
+      "access_type": "ro"
+    },
+    {
+      "name": "uptime",
+      "data_type": "uint32",
+      "description": "uptime in seconds for beacon",
+      "access_type": "ro"
+    },
+    {
+      "name": "power_cycles",
+      "data_type": "uint16",
+      "description": "the current timestamp",
+      "access_type": "ro"
+    },
+    {
+      "name": "stoarge_percent",
+      "data_type": "uint8",
+      "description": "the storage usage percent",
+      "access_type": "ro"
+    },
+    {
+      "name": "lband_rx_bytes",
+      "data_type": "uint32",
+      "description": "lband received byte count",
+      "access_type": "ro"
+    },
+    {
+      "name": "lband_rx_packets",
+      "data_type": "uint32",
+      "description": "lband received packet count",
+      "access_type": "ro"
+    },
+    {
+      "name": "lband_rssi",
+      "data_type": "int8",
+      "description": "lband rssi",
+      "access_type": "ro"
+    },
+    {
+      "name": "uhf_rx_bytes",
+      "data_type": "uint32",
+      "description": "uhf received byte count",
+      "access_type": "ro"
+    },
+    {
+      "name": "uhf_rx_packets",
+      "data_type": "uint32",
+      "description": "uhf received packet count",
+      "access_type": "ro"
+    },
+    {
+      "name": "uhf_rssi",
+      "data_type": "int8",
+      "description": "uhf rssi",
+      "access_type": "ro"
+    },
+    {
+      "name": "bank_status",
+      "data_type": "uint8",
+      "description": "bit 0: current back\nbit 1: next bank",
+      "access_type": "ro"
+    },
+    {
+      "name": "edl_sequence_count",
+      "data_type": "uint32",
+      "description": "edl sequence count",
+      "access_type": "ro"
+    },
+    {
+      "name": "edl_rejected_count",
+      "data_type": "uint32",
+      "description": "edl sequence count",
+      "access_type": "ro"
+    }
+  ],
+  "sync_ms": 1000
+}

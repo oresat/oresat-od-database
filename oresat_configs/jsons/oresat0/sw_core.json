@@ -1,0 +1,146 @@
+{
+  "objects": [
+    {
+      "name": "olaf_version",
+      "data_type": "str",
+      "description": "olaf lib version",
+      "access_type": "const"
+    },
+    {
+      "name": "fread_cache_len",
+      "data_type": "uint16",
+      "description": "number of files in fread cache",
+      "access_type": "ro"
+    },
+    {
+      "name": "fread_cache_files_json",
+      "data_type": "str",
+      "description": "all file names of files in fread cache as a JSON",
+      "access_type": "ro"
+    },
+    {
+      "name": "fread_cache_list_json",
+      "data_type": "str",
+      "description": "file name to read"
+    },
+    {
+      "name": "fread_cache_data",
+      "data_type": "domain",
+      "description": "file data to read",
+      "access_type": "ro"
+    },
+    {
+      "name": "fread_cache_remove",
+      "data_type": "bool",
+      "description": "write true to remove file",
+      "access_type": "wo"
+    },
+    {
+      "name": "fwrite_cache_len",
+      "data_type": "uint16",
+      "description": "number of files in fwrite cache",
+      "access_type": "ro"
+    },
+    {
+      "name": "fwrite_cache_list_json",
+      "data_type": "str",
+      "description": "all file names of files in fwrite cache as a JSON",
+      "access_type": "ro"
+    },
+    {
+      "name": "fwrite_cache_file_name",
+      "data_type": "str",
+      "description": "file name to write"
+    },
+    {
+      "name": "fwrite_cache_data",
+      "data_type": "domain",
+      "description": "file data to write",
+      "access_type": "wo"
+    },
+    {
+      "name": "fwrite_cache_remove",
+      "data_type": "bool",
+      "description": "write true to remove file",
+      "access_type": "wo"
+    },
+    {
+      "name": "bash_command",
+      "data_type": "str",
+      "description": "bash command to run"
+    },
+    {
+      "name": "bash_command_status",
+      "data_type": "uint8",
+      "description": "the status of the bash command",
+      "access_type": "ro"
+    },
+    {
+      "name": "bash_command_reply",
+      "data_type": "str",
+      "description": "the reply of the bash command",
+      "access_type": "ro"
+    },
+    {
+      "name": "updater_status",
+      "data_type": "uint8",
+      "description": "status of the updater",
+      "access_type": "ro"
+    },
+    {
+      "name": "update_cache_len",
+      "data_type": "uint8",
+      "description": "number of updates cached",
+      "access_type": "ro"
+    },
+    {
+      "name": "update_cache_list_json",
+      "data_type": "str",
+      "description": "list of updates cached as a JSON str in run order",
+      "access_type": "ro"
+    },
+    {
+      "name": "update",
+      "data_type": "bool",
+      "description": "start an update",
+      "access_type": "wo"
+    },
+    {
+      "name": "make_updater_status_file",
+      "data_type": "bool",
+      "description": "add a updater system status file to the fread cache",
+      "access_type": "wo"
+    },
+    {
+      "name": "make_logs_file",
+      "data_type": "bool",
+      "description": "copy the logs to a tar and add to the fread cache",
+      "access_type": "wo"
+    },
+    {
+      "name": "get_logs",
+      "data_type": "str",
+      "description": "get the logs since boot",
+      "access_type": "ro"
+    },
+    {
+      "name": "storage_percent",
+      "data_type": "uint8",
+      "description": "the current storage percent used",
+      "access_type": "ro"
+    }
+  ],
+  "publish": {
+    "0x0": {
+      "name": "core_status",
+      "fields": [
+        "storage_percent",
+        "fread_cache_len",
+        "fwrite_cache_len",
+        "updater_status",
+        "update_cache_len"
+      ],
+      "delay_ms": 30000
+    }
+  }
+}
