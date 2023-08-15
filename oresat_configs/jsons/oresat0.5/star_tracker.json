@@ -1,0 +1,61 @@
+{
+  "objects": [
+    {
+      "name": "sw_version",
+      "data_type": "str",
+      "description": "software version",
+      "access_type": "const"
+    },
+    {
+      "name": "num_of_images",
+      "data_type": "uint8",
+      "description": "number of images to capture, 0 for endless"
+    },
+    {
+      "name": "delay_ms",
+      "data_type": "uint32",
+      "description": "delay between captures in ms"
+    },
+    {
+      "name": "status",
+      "data_type": "uint8",
+      "description": "the camera status"
+    },
+    {
+      "name": "right_ascension",
+      "data_type": "int16",
+      "description": "the right ascension of the satellite in degrees",
+      "access_type": "ro"
+    },
+    {
+      "name": "declination",
+      "data_type": "int16",
+      "description": "the delination of the satellite in degrees",
+      "access_type": "ro"
+    },
+    {
+      "name": "roll",
+      "data_type": "int16",
+      "description": "the roll of the satellite in degrees",
+      "access_type": "ro"
+    },
+    {
+      "name": "time_since_midnight",
+      "data_type": "uint32",
+      "description": "the number of seconds since midnight",
+      "access_type": "ro"
+    }
+  ],
+  "publish": {
+    "0x1": {
+      "fields": [
+        "status",
+        "right_ascension",
+        "declination",
+        "roll",
+        "time_since_midnight"
+      ],
+      "sync": 10
+    }
+  }
+}

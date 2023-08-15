@@ -1,0 +1,117 @@
+{
+  "objects": [
+    {
+      "name": "voltage",
+      "data_type": "uint16",
+      "access_type": "ro"
+    },
+    {
+      "name": "current",
+      "data_type": "int16",
+      "access_type": "ro"
+    },
+    {
+      "name": "power",
+      "data_type": "uint16",
+      "access_type": "ro"
+    },
+    {
+      "name": "voltage_avg",
+      "data_type": "uint16",
+      "access_type": "ro"
+    },
+    {
+      "name": "current_avg",
+      "data_type": "int16",
+      "access_type": "ro"
+    },
+    {
+      "name": "power_avg",
+      "data_type": "uint16",
+      "access_type": "ro"
+    },
+    {
+      "name": "voltage_max",
+      "data_type": "uint16",
+      "access_type": "ro"
+    },
+    {
+      "name": "current_max",
+      "data_type": "int16",
+      "access_type": "ro"
+    },
+    {
+      "name": "power_max",
+      "data_type": "uint16",
+      "access_type": "ro"
+    },
+    {
+      "name": "energy",
+      "data_type": "uint16",
+      "access_type": "ro"
+    },
+    {
+      "name": "cell_1_temperature",
+      "data_type": "int8",
+      "access_type": "ro"
+    },
+    {
+      "name": "cell_2_temperature",
+      "data_type": "int8",
+      "access_type": "ro"
+    },
+    {
+      "name": "cell_1_temperature_min",
+      "data_type": "int8",
+      "access_type": "ro"
+    },
+    {
+      "name": "cell_2_temperature_min",
+      "data_type": "int8",
+      "access_type": "ro"
+    },
+    {
+      "name": "cell_1_temperature_max",
+      "data_type": "int8",
+      "access_type": "ro"
+    },
+    {
+      "name": "cell_2_temperature_max",
+      "data_type": "int8",
+      "access_type": "ro"
+    },
+    {
+      "name": "mppt_alg",
+      "data_type": "uint8",
+      "access_type": "rww"
+    },
+    {
+      "name": "lt1618_iadj",
+      "data_type": "uint16",
+      "access_type": "ro"
+    }
+  ],
+  "publish": {
+    "0x1": {
+      "fields": [
+        "voltage",
+        "current",
+        "power",
+        "voltage_avg",
+        "current_avg",
+        "power_avg",
+        "voltage_max",
+        "current_max",
+        "power_max",
+        "energy",
+        "cell_1_temperature",
+        "cell_2_temperature",
+        "cell_1_temperature_min",
+        "cell_2_temperature_min",
+        "cell_1_temperature_max",
+        "cell_2_temperature_max"
+      ],
+      "delay_ms": 10000
+    }
+  }
+}

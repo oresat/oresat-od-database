@@ -1,0 +1,24 @@
+{
+  "objects": [
+    {
+      "name": "sw_version",
+      "data_type": "str",
+      "description": "software version",
+      "access_type": "const"
+    },
+    {
+      "name": "transmitting",
+      "data_type": "bool",
+      "description": "the card is currently transmitting",
+      "access_type": "ro"
+    }
+  ],
+  "publish": {
+    "0x1": {
+      "fields": [
+        "transmitting"
+      ],
+      "delay_ms": 1000
+    }
+  }
+}

@@ -1,0 +1,279 @@
+{
+  "objects": [
+    {
+      "name": "pack_1_vbatt",
+      "data_type": "uint16",
+      "access_type": "ro"
+    },
+    {
+      "name": "pack_1_vcell_max",
+      "data_type": "uint16",
+      "access_type": "ro"
+    },
+    {
+      "name": "pack_1_vcell_min",
+      "data_type": "uint16",
+      "access_type": "ro"
+    },
+    {
+      "name": "pack_1_vcell",
+      "data_type": "uint16",
+      "access_type": "ro"
+    },
+    {
+      "name": "pack_1_vcell_1",
+      "data_type": "uint16",
+      "access_type": "ro"
+    },
+    {
+      "name": "pack_1_vcell_2",
+      "data_type": "uint16",
+      "access_type": "ro"
+    },
+    {
+      "name": "pack_1_vcell_avg",
+      "data_type": "uint16",
+      "access_type": "ro"
+    },
+    {
+      "name": "pack_1_current",
+      "data_type": "int16",
+      "access_type": "ro"
+    },
+    {
+      "name": "pack_1_current_avg",
+      "data_type": "int16",
+      "access_type": "ro"
+    },
+    {
+      "name": "pack_1_current_max",
+      "data_type": "int16",
+      "access_type": "ro"
+    },
+    {
+      "name": "pack_1_current_min",
+      "data_type": "int16",
+      "access_type": "ro"
+    },
+    {
+      "name": "pack_1_full_capacity",
+      "data_type": "uint16",
+      "access_type": "ro"
+    },
+    {
+      "name": "pack_1_reported_capacity",
+      "data_type": "uint16",
+      "access_type": "ro"
+    },
+    {
+      "name": "pack_1_time_to_empty",
+      "data_type": "uint16",
+      "access_type": "ro"
+    },
+    {
+      "name": "pack_1_time_to_full",
+      "data_type": "uint16",
+      "access_type": "ro"
+    },
+    {
+      "name": "pack_1_cycles",
+      "data_type": "uint16",
+      "access_type": "ro"
+    },
+    {
+      "name": "pack_1_reported_state_of_charge",
+      "data_type": "uint8",
+      "access_type": "ro"
+    },
+    {
+      "name": "pack_1_temperature",
+      "data_type": "int8",
+      "access_type": "ro"
+    },
+    {
+      "name": "pack_1_temperature_avg",
+      "data_type": "int8",
+      "access_type": "ro"
+    },
+    {
+      "name": "pack_1_temperature_max",
+      "data_type": "int8",
+      "access_type": "ro"
+    },
+    {
+      "name": "pack_1_temperature_min",
+      "data_type": "int8",
+      "access_type": "ro"
+    },
+    {
+      "name": "pack_1_status",
+      "data_type": "int8",
+      "access_type": "ro"
+    },
+    {
+      "name": "pack_2_vbatt",
+      "data_type": "uint16",
+      "access_type": "ro"
+    },
+    {
+      "name": "pack_2_vcell_max",
+      "data_type": "uint16",
+      "access_type": "ro"
+    },
+    {
+      "name": "pack_2_vcell_min",
+      "data_type": "uint16",
+      "access_type": "ro"
+    },
+    {
+      "name": "pack_2_vcell",
+      "data_type": "uint16",
+      "access_type": "ro"
+    },
+    {
+      "name": "pack_2_vcell_1",
+      "data_type": "uint16",
+      "access_type": "ro"
+    },
+    {
+      "name": "pack_2_vcell_2",
+      "data_type": "uint16",
+      "access_type": "ro"
+    },
+    {
+      "name": "pack_2_vcell_avg",
+      "data_type": "uint16",
+      "access_type": "ro"
+    },
+    {
+      "name": "pack_2_current",
+      "data_type": "int16",
+      "access_type": "ro"
+    },
+    {
+      "name": "pack_2_current_avg",
+      "data_type": "int16",
+      "access_type": "ro"
+    },
+    {
+      "name": "pack_2_current_max",
+      "data_type": "int16",
+      "access_type": "ro"
+    },
+    {
+      "name": "pack_2_current_min",
+      "data_type": "int16",
+      "access_type": "ro"
+    },
+    {
+      "name": "pack_2_full_capacity",
+      "data_type": "uint16",
+      "access_type": "ro"
+    },
+    {
+      "name": "pack_2_reported_capacity",
+      "data_type": "uint16",
+      "access_type": "ro"
+    },
+    {
+      "name": "pack_2_time_to_empty",
+      "data_type": "uint16",
+      "access_type": "ro"
+    },
+    {
+      "name": "pack_2_time_to_full",
+      "data_type": "uint16",
+      "access_type": "ro"
+    },
+    {
+      "name": "pack_2_cycles",
+      "data_type": "uint16",
+      "access_type": "ro"
+    },
+    {
+      "name": "pack_2_reported_state_of_charge",
+      "data_type": "uint8",
+      "access_type": "ro"
+    },
+    {
+      "name": "pack_2_temperature",
+      "data_type": "int8",
+      "access_type": "ro"
+    },
+    {
+      "name": "pack_2_temperature_avg",
+      "data_type": "int8",
+      "access_type": "ro"
+    },
+    {
+      "name": "pack_2_temperature_max",
+      "data_type": "int8",
+      "access_type": "ro"
+    },
+    {
+      "name": "pack_2_temperature_min",
+      "data_type": "int8",
+      "access_type": "ro"
+    },
+    {
+      "name": "pack_2_status",
+      "data_type": "int8",
+      "access_type": "ro"
+    },
+    {
+      "name": "model_gauge_alg_status",
+      "data_type": "uint16",
+      "access_type": "rw"
+    }
+  ],
+  "publish": {
+    "0x1": {
+      "fields": [
+        "pack_1_vbatt",
+        "pack_1_vcell_max",
+        "pack_1_vcell_min",
+        "pack_1_vcell",
+        "pack_1_vcell_1",
+        "pack_1_vcell_2",
+        "pack_1_vcell_avg",
+        "pack_1_current",
+        "pack_1_current_avg",
+        "pack_1_current_max",
+        "pack_1_current_min",
+        "pack_1_temperature",
+        "pack_1_temperature_avg",
+        "pack_1_temperature_max",
+        "pack_1_temperature_min",
+        "pack_1_full_capacity",
+        "pack_1_reported_capacity",
+        "pack_1_reported_state_of_charge",
+        "pack_1_status"
+      ],
+      "delay_ms": 10000
+    },
+    "0x2": {
+      "fields": [
+        "pack_2_vbatt",
+        "pack_2_vcell_max",
+        "pack_2_vcell_min",
+        "pack_2_vcell",
+        "pack_2_vcell_1",
+        "pack_2_vcell_2",
+        "pack_2_vcell_avg",
+        "pack_2_current",
+        "pack_2_current_avg",
+        "pack_2_current_max",
+        "pack_2_current_min",
+        "pack_2_temperature",
+        "pack_2_temperature_avg",
+        "pack_2_temperature_max",
+        "pack_2_temperature_min",
+        "pack_2_full_capacity",
+        "pack_2_reported_capacity",
+        "pack_2_reported_state_of_charge",
+        "pack_2_status"
+      ],
+      "delay_ms": 10000
+    }
+  }
+}
