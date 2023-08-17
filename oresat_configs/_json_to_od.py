@@ -46,10 +46,15 @@ OD_DEFAULTS = {
 @dataclass_json(letter_case=LetterCase.SNAKE)
 @dataclass
 class OdConfigEntry:
+
     name: str
+    '''Name of the Entry in snake_case'''
     data_type: str
+    '''Data type of the entry'''
     description: str = ''
+    '''Description of the entry'''
     access_type: str = 'rw'
+    '''Access type of the entry; can be: rw, ro, wo, or const'''
 
 
 @dataclass_json(letter_case=LetterCase.SNAKE)
@@ -57,8 +62,14 @@ class OdConfigEntry:
 class OdConfigPublish:
 
     fields: List[str]
-    delay_ms = 0
-    sync = 0
+    '''Fields to publish, must match names of entries'''
+    delay_ms: int = 0
+    '''
+    Delay between publishing in milliseconds, if both delay_ms and sync are non-zero delay_ms
+    is ignored and sync is used.
+    '''
+    sync: int = 0
+    '''Number of sync messages required before publishing data'''
 
 
 @dataclass_json(letter_case=LetterCase.SNAKE)
@@ -66,7 +77,9 @@ class OdConfigPublish:
 class OdConfig:
 
     objects: List[OdConfigEntry]
+    '''List of objects/entries in OD'''
     publish: Dict[str, OdConfigPublish] = field(default_factory=dict)
+    '''Publish data configs'''
 
 
 def make_rec(objects: list, index: int, name: str):
@@ -298,21 +311,27 @@ def add_all_subscribe_data(master_node_od: canopen.ObjectDictionary,
 
 
 def read_json_od_config(file_path):
+
     with open(file_path, 'r') as f:
         config = f.read()
+
     return OdConfig.from_json(config)
 
 
 def make_od(config, node_id, core_config=None):
+
     od = canopen.ObjectDictionary()
     od.bitrate = BIT_RATE
     od.node_id = node_id.value
     od.device_information.product_name = node_id.name.lower()
+
     if core_config:
         core_rec = make_rec(core_config.objects, CORE_INDEX, 'core')
         od.add_object(core_rec)
         add_publish_data(od, core_config)
+
     card_rec = make_rec(config.objects, CARD_INDEX, node_id.name.lower())
     od.add_object(card_rec)
     add_publish_data(od, config, False)
+
     return od
