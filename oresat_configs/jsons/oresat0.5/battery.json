@@ -247,12 +247,7 @@
         "pack_1_full_capacity",
         "pack_1_reported_capacity",
         "pack_1_reported_state_of_charge",
-        "pack_1_status"
-      ],
-      "delay_ms": 10000
-    },
-    "0x2": {
-      "fields": [
+        "pack_1_status",
         "pack_2_vbatt",
         "pack_2_vcell_max",
         "pack_2_vcell_min",
