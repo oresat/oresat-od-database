@@ -33,13 +33,13 @@
     {
       "name": "gps_week",
       "data_type": "uint8",
-      "description": "number of gps satellites lock onto",
+      "description": "the gps week number",
       "access_type": "ro"
     },
     {
       "name": "tow",
       "data_type": "uint16",
-      "description": "number of gps satellites lock onto",
+      "description": "the time of the week",
       "access_type": "ro"
     },
     {
@@ -98,37 +98,37 @@
     },
     {
       "name": "ecef_x",
-      "data_type": "uint32",
+      "data_type": "int32",
       "description": "ecef x coordinate in cm",
       "access_type": "ro"
     },
     {
       "name": "ecef_y",
-      "data_type": "uint32",
+      "data_type": "int32",
       "description": "ecef y coordinate in cm",
       "access_type": "ro"
     },
     {
       "name": "ecef_z",
-      "data_type": "uint32",
+      "data_type": "int32",
       "description": "ecef z coordinate in cm",
       "access_type": "ro"
     },
     {
       "name": "ecef_vx",
-      "data_type": "uint32",
+      "data_type": "int32",
       "description": "ecef y velocity in cm/s",
       "access_type": "ro"
     },
     {
       "name": "ecef_vy",
-      "data_type": "uint32",
+      "data_type": "int32",
       "description": "ecef y velocity in cm/s",
       "access_type": "ro"
     },
     {
       "name": "ecef_vz",
-      "data_type": "uint32",
+      "data_type": "int32",
       "description": "ecef z velocity in cm/s",
       "access_type": "ro"
     },
