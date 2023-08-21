@@ -1,10 +1,10 @@
-__version__ = '0.1.0'
+__version__ = "0.1.0"
 
 from enum import IntEnum
 
 
 class OreSatId(IntEnum):
-    '''Unique ID for each OreSat'''
+    """Unique ID for each OreSat"""
 
     ORESAT0 = 1
     ORESAT0_5 = 2
@@ -12,7 +12,7 @@ class OreSatId(IntEnum):
 
 
 class NodeId(IntEnum):
-    '''All the CANopen Node ID for OreSat boards.'''
+    """All the CANopen Node ID for OreSat boards."""
 
     C3 = 0x01
     BATTERY_1 = 0x04
@@ -38,7 +38,7 @@ class NodeId(IntEnum):
 
 
 class OpdNodeId(IntEnum):
-    '''I2C addresses for all cards on the OPD'''
+    """I2C addresses for all cards on the OPD"""
 
     BATTERY_1 = 0x18
     GPS = 0x19
@@ -55,7 +55,7 @@ class OpdNodeId(IntEnum):
 
 
 class Index(IntEnum):
-    '''OD posible indexes'''
+    """OD posible indexes"""
 
     CORE_DATA = 0x3000
     CARD_CONFIGS = 0x6000

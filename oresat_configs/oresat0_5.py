@@ -5,18 +5,18 @@ from . import NodeId
 from ._json_to_od import read_json_od_config, make_od, add_all_subscribe_data
 
 _file_path = os.path.dirname(os.path.abspath(__file__))
-_oresat0_5_json_dir = f'{_file_path}/jsons/oresat0.5'
+_oresat0_5_json_dir = f"{_file_path}/jsons/oresat0.5"
 
-_sw_core_config = read_json_od_config(f'{_oresat0_5_json_dir}/sw_core.json')
-_solar_config = read_json_od_config(f'{_oresat0_5_json_dir}/solar.json')
-_battery_config = read_json_od_config(f'{_oresat0_5_json_dir}/battery.json')
-_imu_config = read_json_od_config(f'{_oresat0_5_json_dir}/imu.json')
-_rw_config = read_json_od_config(f'{_oresat0_5_json_dir}/reaction_wheel.json')
-_c3_config = read_json_od_config(f'{_oresat0_5_json_dir}/c3.json')
-_gps_config = read_json_od_config(f'{_oresat0_5_json_dir}/gps.json')
-_st_config = read_json_od_config(f'{_oresat0_5_json_dir}/star_tracker.json')
-_cfc_config = read_json_od_config(f'{_oresat0_5_json_dir}/cfc.json')
-_dxwifi_config = read_json_od_config(f'{_oresat0_5_json_dir}/dxwifi.json')
+_sw_core_config = read_json_od_config(f"{_oresat0_5_json_dir}/sw_core.json")
+_solar_config = read_json_od_config(f"{_oresat0_5_json_dir}/solar.json")
+_battery_config = read_json_od_config(f"{_oresat0_5_json_dir}/battery.json")
+_imu_config = read_json_od_config(f"{_oresat0_5_json_dir}/imu.json")
+_rw_config = read_json_od_config(f"{_oresat0_5_json_dir}/reaction_wheel.json")
+_c3_config = read_json_od_config(f"{_oresat0_5_json_dir}/c3.json")
+_gps_config = read_json_od_config(f"{_oresat0_5_json_dir}/gps.json")
+_st_config = read_json_od_config(f"{_oresat0_5_json_dir}/star_tracker.json")
+_cfc_config = read_json_od_config(f"{_oresat0_5_json_dir}/cfc.json")
+_dxwifi_config = read_json_od_config(f"{_oresat0_5_json_dir}/dxwifi.json")
 
 # make ODs for all nodes
 C3_OD = make_od(_c3_config, NodeId.C3)
@@ -55,5 +55,5 @@ add_all_subscribe_data(C3_OD, REACTION_WHEEL_4_OD)
 add_all_subscribe_data(C3_OD, CFC_OD)
 add_all_subscribe_data(C3_OD, DXWIFI_OD)
 
-with open(f'{_oresat0_5_json_dir}/beacon.json', 'r') as f:
+with open(f"{_oresat0_5_json_dir}/beacon.json", "r") as f:
     BEACON_DEF = json.load(f)
