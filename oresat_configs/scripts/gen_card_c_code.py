@@ -3,7 +3,7 @@
 from argparse import ArgumentParser
 
 from oresat_configs import oresat0, oresat0_5
-from oresat_configs.write_canopennode import write_canopennode
+from oresat_configs._write_canopennode import write_canopennode
 
 
 OD_LIST = {
