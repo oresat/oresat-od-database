@@ -7,7 +7,7 @@
     ["c3", "uptime"],
     ["c3", "unix_time"],
     ["c3", "power_cycles"],
-    ["c3", "stoarge_percent"],
+    ["c3", "storage_percent"],
     ["c3", "lband_rx_bytes"],
     ["c3", "lband_rx_packets"],
     ["c3", "lband_rssi"],

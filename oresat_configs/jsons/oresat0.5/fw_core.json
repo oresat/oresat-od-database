@@ -1,6 +1,18 @@
 {
   "objects": [
     {
+      "name": "config_version",
+      "data_type": "str",
+      "description": "oresat config version",
+      "access_type": "const"
+    },
+    {
+      "name": "fw_version",
+      "data_type": "str",
+      "description": "app fw version",
+      "access_type": "const"
+    },
+    {
       "name": "processor_temperature",
       "data_type": "int8",
       "description": "the temperature of the processor in celsius",

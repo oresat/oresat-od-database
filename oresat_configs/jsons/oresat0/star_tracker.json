@@ -1,12 +1,6 @@
 {
   "objects": [
     {
-      "name": "sw_version",
-      "data_type": "str",
-      "description": "software version",
-      "access_type": "const"
-    },
-    {
       "name": "num_of_images",
       "data_type": "uint8",
       "description": "number of images to capture, 0 for endless"

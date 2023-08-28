@@ -1,9 +1,21 @@
 {
   "objects": [
     {
+      "name": "config_version",
+      "data_type": "str",
+      "description": "oresat config version",
+      "access_type": "const"
+    },
+    {
       "name": "olaf_version",
       "data_type": "str",
       "description": "olaf lib version",
+      "access_type": "const"
+    },
+    {
+      "name": "sw_version",
+      "data_type": "str",
+      "description": "app sw version",
       "access_type": "const"
     },
     {
