@@ -226,43 +226,88 @@
       "access_type": "rw"
     }
   ],
-  "publish": {
-    "0x1": {
+  "tpdos": {
+    "1": {
       "fields": [
         "pack_1_vbatt",
         "pack_1_vcell_max",
         "pack_1_vcell_min",
-        "pack_1_vcell",
+        "pack_1_vcell"
+      ],
+      "delay_ms": 10000
+    },
+    "2": {
+      "fields": [
         "pack_1_vcell_1",
         "pack_1_vcell_2",
-        "pack_1_vcell_avg",
+        "pack_1_vcell_avg"
+      ],
+      "delay_ms": 10000
+    },
+    "3": {
+      "fields": [
         "pack_1_current",
         "pack_1_current_avg",
         "pack_1_current_max",
-        "pack_1_current_min",
+        "pack_1_current_min"
+      ],
+      "delay_ms": 10000
+    },
+    "4": {
+      "fields": [
         "pack_1_temperature",
         "pack_1_temperature_avg",
-        "pack_1_temperature_max",
+        "pack_1_temperature_max"
+      ],
+      "delay_ms": 10000
+    },
+    "5": {
+      "fields": [
         "pack_1_temperature_min",
         "pack_1_full_capacity",
         "pack_1_reported_capacity",
         "pack_1_reported_state_of_charge",
-        "pack_1_status",
+        "pack_1_status"
+      ],
+      "delay_ms": 10000
+    },
+    "6": {
+      "fields": [
         "pack_2_vbatt",
         "pack_2_vcell_max",
         "pack_2_vcell_min",
-        "pack_2_vcell",
+        "pack_2_vcell"
+      ],
+      "delay_ms": 10000
+    },
+    "7": {
+      "fields": [
         "pack_2_vcell_1",
         "pack_2_vcell_2",
-        "pack_2_vcell_avg",
+        "pack_2_vcell_avg"
+      ],
+      "delay_ms": 10000
+    },
+    "8": {
+      "fields": [
         "pack_2_current",
         "pack_2_current_avg",
         "pack_2_current_max",
-        "pack_2_current_min",
+        "pack_2_current_min"
+      ],
+      "delay_ms": 10000
+    },
+    "9": {
+      "fields": [
         "pack_2_temperature",
         "pack_2_temperature_avg",
         "pack_2_temperature_max",
-        "pack_2_temperature_min",
+        "pack_2_temperature_min"
+      ],
+      "delay_ms": 10000
+    },
+    "10": {
+      "fields": [
         "pack_2_full_capacity",
         "pack_2_reported_capacity",
         "pack_2_reported_state_of_charge",

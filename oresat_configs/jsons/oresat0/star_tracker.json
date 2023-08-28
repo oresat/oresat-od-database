@@ -22,6 +22,18 @@
       "description": "the camera status"
     },
     {
+      "name": "camera_last_capture",
+      "data_type": "domain",
+      "description": "the last raw capture",
+      "access_type": "ro"
+    },
+    {
+      "name": "camera_last_display_image",
+      "data_type": "domain",
+      "description": "the last capture convert to nice display image",
+      "access_type": "ro"
+    },
+    {
       "name": "right_ascension",
       "data_type": "int16",
       "description": "the right ascension of the satellite in degrees",
@@ -42,20 +54,23 @@
     {
       "name": "time_since_midnight",
       "data_type": "uint32",
-      "description": "the number of seconds since midnight",
+      "description": "the number of milliseconds since midnight",
       "access_type": "ro"
     }
   ],
-  "publish": {
-    "0x1": {
+  "tpdos": {
+    "3": {
       "fields": [
         "status",
         "right_ascension",
         "declination",
-        "roll",
+        "roll"
+      ]
+    },
+    "4": {
+      "fields": [
         "time_since_midnight"
-      ],
-      "sync": 10
+      ]
     }
   }
 }

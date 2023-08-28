@@ -126,30 +126,56 @@
       "access_type": "ro"
     }
   ],
-  "publish": {
-    "0x1": {
+  "tpdos": {
+    "1": {
       "fields": [
         "pitch_rate",
         "yaw_rate",
-        "roll_rate",
+        "roll_rate"
+      ],
+      "delay_ms": 1000
+    },
+    "2": {
+      "fields": [
         "acc_x",
         "acc_y",
-        "acc_z",
-        "temperature",
+        "acc_z"
+      ],
+      "delay_ms": 1000
+    },
+    "3": {
+      "fields": [
+        "temperature"
+      ],
+      "delay_ms": 1000
+    },
+    "4": {
+      "fields": [
         "mag_pz_1_x",
         "mag_pz_1_y",
-        "mag_pz_1_z",
+        "mag_pz_1_z"
+      ]
+    },
+    "5": {
+      "fields": [
         "mag_pz_2_x",
         "mag_pz_2_y",
-        "mag_pz_2_z",
+        "mag_pz_2_z"
+      ]
+    },
+    "6": {
+      "fields": [
         "mag_mz_1_x",
         "mag_mz_1_y",
-        "mag_mz_1_z",
+        "mag_mz_1_z"
+      ]
+    },
+    "7": {
+      "fields": [
         "mag_mz_2_x",
         "mag_mz_2_y",
         "mag_mz_2_z"
-      ],
-      "sync": 10
+      ]
     }
   }
 }

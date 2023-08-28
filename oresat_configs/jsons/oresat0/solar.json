@@ -91,19 +91,34 @@
       "access_type": "ro"
     }
   ],
-  "publish": {
-    "0x1": {
+  "tpdos": {
+    "1": {
       "fields": [
         "voltage",
         "current",
         "power",
-        "voltage_avg",
+        "voltage_avg"
+      ],
+      "delay_ms": 10000
+    },
+    "2": {
+      "fields": [
         "current_avg",
         "power_avg",
         "voltage_max",
-        "current_max",
+        "current_max"
+      ],
+      "delay_ms": 10000
+    },
+    "3": {
+      "fields": [
         "power_max",
-        "energy",
+        "energy"
+      ],
+      "delay_ms": 10000
+    },
+    "4": {
+      "fields": [
         "cell_1_temperature",
         "cell_2_temperature",
         "cell_1_temperature_min",

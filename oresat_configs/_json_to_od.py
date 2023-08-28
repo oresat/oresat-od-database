@@ -4,7 +4,7 @@ from dataclasses import dataclass, field
 import canopen
 from dataclasses_json import dataclass_json, LetterCase
 
-from . import Index
+from . import Index, NodeId
 
 OD_DATA_TYPES = {
     "bool": canopen.objectdictionary.BOOLEAN,
@@ -21,6 +21,23 @@ OD_DATA_TYPES = {
     "str": canopen.objectdictionary.VISIBLE_STRING,
     "octet_str": canopen.objectdictionary.OCTET_STRING,
     "domain": canopen.objectdictionary.DOMAIN,
+}
+
+OD_DATA_TYPE_SIZE = {
+    canopen.objectdictionary.BOOLEAN: 8,
+    canopen.objectdictionary.INTEGER8: 8,
+    canopen.objectdictionary.INTEGER16: 16,
+    canopen.objectdictionary.INTEGER32: 32,
+    canopen.objectdictionary.INTEGER64: 64,
+    canopen.objectdictionary.UNSIGNED8: 8,
+    canopen.objectdictionary.UNSIGNED16: 16,
+    canopen.objectdictionary.UNSIGNED32: 32,
+    canopen.objectdictionary.UNSIGNED64: 64,
+    canopen.objectdictionary.REAL32: 32,
+    canopen.objectdictionary.REAL64: 64,
+    canopen.objectdictionary.VISIBLE_STRING: 0,
+    canopen.objectdictionary.OCTET_STRING: 0,
+    canopen.objectdictionary.DOMAIN: 0,
 }
 
 OD_DEFAULTS = {
@@ -44,40 +61,48 @@ OD_DEFAULTS = {
 @dataclass_json(letter_case=LetterCase.SNAKE)
 @dataclass
 class OdConfigEntry:
+    """OD entry info."""
+
     name: str
-    """Name of the Entry in snake_case"""
+    """Name of the entry in snake_case"""
     data_type: str
     """Data type of the entry"""
     description: str = ""
     """Description of the entry"""
     access_type: str = "rw"
-    """Access type of the entry; can be: rw, ro, wo, or const"""
+    """Access type of the entry; can be: ro, wo, rw, rwr, rww, or const"""
 
 
 @dataclass_json(letter_case=LetterCase.SNAKE)
 @dataclass
-class OdConfigPublish:
+class OdConfigTpdo:
+    """OD tpdos data info."""
+
     fields: List[str]
-    """Fields to publish, must match names of entries"""
+    """Fields to tpdos, must match names of entries"""
     delay_ms: int = 0
     """
-    Delay between publishing in milliseconds, if both delay_ms and sync are non-zero delay_ms
+    Delay between tpdosing in milliseconds, if both delay_ms and sync are non-zero delay_ms
     is ignored and sync is used.
     """
     sync: int = 0
-    """Number of sync messages required before publishing data"""
+    """Number of sync messages required before tpdosing data"""
 
 
 @dataclass_json(letter_case=LetterCase.SNAKE)
 @dataclass
 class OdConfig:
+    """OD data info."""
+
     objects: List[OdConfigEntry]
     """List of objects/entries in OD"""
-    publish: Dict[str, OdConfigPublish] = field(default_factory=dict)
-    """Publish data configs"""
+    tpdos: Dict[str, OdConfigTpdo] = field(default_factory=dict)
+    """TPDO configs"""
 
 
 def make_rec(objects: list, index: int, name: str) -> canopen.objectdictionary.Record:
+    """Make a Record for the OD."""
+
     rec = canopen.objectdictionary.Record(name, index)
 
     for obj in objects:
@@ -101,36 +126,51 @@ def make_rec(objects: list, index: int, name: str) -> canopen.objectdictionary.R
     return rec
 
 
-def add_publish_data(od: canopen.ObjectDictionary, config: OdConfig, core=True):
+def add_tpdo_data(od: canopen.ObjectDictionary, config: OdConfig, core=True):
+    """Add tpdo objects to OD."""
+
     if core:
         mapped_index = Index.CORE_DATA.value
     else:
         mapped_index = Index.CARD_DATA.value
 
-    for i in config.publish:
+    for i in config.tpdos:
+        if not od.device_information.nr_of_TXPDO:
+            od.device_information.nr_of_TXPDO = 0
+        od.device_information.nr_of_TXPDO += 1
+
         num = int(i, 16)
-        com_index = 0x1800 + num
-        map_index = 0x1A00 + num
+        com_index = 0x1800 + num - 1
+        map_index = 0x1A00 + num - 1
         com_rec = canopen.objectdictionary.Record(
-            f"Publish data {num} communication parameters", com_index
+            f"TPDO {num} communication parameters", com_index
         )
         map_rec = canopen.objectdictionary.Record(
-            f"Publish data {num} mapping parameters", map_index
+            f"TPDO {num} mapping parameters", map_index
         )
         od.add_object(map_rec)
         od.add_object(com_rec)
 
-        for j in config.publish[i].fields:
-            subindex = config.publish[i].fields.index(j) + 1
+        for j in config.tpdos[i].fields:
+            subindex = config.tpdos[i].fields.index(j) + 1
             var = canopen.objectdictionary.Variable(
                 f"Mapping object {subindex}", map_index, subindex
             )
             var.access_type = "const"
             var.storage_location = "RAM"
             var.data_type = canopen.objectdictionary.UNSIGNED32
-            mapped_subindex = od[mapped_index][j].subindex
+            try:
+                mapped_obj = od[Index.CARD_DATA.value][j]
+            except KeyError:
+                pass
+            try:
+                mapped_obj = od[Index.CORE_DATA.value][j]
+            except KeyError:
+                pass
+            mapped_subindex = mapped_obj.subindex
             value = mapped_index << 16
             value += mapped_subindex << 8
+            value += OD_DATA_TYPE_SIZE[mapped_obj.data_type]
             var.default = value
             map_rec.add_member(var)
 
@@ -153,10 +193,10 @@ def add_publish_data(od: canopen.ObjectDictionary, config: OdConfig, core=True):
         var.access_type = "const"
         var.storage_location = "RAM"
         var.data_type = canopen.objectdictionary.UNSIGNED8
-        if config.publish[i].sync != 0:
-            var.default = config.publish[i].sync
+        if config.tpdos[i].sync != 0:
+            var.default = config.tpdos[i].sync
         else:
-            var.default = 254
+            var.default = 255  # event driven (delay-based or app specific)
         com_rec.add_member(var)
 
         var = canopen.objectdictionary.Variable("Inhibit time", com_index, 0x3)
@@ -177,7 +217,7 @@ def add_publish_data(od: canopen.ObjectDictionary, config: OdConfig, core=True):
         var.access_type = "const"
         var.storage_location = "RAM"
         var.data_type = canopen.objectdictionary.UNSIGNED16
-        var.default = config.publish[i].delay_ms
+        var.default = config.tpdos[i].delay_ms
         com_rec.add_member(var)
 
         var = canopen.objectdictionary.Variable("SYNC start value", com_index, 0x6)
@@ -196,22 +236,19 @@ def add_publish_data(od: canopen.ObjectDictionary, config: OdConfig, core=True):
         com_rec.add_member(var)
 
 
-def add_all_subscribe_data(
+def add_all_rpdo_data(
     master_node_od: canopen.ObjectDictionary, node_od: canopen.ObjectDictionary
 ):
-    if (
-        0x1800 not in node_od
-        and 0x1801 not in node_od
-        and 0x1802 not in node_od
-        and 0x1803 not in node_od
-    ):
-        return
+    """Add all RPDO object to OD based off of TPDO objects from another OD."""
+
+    if not node_od.device_information.nr_of_TXPDO:
+        return  # no TPDOs
 
     node_name = node_od.device_information.product_name
 
     node_rec_index = 0x7000 + node_od.node_id
     if node_rec_index not in master_node_od:
-        node_rec = canopen.objectdictionary.Record(f"{node_name}", node_rec_index)
+        node_rec = canopen.objectdictionary.Record(f"{node_name} data", node_rec_index)
         master_node_od.add_object(node_rec)
 
         # index 0 for node data index
@@ -222,13 +259,18 @@ def add_all_subscribe_data(
         var.default = 0
         node_rec.add_member(var)
 
-    for i in range(4):
+    for i in range(16):
         if i + 0x1800 not in node_od:
             continue
 
-        com_index = 0x1400 + (i * 0x80) + node_od.node_id
+        if not master_node_od.device_information.nr_of_RXPDO:
+            master_node_od.device_information.nr_of_RXPDO = 0
+        master_node_od.device_information.nr_of_RXPDO += 1
+        rpdo_num = master_node_od.device_information.nr_of_RXPDO
+
+        com_index = 0x1400 + rpdo_num - 1
         com_rec = canopen.objectdictionary.Record(
-            f"Subscribe {node_name} data communication parameters", com_index
+            f"RPDO {rpdo_num} communication parameters", com_index
         )
         master_node_od.add_object(com_rec)
 
@@ -282,9 +324,9 @@ def add_all_subscribe_data(
         var.default = len(com_rec)
         com_rec.add_member(var)
 
-        map_index = 0x1600 + (i * 0x80) + node_od.node_id
+        map_index = 0x1600 + rpdo_num - 1
         map_rec = canopen.objectdictionary.Record(
-            f"Subscribe {node_name} data mapping parameters", map_index
+            f"RPDO {rpdo_num} mapping parameters", map_index
         )
         master_node_od.add_object(map_rec)
 
@@ -313,8 +355,8 @@ def add_all_subscribe_data(
             )
             var.access_type = "const"
             var.storage_location = "RAM"
-            var.data_type = node_obj.data_type
-            var.default = node_obj.default
+            var.data_type = mapped_obj.data_type
+            var.default = mapped_obj.default
             node_rec.add_member(var)
 
             # master node mapping obj
@@ -325,8 +367,9 @@ def add_all_subscribe_data(
             var.access_type = "const"
             var.storage_location = "RAM"
             var.data_type = canopen.objectdictionary.UNSIGNED32
-            value = node_map_index << 16
+            value = node_rec_index << 16
             value += node_rec_subindex << 8
+            value += OD_DATA_TYPE_SIZE[master_node_od[node_rec_index][node_rec_subindex].data_type]
             var.default = value
             map_rec.add_member(var)
 
@@ -335,26 +378,31 @@ def add_all_subscribe_data(
             map_rec[0].default += 1
 
 
-def read_json_od_config(file_path):
+def read_json_od_config(file_path: str) -> OdConfig:
+    """read the od JSON in."""
+
     with open(file_path, "r") as f:
         config = f.read()
 
     return OdConfig.from_json(config)
 
 
-def make_od(config, node_id, core_config=None):
+def make_od(config: OdConfig, node_id: NodeId, core_config=None, add_core_tpdos=True) -> canopen.ObjectDictionary:
+    """Make the OD"""
+
     od = canopen.ObjectDictionary()
     od.bitrate = 1_000_000
     od.node_id = node_id.value
     od.device_information.product_name = node_id.name.lower()
 
     if core_config:
-        core_rec = make_rec(core_config.objects, Index.CORE_DATA, "core")
+        core_rec = make_rec(core_config.objects, Index.CORE_DATA, "core data")
         od.add_object(core_rec)
-        add_publish_data(od, core_config)
+        if add_core_tpdos:
+            add_tpdo_data(od, core_config)
 
-    card_rec = make_rec(config.objects, Index.CARD_DATA, node_id.name.lower())
+    card_rec = make_rec(config.objects, Index.CARD_DATA, "card data")
     od.add_object(card_rec)
-    add_publish_data(od, config, False)
+    add_tpdo_data(od, config, False)
 
     return od

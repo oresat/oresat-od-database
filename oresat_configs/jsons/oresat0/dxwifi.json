@@ -13,8 +13,8 @@
       "access_type": "ro"
     }
   ],
-  "publish": {
-    "0x1": {
+  "tpdos": {
+    "3": {
       "fields": [
         "transmitting"
       ],

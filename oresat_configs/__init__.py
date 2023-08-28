@@ -4,7 +4,7 @@ from enum import IntEnum
 
 
 class OreSatId(IntEnum):
-    """Unique ID for each OreSat"""
+    """Unique ID for each OreSat."""
 
     ORESAT0 = 1
     ORESAT0_5 = 2
@@ -38,7 +38,7 @@ class NodeId(IntEnum):
 
 
 class OpdNodeId(IntEnum):
-    """I2C addresses for all cards on the OPD"""
+    """I2C addresses for all cards on the OPD."""
 
     BATTERY_1 = 0x18
     GPS = 0x19
@@ -55,12 +55,10 @@ class OpdNodeId(IntEnum):
 
 
 class Index(IntEnum):
-    """OD posible indexes"""
+    """OD posible indexes."""
 
     CORE_DATA = 0x3000
-    CARD_CONFIGS = 0x6000
-    CARD_DATA = 0x6001
-    CARD_TEST_DATA = 0x8002
+    CARD_DATA = 0x6000
     _OTHER_CARD_BASE_INDEX = 0x7000
     C3_DATA = _OTHER_CARD_BASE_INDEX + NodeId.C3
     BATTERY_1_DATA = _OTHER_CARD_BASE_INDEX + NodeId.BATTERY_1

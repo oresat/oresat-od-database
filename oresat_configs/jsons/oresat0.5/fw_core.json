@@ -1,0 +1,10 @@
+{
+  "objects": [
+    {
+      "name": "processor_temperature",
+      "data_type": "int8",
+      "description": "the temperature of the processor in celsius",
+      "access_type": "ro"
+    }
+  ]
+}

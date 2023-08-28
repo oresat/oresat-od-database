@@ -135,25 +135,46 @@
     {
       "name": "time_since_midnight",
       "data_type": "uint32",
-      "description": "the number of seconds since midnight",
+      "description": "the number of milliseconds since midnight",
       "access_type": "ro"
     }
   ],
-  "publish": {
-    "0x1": {
+  "tpdos": {
+    "3": {
       "fields": [
         "status",
         "num_of_sv",
-        "time_syncd",
+        "time_syncd"
+      ]
+    },
+    "4": {
+      "fields": [
         "ecef_x",
-        "ecef_y",
+        "ecef_y"
+      ]
+    },
+    "5": {
+      "fields": [
         "ecef_z",
-        "ecef_vx",
+        "ecef_vx"
+      ]
+    },
+    "6": {
+      "fields": [
         "ecef_vy",
-        "ecef_vz",
+        "ecef_vz"
+      ]
+    },
+    "7": {
+      "fields": [
         "time_since_midnight"
+      ]
+    },
+    "16": {
+      "fields": [
+        "scet"
       ],
-      "sync": 10
+      "sync": 1
     }
   }
 }

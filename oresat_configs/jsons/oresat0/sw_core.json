@@ -7,6 +7,12 @@
       "access_type": "const"
     },
     {
+      "name": "scet",
+      "data_type": "uint64",
+      "description": "scet timestamp of card",
+      "access_type": "rw"
+    },
+    {
       "name": "fread_cache_len",
       "data_type": "uint16",
       "description": "number of files in fread cache",
@@ -16,15 +22,16 @@
       "name": "fread_cache_files_json",
       "data_type": "str",
       "description": "all file names of files in fread cache as a JSON",
-      "access_type": "ro"
+      "access_type": "ro",
+      "default": "{}"
     },
     {
-      "name": "fread_cache_list_json",
+      "name": "fread_cache_file_name",
       "data_type": "str",
       "description": "file name to read"
     },
     {
-      "name": "fread_cache_data",
+      "name": "fread_cache_file_data",
       "data_type": "domain",
       "description": "file data to read",
       "access_type": "ro"
@@ -45,7 +52,8 @@
       "name": "fwrite_cache_list_json",
       "data_type": "str",
       "description": "all file names of files in fwrite cache as a JSON",
-      "access_type": "ro"
+      "access_type": "ro",
+      "default": "{}"
     },
     {
       "name": "fwrite_cache_file_name",
@@ -130,17 +138,27 @@
       "access_type": "ro"
     }
   ],
-  "publish": {
-    "0x0": {
-      "name": "core_status",
+  "tpdos": {
+    "1": {
       "fields": [
         "storage_percent",
         "fread_cache_len",
-        "fwrite_cache_len",
+        "fwrite_cache_len"
+      ],
+      "delay_ms": 30000
+    },
+    "2": {
+      "fields": [
         "updater_status",
         "update_cache_len"
       ],
-      "delay_ms": 30000
+      "delay_ms": 5000
+    }
+  },
+  "rpdos": {
+    "1": {
+      "card": "c3",
+      "tpdo_num": 1
     }
   }
 }

@@ -43,7 +43,7 @@
       "access_type": "ro"
     },
     {
-      "name": "stoarge_percent",
+      "name": "storage_percent",
       "data_type": "uint8",
       "description": "the storage usage percent",
       "access_type": "ro"
@@ -103,5 +103,11 @@
       "access_type": "ro"
     }
   ],
-  "sync_ms": 1000
+  "tpdos": {
+    "1": {
+      "fields": [
+        "scet"
+      ]
+    }
+  }
 }
