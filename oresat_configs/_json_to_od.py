@@ -4,7 +4,7 @@ from typing import List, Dict, Any
 import canopen
 from dataclasses_json import dataclass_json, LetterCase
 
-from . import Index, NodeId
+from . import __version__, Index, NodeId
 
 OD_DATA_TYPES = {
     "bool": canopen.objectdictionary.BOOLEAN,
@@ -126,7 +126,9 @@ def make_rec(objects: list, index: int, name: str) -> canopen.objectdictionary.R
         var.access_type = obj.access_type
         var.storage_location = "RAM"
         var.data_type = OD_DATA_TYPES[obj.data_type]
-        if obj.default is None:
+        if obj.name == "config_version":
+            var.default = __version__
+        elif obj.default is None:
             var.default = OD_DEFAULTS[obj.data_type]
         else:
             var.default = obj.default

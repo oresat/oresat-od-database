@@ -21,19 +21,19 @@
     {
       "name": "num_of_sv",
       "data_type": "uint8",
-      "description": "number of gps satellites lock onto. max 12",
+      "description": "number of gps satellites locked onto. max 12",
       "access_type": "ro"
     },
     {
       "name": "gps_week",
-      "data_type": "uint8",
-      "description": "the gps week number",
+      "data_type": "uint16",
+      "description": "gps week number",
       "access_type": "ro"
     },
     {
       "name": "tow",
-      "data_type": "uint16",
-      "description": "the time of the week",
+      "data_type": "uint32",
+      "description": "time of the week in 0.01 seconds scaling",
       "access_type": "ro"
     },
     {

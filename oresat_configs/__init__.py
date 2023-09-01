@@ -37,23 +37,6 @@ class NodeId(IntEnum):
     CFC_PROCESSOR = 0x50
 
 
-class OpdNodeId(IntEnum):
-    """I2C addresses for all cards on the OPD."""
-
-    BATTERY_1 = 0x18
-    GPS = 0x19
-    IMU = 0x1A
-    DXWIFI = 0x1B
-    STAR_TRACKER_1 = 0x1C
-    CFC_PROCESSOR = 0x1D
-    CFC_SENSOR = 0x1E
-    BATTERY_2 = 0x1F
-    REACTION_WHEEL_1 = 0x20
-    REACTION_WHEEL_2 = 0x21
-    REACTION_WHEEL_3 = 0x22
-    REACTION_WHEEL_4 = 0x23
-
-
 class Index(IntEnum):
     """OD posible indexes."""
 
