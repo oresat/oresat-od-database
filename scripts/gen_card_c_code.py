@@ -1,6 +1,11 @@
 #!/usr/bin/env python3
 
+import os
+import sys
 from argparse import ArgumentParser
+
+_FILE_PATH = os.path.dirname(os.path.abspath(__file__))
+sys.path.append(f"{_FILE_PATH}/..")
 
 from oresat_configs import oresat0, oresat0_5
 from oresat_configs._write_canopennode import write_canopennode
@@ -18,18 +23,18 @@ OD_LIST = {
 }
 
 
-def main():
+if __name__ == "__main__":
     parser = ArgumentParser("generate CANopenNode OD.[c/h] files")
+    parser.add_argument("oresat", help="oresat mission; oresat0 or oresat0.5")
+    parser.add_argument("card", help="card name; c3, battery, solar, imu, or reaction_wheel")
     parser.add_argument(
-        "-o", "--oresat", default="oresat0", help="oresat mission; oresat0 or oresat0.5"
+        "-d", "--dir_path", default=".", help='output directory path, default: "."'
     )
-    parser.add_argument("-c", "--card", help="card name; battery, solar, or imu")
-    parser.add_argument("-d", "--dir_path", default=".", help="output directory path")
     args = parser.parse_args()
+
+    if (args.oresat.lower(), args.card) not in OD_LIST:
+        print("invalid oresat and/or card")
+        sys.exit()
 
     od = OD_LIST[(args.oresat.lower(), args.card)]
     write_canopennode(od, args.dir_path)
-
-
-if __name__ == "__main__":
-    main()

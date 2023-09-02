@@ -146,13 +146,8 @@ def make_rec(objects: list, index: int, name: str) -> canopen.objectdictionary.R
     return rec
 
 
-def add_tpdo_data(od: canopen.ObjectDictionary, config: OdConfig, core=True):
+def add_tpdo_data(od: canopen.ObjectDictionary, config: OdConfig):
     """Add tpdo objects to OD."""
-
-    if core:
-        mapped_index = Index.CORE_DATA.value
-    else:
-        mapped_index = Index.CARD_DATA.value
 
     for i in config.tpdos:
         if not od.device_information.nr_of_TXPDO:
@@ -263,7 +258,7 @@ def add_all_rpdo_data(master_node_od: canopen.ObjectDictionary, node_od: canopen
 
     node_name = node_od.device_information.product_name
 
-    node_rec_index = 0x7000 + node_od.node_id
+    node_rec_index = Index._OTHER_CARD_BASE_INDEX + node_od.node_id
     if node_rec_index not in master_node_od:
         node_rec = canopen.objectdictionary.Record(f"{node_name}_data", node_rec_index)
         master_node_od.add_object(node_rec)
@@ -382,12 +377,12 @@ def read_json_od_config(file_path: str) -> OdConfig:
 
 
 def make_od(
-    config: OdConfig, node_id: NodeId, core_config=None, add_core_tpdos=True
+    node_id: NodeId, card_config: OdConfig, core_config: OdConfig, add_core_tpdos=True
 ) -> canopen.ObjectDictionary:
     """Make the OD from a config."""
 
     od = canopen.ObjectDictionary()
-    od.bitrate = 1_000_000
+    od.bitrate = 1_000_000  # bps
     od.node_id = node_id.value
     od.device_information.product_name = node_id.name.lower()
 
@@ -397,8 +392,8 @@ def make_od(
         if add_core_tpdos:
             add_tpdo_data(od, core_config)
 
-    card_rec = make_rec(config.objects, Index.CARD_DATA, "card_data")
+    card_rec = make_rec(card_config.objects, Index.CARD_DATA, "card_data")
     od.add_object(card_rec)
-    add_tpdo_data(od, config, False)
+    add_tpdo_data(od, card_config)
 
     return od
