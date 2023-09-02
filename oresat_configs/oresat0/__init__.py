@@ -1,8 +1,8 @@
 import os
 import json
 
-from . import NodeId
-from ._json_to_od import read_json_od_config, make_od, add_all_rpdo_data
+from .. import NodeId
+from .._json_to_od import read_json_od_config, make_od, add_all_rpdo_data
 
 _file_path = os.path.dirname(os.path.abspath(__file__))
 _oresat0_json_dir = f"{_file_path}/jsons"
