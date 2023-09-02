@@ -40,7 +40,7 @@ line_length = 99
 format = "pylint"
 skip = "*/.tox/*,*/.env/*"
 linters = "pycodestyle,pyflakes,mccabe,mypy"
-ignore = "E402,C901"
+ignore = "E402,C901,C0403"
 max_line_length = 100
 
 [tool.pylama.linter.mypy]

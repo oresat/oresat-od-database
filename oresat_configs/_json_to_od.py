@@ -122,16 +122,17 @@ class OdConfig:
     """RPDO configs."""
 
 
-def make_rec(objects: list, index: int, name: str) -> canopen.objectdictionary.Record:
-    """Make a Record for the OD."""
+def _add_rec(
+    od: canopen.ObjectDictionary, objects: list, index: Index
+) -> canopen.objectdictionary.Record:
+    """Add a Record tothe OD based off the config objects."""
 
-    rec = canopen.objectdictionary.Record(name, index)
+    rec = canopen.objectdictionary.Record(index.name.lower(), index.value)
 
     for obj in objects:
         subindex = objects.index(obj) + 1
         var = canopen.objectdictionary.Variable(obj.name, index, subindex)
         var.access_type = obj.access_type
-        var.storage_location = "RAM"
         var.data_type = OD_DATA_TYPES[obj.data_type]
         if obj.name == "config_version":
             var.default = __version__
@@ -145,23 +146,22 @@ def make_rec(objects: list, index: int, name: str) -> canopen.objectdictionary.R
     # index 0
     var = canopen.objectdictionary.Variable("Highest index supported", index, 0x0)
     var.access_type = "const"
-    var.storage_location = "RAM"
     var.data_type = canopen.objectdictionary.UNSIGNED8
     var.default = len(rec)
     rec.add_member(var)
 
-    return rec
+    od.add_object(rec)
 
 
-def add_tpdo_data(od: canopen.ObjectDictionary, config: OdConfig):
+def _add_tpdo_data(od: canopen.ObjectDictionary, config: OdConfig):
     """Add tpdo objects to OD."""
 
     for i in config.tpdos:
         od.device_information.nr_of_TXPDO += 1
 
         num = int(i)
-        com_index = 0x1800 + num - 1
-        map_index = 0x1A00 + num - 1
+        com_index = TPDO_COMM_START + num - 1
+        map_index = TPDO_PARA_START + num - 1
         com_rec = canopen.objectdictionary.Record(
             f"TPDO {num} communication parameters", com_index
         )
@@ -175,7 +175,6 @@ def add_tpdo_data(od: canopen.ObjectDictionary, config: OdConfig):
                 f"Mapping object {subindex}", map_index, subindex
             )
             var.access_type = "const"
-            var.storage_location = "RAM"
             var.data_type = canopen.objectdictionary.UNSIGNED32
             try:
                 mapped_obj = od[Index.CARD_DATA.value][j]
@@ -191,14 +190,12 @@ def add_tpdo_data(od: canopen.ObjectDictionary, config: OdConfig):
         # index 0 for mapping index
         var = canopen.objectdictionary.Variable("Highest index supported", map_index, 0x0)
         var.access_type = "const"
-        var.storage_location = "RAM"
         var.data_type = canopen.objectdictionary.UNSIGNED8
         var.default = len(map_rec)
         map_rec.add_member(var)
 
         var = canopen.objectdictionary.Variable("COB-ID", com_index, 0x1)
         var.access_type = "const"
-        var.storage_location = "RAM"
         var.data_type = canopen.objectdictionary.UNSIGNED32
         node_id = od.node_id
         if od.node_id == NodeId.GPS and num == 16:
@@ -210,7 +207,6 @@ def add_tpdo_data(od: canopen.ObjectDictionary, config: OdConfig):
 
         var = canopen.objectdictionary.Variable("Transmission type", com_index, 0x2)
         var.access_type = "const"
-        var.storage_location = "RAM"
         var.data_type = canopen.objectdictionary.UNSIGNED8
         if config.tpdos[i].sync != 0:
             var.default = config.tpdos[i].sync
@@ -220,28 +216,24 @@ def add_tpdo_data(od: canopen.ObjectDictionary, config: OdConfig):
 
         var = canopen.objectdictionary.Variable("Inhibit time", com_index, 0x3)
         var.access_type = "const"
-        var.storage_location = "RAM"
         var.data_type = canopen.objectdictionary.UNSIGNED16
         var.default = 0
         com_rec.add_member(var)
 
         var = canopen.objectdictionary.Variable("Compatibility entry", com_index, 0x4)
         var.access_type = "const"
-        var.storage_location = "RAM"
         var.data_type = canopen.objectdictionary.UNSIGNED8
         var.default = 0
         com_rec.add_member(var)
 
         var = canopen.objectdictionary.Variable("Event timer", com_index, 0x5)
         var.access_type = "const"
-        var.storage_location = "RAM"
         var.data_type = canopen.objectdictionary.UNSIGNED16
         var.default = config.tpdos[i].delay_ms
         com_rec.add_member(var)
 
         var = canopen.objectdictionary.Variable("SYNC start value", com_index, 0x6)
         var.access_type = "const"
-        var.storage_location = "RAM"
         var.data_type = canopen.objectdictionary.UNSIGNED8
         var.default = 0
         com_rec.add_member(var)
@@ -249,7 +241,6 @@ def add_tpdo_data(od: canopen.ObjectDictionary, config: OdConfig):
         # index 0 for comms index
         var = canopen.objectdictionary.Variable("Highest index supported", com_index, 0x0)
         var.access_type = "const"
-        var.storage_location = "RAM"
         var.data_type = canopen.objectdictionary.UNSIGNED8
         var.default = len(com_rec)
         com_rec.add_member(var)
@@ -271,19 +262,18 @@ def add_all_rpdo_data(master_node_od: canopen.ObjectDictionary, node_od: canopen
         # index 0 for node data index
         var = canopen.objectdictionary.Variable("Highest index supported", node_rec_index, 0x0)
         var.access_type = "const"
-        var.storage_location = "RAM"
         var.data_type = canopen.objectdictionary.UNSIGNED8
         var.default = 0
         node_rec.add_member(var)
 
     for i in range(16):
-        if i + 0x1800 not in node_od:
+        if i + TPDO_COMM_START not in node_od:
             continue
 
         master_node_od.device_information.nr_of_RXPDO += 1
         rpdo_num = master_node_od.device_information.nr_of_RXPDO
 
-        com_index = 0x1400 + rpdo_num - 1
+        com_index = RPDO_COMM_START + rpdo_num - 1
         com_rec = canopen.objectdictionary.Record(
             f"RPDO {rpdo_num} communication parameters", com_index
         )
@@ -291,21 +281,18 @@ def add_all_rpdo_data(master_node_od: canopen.ObjectDictionary, node_od: canopen
 
         var = canopen.objectdictionary.Variable("COB-ID", com_index, 0x1)
         var.access_type = "const"
-        var.storage_location = "RAM"
         var.data_type = canopen.objectdictionary.UNSIGNED32
         var.default = node_od[i + 0x1800][0x1].default  # get value from TPDO def
         com_rec.add_member(var)
 
         var = canopen.objectdictionary.Variable("Transmission type", com_index, 0x2)
         var.access_type = "const"
-        var.storage_location = "RAM"
         var.data_type = canopen.objectdictionary.UNSIGNED8
         var.default = 255
         com_rec.add_member(var)
 
         var = canopen.objectdictionary.Variable("Event timer", com_index, 0x5)
         var.access_type = "const"
-        var.storage_location = "RAM"
         var.data_type = canopen.objectdictionary.UNSIGNED16
         var.default = 0
         com_rec.add_member(var)
@@ -313,24 +300,22 @@ def add_all_rpdo_data(master_node_od: canopen.ObjectDictionary, node_od: canopen
         # index 0 for comms index
         var = canopen.objectdictionary.Variable("Highest index supported", com_index, 0x0)
         var.access_type = "const"
-        var.storage_location = "RAM"
         var.data_type = canopen.objectdictionary.UNSIGNED8
         var.default = sorted([k for k in com_rec.subindices.keys()])[-1]  # no subindex 0x3 and 0x4
         com_rec.add_member(var)
 
-        map_index = 0x1600 + rpdo_num - 1
+        map_index = RPDO_PARA_START + rpdo_num - 1
         map_rec = canopen.objectdictionary.Record(f"RPDO {rpdo_num} mapping parameters", map_index)
         master_node_od.add_object(map_rec)
 
         # index 0 for map index
         var = canopen.objectdictionary.Variable("Highest index supported", map_index, 0x0)
         var.access_type = "const"
-        var.storage_location = "RAM"
         var.data_type = canopen.objectdictionary.UNSIGNED8
         var.default = 0
         map_rec.add_member(var)
 
-        node_map_index = 0x1A00 + i
+        node_map_index = TPDO_PARA_START + i
         for j in range(len(node_od[node_map_index])):
             if j == 0:
                 continue  # skip
@@ -346,7 +331,6 @@ def add_all_rpdo_data(master_node_od: canopen.ObjectDictionary, node_od: canopen
                 mapped_obj.name, node_rec_index, node_rec_subindex
             )
             var.access_type = "const"
-            var.storage_location = "RAM"
             var.data_type = mapped_obj.data_type
             var.default = mapped_obj.default
             node_rec.add_member(var)
@@ -357,7 +341,6 @@ def add_all_rpdo_data(master_node_od: canopen.ObjectDictionary, node_od: canopen
                 f"Mapping object {map_rec_subindex}", map_index, map_rec_subindex
             )
             var.access_type = "const"
-            var.storage_location = "RAM"
             var.data_type = canopen.objectdictionary.UNSIGNED32
             value = node_rec_index << 16
             value += node_rec_subindex << 8
@@ -380,7 +363,7 @@ def read_json_od_config(file_path: str) -> OdConfig:
 
 
 def make_od(
-    node_id: NodeId, card_config: OdConfig, core_config: OdConfig, add_core_tpdos=True
+    node_id: NodeId, card_config: OdConfig, core_config: OdConfig, add_core_tpdos: bool = True
 ) -> canopen.ObjectDictionary:
     """Make the OD from a config."""
 
@@ -403,14 +386,11 @@ def make_od(
     od.device_information.nr_of_TXPDO = 0
     od.device_information.LSS_supported = False
 
-    if core_config:
-        core_rec = make_rec(core_config.objects, Index.CORE_DATA, "core_data")
-        od.add_object(core_rec)
-        if add_core_tpdos:
-            add_tpdo_data(od, core_config)
+    _add_rec(od, core_config.objects, Index.CORE_DATA)
+    if add_core_tpdos:
+        _add_tpdo_data(od, core_config)
 
-    card_rec = make_rec(card_config.objects, Index.CARD_DATA, "card_data")
-    od.add_object(card_rec)
-    add_tpdo_data(od, card_config)
+    _add_rec(od, card_config.objects, Index.CARD_DATA)
+    _add_tpdo_data(od, card_config)
 
     return od
