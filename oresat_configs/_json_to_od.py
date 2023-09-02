@@ -1,3 +1,5 @@
+"""Convert OreSat JSON files to an canopen.ObjectDictionary object."""
+
 from dataclasses import dataclass, field
 from typing import List, Dict, Any
 
@@ -5,6 +7,11 @@ import canopen
 from dataclasses_json import dataclass_json, LetterCase
 
 from . import __version__, Index, NodeId
+
+RPDO_COMM_START = 0x1400
+RPDO_PARA_START = 0x1600
+TPDO_COMM_START = 0x1800
+TPDO_PARA_START = 0x1A00
 
 OD_DATA_TYPES = {
     "bool": canopen.objectdictionary.BOOLEAN,
@@ -150,8 +157,6 @@ def add_tpdo_data(od: canopen.ObjectDictionary, config: OdConfig):
     """Add tpdo objects to OD."""
 
     for i in config.tpdos:
-        if not od.device_information.nr_of_TXPDO:
-            od.device_information.nr_of_TXPDO = 0
         od.device_information.nr_of_TXPDO += 1
 
         num = int(i)
@@ -275,8 +280,6 @@ def add_all_rpdo_data(master_node_od: canopen.ObjectDictionary, node_od: canopen
         if i + 0x1800 not in node_od:
             continue
 
-        if not master_node_od.device_information.nr_of_RXPDO:
-            master_node_od.device_information.nr_of_RXPDO = 0
         master_node_od.device_information.nr_of_RXPDO += 1
         rpdo_num = master_node_od.device_information.nr_of_RXPDO
 
@@ -384,7 +387,21 @@ def make_od(
     od = canopen.ObjectDictionary()
     od.bitrate = 1_000_000  # bps
     od.node_id = node_id.value
+    od.device_information.allowed_baudrates = set([1000])
+    od.device_information.vendor_name = "PSAS"
+    od.device_information.vendor_number = 0
     od.device_information.product_name = node_id.name.lower()
+    od.device_information.product_number = 0
+    od.device_information.revision_number = 0
+    od.device_information.order_code = 0
+    od.device_information.simple_boot_up_master = False
+    od.device_information.simple_boot_up_slave = False
+    od.device_information.granularity = 8
+    od.device_information.dynamic_channels_supported = False
+    od.device_information.group_messaging = False
+    od.device_information.nr_of_RXPDO = 0
+    od.device_information.nr_of_TXPDO = 0
+    od.device_information.LSS_supported = False
 
     if core_config:
         core_rec = make_rec(core_config.objects, Index.CORE_DATA, "core_data")

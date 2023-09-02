@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+"""Generate a OreSat card's CANopenNode OD.[c/h] files"""
 
 import os
 import sys

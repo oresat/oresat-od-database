@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+"""Print out a card's objects directory."""
 
 import os
 import sys
