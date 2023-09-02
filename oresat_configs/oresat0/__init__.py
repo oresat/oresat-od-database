@@ -5,7 +5,7 @@ from . import NodeId
 from ._json_to_od import read_json_od_config, make_od, add_all_rpdo_data
 
 _file_path = os.path.dirname(os.path.abspath(__file__))
-_oresat0_json_dir = f"{_file_path}/jsons/oresat0"
+_oresat0_json_dir = f"{_file_path}/jsons"
 
 _fw_core_config = read_json_od_config(f"{_oresat0_json_dir}/fw_core.json")
 _sw_core_config = read_json_od_config(f"{_oresat0_json_dir}/sw_core.json")
