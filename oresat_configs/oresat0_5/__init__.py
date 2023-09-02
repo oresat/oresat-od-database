@@ -3,7 +3,7 @@
 import os
 import json
 
-from .. import NodeId
+from .. import NodeId, OreSatId
 from .._json_to_od import read_json_od_config, make_od, add_all_rpdo_data
 
 _FILE_PATH = os.path.dirname(os.path.abspath(__file__))
@@ -64,6 +64,8 @@ with open(f"{_JSON_DIR}/beacon.json", "r") as f:
 # C3 defaults
 C3_OD["card_data"]["beacon_revision"].default = BEACON_DEF["revision"]
 C3_OD["card_data"]["beacon_revision"].value = BEACON_DEF["revision"]
+C3_OD["card_data"]["satellite_id"].default = OreSatId.ORESAT0_5.value
+C3_OD["card_data"]["satellite_id"].value = OreSatId.ORESAT0_5.value
 
 
 ALL_ODS = {

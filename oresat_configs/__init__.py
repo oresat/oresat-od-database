@@ -12,7 +12,7 @@ class OreSatId(IntEnum):
 
 
 class NodeId(IntEnum):
-    """All the CANopen Node ID for OreSat boards."""
+    """All the CANopen Node ID for OreSat cards."""
 
     C3 = 0x01
     BATTERY_1 = 0x04
