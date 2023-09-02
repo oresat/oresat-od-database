@@ -1,9 +1,10 @@
 {
-  "revision": "0",
+  "revision": 0,
   "fields": [
     ["c3", "satellite_id"],
     ["c3", "beacon_revision"],
     ["c3", "status"],
+    ["c3", "mode"],
     ["c3", "uptime"],
     ["c3", "unix_time"],
     ["c3", "power_cycles"],
@@ -14,7 +15,6 @@
     ["c3", "uhf_rx_bytes"],
     ["c3", "uhf_rx_packets"],
     ["c3", "uhf_rssi"],
-    ["c3", "bank_status"],
     ["c3", "edl_sequence_count"],
     ["c3", "edl_rejected_count"],
     ["battery_1", "pack_1_vbatt"],

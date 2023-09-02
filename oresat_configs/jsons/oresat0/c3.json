@@ -4,7 +4,8 @@
       "name": "satellite_id",
       "data_type": "uint8",
       "description": "the unique oresat satellite id",
-      "access_type": "const"
+      "access_type": "const",
+      "default": 1
     },
     {
       "name": "beacon_revision",
@@ -94,6 +95,18 @@
       "name": "edl_rejected_count",
       "data_type": "uint32",
       "description": "edl sequence count",
+      "access_type": "ro"
+    },
+    {
+      "name": "scet",
+      "data_type": "uint64",
+      "description": "scet timestamp of card",
+      "access_type": "rw"
+    },
+    {
+      "name": "storage_percent",
+      "data_type": "uint8",
+      "description": "the current storage percent used",
       "access_type": "ro"
     }
   ],

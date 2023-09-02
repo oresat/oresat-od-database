@@ -4,7 +4,8 @@
       "name": "satellite_id",
       "data_type": "uint8",
       "description": "the unique oresat satellite id",
-      "access_type": "const"
+      "access_type": "const",
+      "default": 2
     },
     {
       "name": "beacon_revision",
@@ -16,6 +17,12 @@
       "name": "status",
       "data_type": "uint8",
       "description": "the c3 state",
+      "access_type": "ro"
+    },
+    {
+      "name": "mode",
+      "data_type": "uint8",
+      "description": "the oresat system mode",
       "access_type": "ro"
     },
     {
@@ -76,12 +83,6 @@
       "name": "uhf_rssi",
       "data_type": "int8",
       "description": "uhf rssi",
-      "access_type": "ro"
-    },
-    {
-      "name": "bank_status",
-      "data_type": "uint8",
-      "description": "bit 0: current back\nbit 1: next bank",
       "access_type": "ro"
     },
     {

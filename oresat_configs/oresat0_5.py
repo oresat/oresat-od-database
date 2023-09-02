@@ -58,3 +58,28 @@ add_all_rpdo_data(C3_OD, DXWIFI_OD)
 
 with open(f"{_oresat0_5_json_dir}/beacon.json", "r") as f:
     BEACON_DEF = json.load(f)
+
+# C3 defaults
+C3_OD["card_data"]["beacon_revision"].default = BEACON_DEF["revision"]
+C3_OD["card_data"]["beacon_revision"].value = BEACON_DEF["revision"]
+
+
+ALL_ODS = {
+    "c3": C3_OD,
+    "battery_1": BATTERY_1_OD,
+    "solar_module_1": SOLAR_MODULE_1_OD,
+    "solar_module_2": SOLAR_MODULE_2_OD,
+    "solar_module_3": SOLAR_MODULE_3_OD,
+    "solar_module_4": SOLAR_MODULE_4_OD,
+    "solar_module_5": SOLAR_MODULE_5_OD,
+    "solar_module_6": SOLAR_MODULE_6_OD,
+    "gps": GPS_OD,
+    "star_tracker": STAR_TRACKER_1_OD,
+    "cfc": CFC_OD,
+    "dxwifi": DXWIFI_OD,
+    "reaction_wheel_1": REACTION_WHEEL_1_OD,
+    "reaction_wheel_2": REACTION_WHEEL_2_OD,
+    "reaction_wheel_3": REACTION_WHEEL_3_OD,
+    "reaction_wheel_4": REACTION_WHEEL_4_OD,
+    "imu": IMU_OD,
+}

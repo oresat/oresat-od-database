@@ -7,12 +7,14 @@ from oresat_configs._write_canopennode import write_canopennode
 
 
 OD_LIST = {
+    ("oresat0", "c3"): oresat0.C3_OD,
     ("oresat0", "battery"): oresat0.BATTERY_1_OD,
     ("oresat0", "solar"): oresat0.SOLAR_MODULE_1_OD,
     ("oresat0", "imu"): oresat0.IMU_OD,
     ("oresat0.5", "battery"): oresat0_5.BATTERY_1_OD,
     ("oresat0.5", "solar"): oresat0_5.SOLAR_MODULE_1_OD,
     ("oresat0.5", "imu"): oresat0_5.IMU_OD,
+    ("oresat0.5", "reaction_wheel"): oresat0_5.REACTION_WHEEL_1_OD,
 }
 
 

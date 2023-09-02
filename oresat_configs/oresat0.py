@@ -18,7 +18,7 @@ _st_config = read_json_od_config(f"{_oresat0_json_dir}/star_tracker.json")
 _dxwifi_config = read_json_od_config(f"{_oresat0_json_dir}/dxwifi.json")
 
 # make ODs for all nodes
-C3_OD = make_od(_c3_config, NodeId.C3, _sw_core_config, False)
+C3_OD = make_od(_c3_config, NodeId.C3, _fw_core_config, False)
 BATTERY_1_OD = make_od(_battery_config, NodeId.BATTERY_1, _fw_core_config)
 SOLAR_MODULE_1_OD = make_od(_solar_config, NodeId.SOLAR_MODULE_1, _fw_core_config)
 SOLAR_MODULE_2_OD = make_od(_solar_config, NodeId.SOLAR_MODULE_2, _fw_core_config)
@@ -42,3 +42,20 @@ add_all_rpdo_data(C3_OD, DXWIFI_OD)
 
 with open(f"{_oresat0_json_dir}/beacon.json", "r") as f:
     BEACON_DEF = json.load(f)
+
+# C3 defaults
+C3_OD["card_data"]["beacon_revision"].default = BEACON_DEF["revision"]
+C3_OD["card_data"]["beacon_revision"].value = BEACON_DEF["revision"]
+
+ALL_ODS = {
+    "c3": C3_OD,
+    "battery_1": BATTERY_1_OD,
+    "solar_module_1": SOLAR_MODULE_1_OD,
+    "solar_module_2": SOLAR_MODULE_2_OD,
+    "solar_module_3": SOLAR_MODULE_3_OD,
+    "solar_module_4": SOLAR_MODULE_4_OD,
+    "gps": GPS_OD,
+    "star_tracker": STAR_TRACKER_1_OD,
+    "dxwifi": DXWIFI_OD,
+    "imu": IMU_OD,
+}
