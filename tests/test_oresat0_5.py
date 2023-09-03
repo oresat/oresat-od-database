@@ -1,26 +1,19 @@
-"""Unitt tests for OreSat0.5 configs."""
+"""Unit tests for OreSat0.5 configs."""
 
-import unittest
+from oresat_configs.oresat0_5 import ALL_ODS, BEACON_DEF
 
-from oresat_configs import Index
-from oresat_configs.oresat0 import C3_OD, BEACON_DEF
+from . import TestConfig
 
 
-class TestBeacon(unittest.TestCase):
-    """Test the beacon definition."""
+class TestOreSat0_5(TestConfig):
+    """Test the OreSat0.5 configs."""
+
+    def test_tpdo_sizes(self):
+        """Validate OreSat0.5 TPDO sizes."""
+
+        self._test_tpdo_sizes(ALL_ODS)
 
     def test_beacon(self):
-        """Test all objects reference in the beacon definition exist."""
+        """Test all OreSat0.5 objects reference in the beacon definition exist."""
 
-        for i in BEACON_DEF["fields"]:
-            index = Index[f"{i[0].upper()}_DATA"].value
-            subindex = i[1]
-            if i[0] == "c3":
-                try:
-                    index = Index.CARD_DATA
-                    obj = C3_OD[index][subindex]
-                except KeyError:
-                    index = Index.CORE_DATA
-                    obj = C3_OD[index][subindex]
-
-                self.assertIsNotNone(obj)
+        self._test_beacon(ALL_ODS, BEACON_DEF)
