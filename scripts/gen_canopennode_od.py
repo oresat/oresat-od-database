@@ -139,7 +139,7 @@ def attr_lines(od: canopen.ObjectDictionary, index: int) -> list:
         elif obj.data_type == canopen.objectdictionary.datatypes.VISIBLE_STRING:
             line += "{"
             for i in obj.default:
-                line += f"\"{i}\", "
+                line += f'"{i}", '
             line += "0}, "
         elif obj.data_type == canopen.objectdictionary.datatypes.OCTET_STRING:
             line += "{"
@@ -175,7 +175,7 @@ def attr_lines(od: canopen.ObjectDictionary, index: int) -> list:
             if obj[i].data_type == canopen.objectdictionary.datatypes.VISIBLE_STRING:
                 line += "{"
                 for i in obj[i].default:
-                    line += f"\"{i}\", "
+                    line += f'"{i}", '
                 line += "0}, "
             elif obj[i].data_type == canopen.objectdictionary.datatypes.OCTET_STRING:
                 line += "{"
@@ -215,7 +215,7 @@ def attr_lines(od: canopen.ObjectDictionary, index: int) -> list:
             elif obj[i].data_type == canopen.objectdictionary.datatypes.VISIBLE_STRING:
                 line = f"{INDENT8}.{name} = " + "{"
                 for i in obj[i].default:
-                    line += f"\"{i}\", "
+                    line += f'"{i}", '
                 line += "0}, "
                 lines.append(line)
             elif obj[i].data_type == canopen.objectdictionary.datatypes.OCTET_STRING:
@@ -383,8 +383,8 @@ def write_canopennode_c(od: canopen.ObjectDictionary, dir_path=""):
         file_path = "OD.c"
 
     lines.append("#define OD_DEFINITION")
-    lines.append("#include \"301/CO_ODinterface.h\"")
-    lines.append("#include \"OD.h\"")
+    lines.append('#include "301/CO_ODinterface.h"')
+    lines.append('#include "OD.h"')
     lines.append("")
 
     lines.append("#if CO_VERSION_MAJOR < 4")

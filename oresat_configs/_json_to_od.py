@@ -181,7 +181,7 @@ def _add_tpdo_data(od: canopen.ObjectDictionary, config: OdConfig):
             )
             var.access_type = "const"
             var.data_type = canopen.objectdictionary.UNSIGNED32
-            if config.tpdos[i].fields[subindex - 1] == 'scet':
+            if config.tpdos[i].fields[subindex - 1] == "scet":
                 mapped_obj = od[Index.SCET.value]
             else:
                 try:
@@ -418,15 +418,15 @@ def _load_std_objs(file_path: str) -> dict:
     std_objs = {}
     for key in std_objs_raw:
         obj = std_objs_raw[key]
-        index = int(obj['index'], 16)
-        if obj['object_type'] == 'variable':
+        index = int(obj["index"], 16)
+        if obj["object_type"] == "variable":
             var = canopen.objectdictionary.Variable(key, index, 0x0)
-            var.data_type = OD_DATA_TYPES[obj['data_type']]
-            var.access_type = obj.get('access_type', "rw")
-            var.default = obj.get('default', OD_DEFAULTS[var.data_type])
-            var.description = obj.get('description', "")
+            var.data_type = OD_DATA_TYPES[obj["data_type"]]
+            var.access_type = obj.get("access_type", "rw")
+            var.default = obj.get("default", OD_DEFAULTS[var.data_type])
+            var.description = obj.get("description", "")
             std_objs[key] = var
-        elif obj['object_type'] == 'record':
+        elif obj["object_type"] == "record":
             rec = canopen.objectdictionary.Record(key, index)
 
             var = canopen.objectdictionary.Variable("Highest index supported", index, 0x0)
@@ -435,24 +435,24 @@ def _load_std_objs(file_path: str) -> dict:
             var.default = 0
             rec.add_member(var)
 
-            for subindex_str in obj['subindexes']:
+            for subindex_str in obj["subindexes"]:
                 subindex = int(subindex_str, 16)
-                sub_obj = obj['subindexes'][subindex_str]
-                var = canopen.objectdictionary.Variable(sub_obj['name'], index, subindex)
-                var.data_type = OD_DATA_TYPES[sub_obj['data_type']]
-                var.access_type = sub_obj.get('access_type', "rw")
-                var.default = sub_obj.get('default', OD_DEFAULTS[var.data_type])
-                var.description = sub_obj.get('description', "")
+                sub_obj = obj["subindexes"][subindex_str]
+                var = canopen.objectdictionary.Variable(sub_obj["name"], index, subindex)
+                var.data_type = OD_DATA_TYPES[sub_obj["data_type"]]
+                var.access_type = sub_obj.get("access_type", "rw")
+                var.default = sub_obj.get("default", OD_DEFAULTS[var.data_type])
+                var.description = sub_obj.get("description", "")
                 rec.add_member(var)
 
             rec[0].default = subindex
             std_objs[key] = rec
-        elif obj['object_type'] == 'array':
+        elif obj["object_type"] == "array":
             arr = canopen.objectdictionary.Array(key, index)
-            data_type = OD_DATA_TYPES[obj['data_type']]
-            access_type = obj.get('access_type', "rw")
-            default = obj.get('default', OD_DEFAULTS[data_type])
-            subindexes = int(obj['subindexes'], 16)
+            data_type = OD_DATA_TYPES[obj["data_type"]]
+            access_type = obj.get("access_type", "rw")
+            default = obj.get("default", OD_DEFAULTS[data_type])
+            subindexes = int(obj["subindexes"], 16)
 
             var = canopen.objectdictionary.Variable("Highest index supported", index, 0x0)
             var.data_type = canopen.objectdictionary.UNSIGNED8
@@ -461,7 +461,7 @@ def _load_std_objs(file_path: str) -> dict:
             arr.add_member(var)
 
             for subindex in range(subindexes + 1):
-                var_name = obj['name'] + f"_{subindex}"
+                var_name = obj["name"] + f"_{subindex}"
                 var = canopen.objectdictionary.Variable(var_name, index, subindex)
                 var.data_type = data_type
                 var.access_type = access_type
@@ -470,7 +470,7 @@ def _load_std_objs(file_path: str) -> dict:
 
             std_objs[key] = arr
         else:
-            raise ValueError(f'unknown object_type for object {key}')
+            raise ValueError(f"unknown object_type for object {key}")
 
     return std_objs
 
@@ -516,8 +516,8 @@ def gen_ods(oresat_id: OreSatId, beacon_def: dict, configs: dict) -> dict:
             od[std_objs[key].index] = deepcopy(std_objs[key])
         for key in core_config.std_objects:
             od[std_objs[key].index] = deepcopy(std_objs[key])
-            if key == 'cob_id_emergency_message':
-                od['cob_id_emergency_message'].default = 0x80 + node_id
+            if key == "cob_id_emergency_message":
+                od["cob_id_emergency_message"].default = 0x80 + node_id
 
         # add TPDSs
         _add_tpdo_data(od, card_config)
