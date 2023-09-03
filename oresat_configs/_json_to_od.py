@@ -6,7 +6,7 @@ from typing import List, Dict, Any
 import canopen
 from dataclasses_json import dataclass_json, LetterCase
 
-from . import __version__, Index, NodeId
+from . import __version__, Index, NodeId, OreSatId
 
 RPDO_COMM_START = 0x1400
 RPDO_PARA_START = 0x1600
@@ -372,15 +372,17 @@ def _add_rpdo_data(
         rpdo_mapping_rec[0].default += 1
 
 
-def add_rpdo_data(config, od: canopen.ObjectDictionary, ods: dict):
+def _add_node_rpdo_data(config, od: canopen.ObjectDictionary, ods: dict):
     """Add all configured RPDO object to OD based off of TPDO objects from another OD."""
 
     for i in config.rpdos:
         rpdo = config.rpdos[i]
-        _add_rpdo_data(int(rpdo.tpdo_num), od, ods[rpdo.card])
+        _add_rpdo_data(int(rpdo.tpdo_num), od, ods[NodeId[rpdo.card.upper()]])
 
 
-def add_all_rpdo_data(master_node_od: canopen.ObjectDictionary, node_od: canopen.ObjectDictionary):
+def _add_all_rpdo_data(
+    master_node_od: canopen.ObjectDictionary, node_od: canopen.ObjectDictionary
+):
     """Add all RPDO object to OD based off of TPDO objects from another OD."""
 
     if not node_od.device_information.nr_of_TXPDO:
@@ -402,7 +404,7 @@ def read_json_od_config(file_path: str) -> OdConfig:
     return OdConfig.from_json(config)
 
 
-def make_od(
+def _make_od(
     node_id: NodeId, card_config: OdConfig, core_config: OdConfig, add_core_tpdos: bool = True
 ) -> canopen.ObjectDictionary:
     """Make the OD from a config."""
@@ -434,3 +436,38 @@ def make_od(
     _add_tpdo_data(od, card_config)
 
     return od
+
+
+def gen_ods(oresat_id: OreSatId, beacon_def: dict, configs: dict) -> dict:
+    """Generate all ODs for a OreSat mission."""
+
+    ods = {}
+
+    # make od with core and card objects and tpdos
+    for node_id in configs:
+        card_config = configs[node_id][0]
+        core_config = configs[node_id][1]
+        _add_all_rpdos = node_id == NodeId.C3
+        ods[node_id] = _make_od(node_id, card_config, core_config, _add_all_rpdos)
+        ods[node_id]["core_data"]["satellite_id"].default = oresat_id.value
+        if node_id == NodeId.C3:
+            ods[node_id]["card_data"]["beacon_revision"].default = beacon_def["revision"]
+
+    # add all RPDOs
+    for node_id in configs:
+        if node_id == NodeId.C3:
+            continue
+        _add_all_rpdo_data(ods[NodeId.C3], ods[node_id])
+        _add_node_rpdo_data(configs[node_id][0], ods[node_id], ods)
+        _add_node_rpdo_data(configs[node_id][1], ods[node_id], ods)
+
+    # set all object values to its default value
+    for od in ods.values():
+        for index in od:
+            if not isinstance(od[index], canopen.objectdictionary.Variable):
+                for subindex in od[index]:
+                    od[index][subindex].value = od[index][subindex].default
+            else:
+                od[index].value = od[index].default
+
+    return ods

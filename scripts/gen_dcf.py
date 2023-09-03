@@ -10,7 +10,7 @@ _FILE_PATH = os.path.dirname(os.path.abspath(__file__))
 sys.path.append(f"{_FILE_PATH}/..")
 
 import canopen
-from oresat_configs import oresat0, oresat0_5
+from oresat_configs import NodeId, oresat0, oresat0_5
 
 
 def write_od(od: canopen.ObjectDictionary, dir_path: str = "."):
@@ -242,5 +242,5 @@ if __name__ == "__main__":
         for od in ods.values():
             write_od(od, args.dir_path)
     else:
-        od = ods[args.card.lower()]
+        od = ods[NodeId[args.card.upper()]]
         write_od(od, args.dir_path)

@@ -1,6 +1,12 @@
 {
   "objects": [
     {
+      "name": "satellite_id",
+      "data_type": "uint8",
+      "description": "the unique oresat satellite id",
+      "access_type": "const"
+    },
+    {
       "name": "config_version",
       "data_type": "str",
       "description": "oresat config version",

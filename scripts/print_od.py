@@ -9,7 +9,7 @@ _FILE_PATH = os.path.dirname(os.path.abspath(__file__))
 sys.path.append(f"{_FILE_PATH}/..")
 
 import canopen
-from oresat_configs import oresat0, oresat0_5
+from oresat_configs import NodeId, oresat0, oresat0_5
 from oresat_configs._json_to_od import OD_DATA_TYPES
 
 if __name__ == "__main__":
@@ -30,8 +30,7 @@ if __name__ == "__main__":
         print("card not set")
         sys.exit()
 
-    od = ods[args.card.lower()]
-
+    od = ods[NodeId[args.card.upper()]]
     for i in od:
         print(f"0x{i:04X}: {od[i].name}")
         if not isinstance(od[i], canopen.objectdictionary.Variable):

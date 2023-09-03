@@ -1,12 +1,6 @@
 {
   "objects": [
     {
-      "name": "satellite_id",
-      "data_type": "uint8",
-      "description": "the unique oresat satellite id",
-      "access_type": "const"
-    },
-    {
       "name": "beacon_revision",
       "data_type": "uint8",
       "description": "the beacon revision number",
