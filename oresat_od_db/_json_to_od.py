@@ -139,7 +139,7 @@ def _add_rec(
         var = canopen.objectdictionary.Variable(obj.name, index, subindex)
         var.access_type = obj.access_type
         var.data_type = OD_DATA_TYPES[obj.data_type]
-        if obj.name == "config_version":
+        if obj.name == "db_version":
             var.default = __version__
         elif obj.default is None:
             var.default = OD_DEFAULTS[var.data_type]

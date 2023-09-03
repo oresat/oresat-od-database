@@ -16,9 +16,9 @@
       "access_type": "const"
     },
     {
-      "name": "config_version",
+      "name": "db_version",
       "data_type": "str",
-      "description": "oresat config version",
+      "description": "oresat od db version",
       "access_type": "const"
     },
     {
