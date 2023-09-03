@@ -4,7 +4,7 @@ import os
 import json
 
 from .. import NodeId, OreSatId
-from .._json_to_od import read_json_od_config, gen_ods
+from .._json_to_od import read_json_od_config, gen_od_db
 
 ORESAT_ID = OreSatId.ORESAT0
 
@@ -24,7 +24,7 @@ with open(f"{_JSON_DIR}/beacon.json", "r") as f:
     BEACON_DEF = json.load(f)
 
 
-OD_DB = gen_ods(
+OD_DB = gen_od_db(
     ORESAT_ID,
     BEACON_DEF,
     {
