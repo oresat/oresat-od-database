@@ -4,7 +4,7 @@ import os
 import json
 
 from .. import NodeId, OreSatId
-from .._json_to_od import read_json_od_config, make_od, add_all_rpdo_data
+from .._json_to_od import read_json_od_config, make_od, add_rpdo_data, add_all_rpdo_data
 
 _FILE_PATH = os.path.dirname(os.path.abspath(__file__))
 _JSON_DIR = f"{_FILE_PATH}/jsons"
@@ -78,7 +78,7 @@ ALL_ODS = {
     "solar_module_5": SOLAR_MODULE_5_OD,
     "solar_module_6": SOLAR_MODULE_6_OD,
     "gps": GPS_OD,
-    "star_tracker": STAR_TRACKER_1_OD,
+    "star_tracker_1": STAR_TRACKER_1_OD,
     "cfc": CFC_OD,
     "dxwifi": DXWIFI_OD,
     "reaction_wheel_1": REACTION_WHEEL_1_OD,
@@ -97,7 +97,7 @@ NON_C3_ODS = {
     "solar_module_5": SOLAR_MODULE_5_OD,
     "solar_module_6": SOLAR_MODULE_6_OD,
     "gps": GPS_OD,
-    "star_tracker": STAR_TRACKER_1_OD,
+    "star_tracker_1": STAR_TRACKER_1_OD,
     "cfc": CFC_OD,
     "dxwifi": DXWIFI_OD,
     "reaction_wheel_1": REACTION_WHEEL_1_OD,
@@ -106,3 +106,39 @@ NON_C3_ODS = {
     "reaction_wheel_4": REACTION_WHEEL_4_OD,
     "imu": IMU_OD,
 }
+
+# subscribe all non-c3 nodes to configure rpdos
+add_rpdo_data(_BAT_CONFIG, BATTERY_1_OD, ALL_ODS)
+add_rpdo_data(_SOLAR_CONFIG, SOLAR_MODULE_1_OD, ALL_ODS)
+add_rpdo_data(_SOLAR_CONFIG, SOLAR_MODULE_2_OD, ALL_ODS)
+add_rpdo_data(_SOLAR_CONFIG, SOLAR_MODULE_3_OD, ALL_ODS)
+add_rpdo_data(_SOLAR_CONFIG, SOLAR_MODULE_4_OD, ALL_ODS)
+add_rpdo_data(_SOLAR_CONFIG, SOLAR_MODULE_5_OD, ALL_ODS)
+add_rpdo_data(_SOLAR_CONFIG, SOLAR_MODULE_6_OD, ALL_ODS)
+add_rpdo_data(_GPS_CONFIG, GPS_OD, ALL_ODS)
+add_rpdo_data(_ST_CONFIG, STAR_TRACKER_1_OD, ALL_ODS)
+add_rpdo_data(_IMU_CONFIG, IMU_OD, ALL_ODS)
+add_rpdo_data(_RW_CONFIG, REACTION_WHEEL_1_OD, ALL_ODS)
+add_rpdo_data(_RW_CONFIG, REACTION_WHEEL_2_OD, ALL_ODS)
+add_rpdo_data(_RW_CONFIG, REACTION_WHEEL_3_OD, ALL_ODS)
+add_rpdo_data(_RW_CONFIG, REACTION_WHEEL_4_OD, ALL_ODS)
+add_rpdo_data(_DXWIFI_CONFIG, DXWIFI_OD, ALL_ODS)
+add_rpdo_data(_CFC_CONFIG, CFC_OD, ALL_ODS)
+
+add_rpdo_data(_FW_CORE_CONFIG, BATTERY_1_OD, ALL_ODS)
+add_rpdo_data(_FW_CORE_CONFIG, SOLAR_MODULE_1_OD, ALL_ODS)
+add_rpdo_data(_FW_CORE_CONFIG, SOLAR_MODULE_2_OD, ALL_ODS)
+add_rpdo_data(_FW_CORE_CONFIG, SOLAR_MODULE_3_OD, ALL_ODS)
+add_rpdo_data(_FW_CORE_CONFIG, SOLAR_MODULE_4_OD, ALL_ODS)
+add_rpdo_data(_FW_CORE_CONFIG, SOLAR_MODULE_5_OD, ALL_ODS)
+add_rpdo_data(_FW_CORE_CONFIG, SOLAR_MODULE_6_OD, ALL_ODS)
+add_rpdo_data(_FW_CORE_CONFIG, IMU_OD, ALL_ODS)
+add_rpdo_data(_FW_CORE_CONFIG, REACTION_WHEEL_1_OD, ALL_ODS)
+add_rpdo_data(_FW_CORE_CONFIG, REACTION_WHEEL_2_OD, ALL_ODS)
+add_rpdo_data(_FW_CORE_CONFIG, REACTION_WHEEL_3_OD, ALL_ODS)
+add_rpdo_data(_FW_CORE_CONFIG, REACTION_WHEEL_4_OD, ALL_ODS)
+
+add_rpdo_data(_SW_CORE_CONFIG, GPS_OD, ALL_ODS)
+add_rpdo_data(_SW_CORE_CONFIG, STAR_TRACKER_1_OD, ALL_ODS)
+add_rpdo_data(_SW_CORE_CONFIG, DXWIFI_OD, ALL_ODS)
+add_rpdo_data(_SW_CORE_CONFIG, CFC_OD, ALL_ODS)
