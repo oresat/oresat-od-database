@@ -1,4 +1,13 @@
 {
+  "std_objects": [
+    "device_type",
+    "error_register",
+    "identity",
+    "cob_id_emergency_message",
+    "producer_heartbeat_time",
+    "scet",
+    "utc"
+  ],
   "objects": [
     {
       "name": "satellite_id",

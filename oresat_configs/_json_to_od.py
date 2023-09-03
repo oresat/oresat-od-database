@@ -1,5 +1,8 @@
 """Convert OreSat JSON files to an canopen.ObjectDictionary object."""
 
+import os
+import json
+from copy import deepcopy
 from dataclasses import dataclass, field
 from typing import List, Dict, Any
 
@@ -48,20 +51,20 @@ OD_DATA_TYPE_SIZE = {
 }
 
 OD_DEFAULTS = {
-    "bool": False,
-    "int8": 0,
-    "int16": 0,
-    "int32": 0,
-    "int64": 0,
-    "uint8": 0,
-    "uint16": 0,
-    "uint32": 0,
-    "uint64": 0,
-    "float32": 0.0,
-    "float64": 0.0,
-    "str": "",
-    "octet_str": b"",
-    "domain": None,
+    canopen.objectdictionary.BOOLEAN: False,
+    canopen.objectdictionary.INTEGER8: 0,
+    canopen.objectdictionary.INTEGER16: 0,
+    canopen.objectdictionary.INTEGER32: 0,
+    canopen.objectdictionary.INTEGER64: 0,
+    canopen.objectdictionary.UNSIGNED8: 0,
+    canopen.objectdictionary.UNSIGNED16: 0,
+    canopen.objectdictionary.UNSIGNED32: 0,
+    canopen.objectdictionary.UNSIGNED64: 0,
+    canopen.objectdictionary.REAL32: 0.0,
+    canopen.objectdictionary.REAL64: 0.0,
+    canopen.objectdictionary.VISIBLE_STRING: "",
+    canopen.objectdictionary.OCTET_STRING: b"",
+    canopen.objectdictionary.DOMAIN: None,
 }
 
 
@@ -114,7 +117,9 @@ class OdConfigTpdo:
 class OdConfig:
     """OD data info."""
 
-    objects: List[OdConfigEntry]
+    std_objects: List[str] = field(default_factory=list)
+    """List of standard object to add."""
+    objects: List[OdConfigEntry] = field(default_factory=list)
     """List of objects/entries in OD."""
     tpdos: Dict[str, OdConfigTpdo] = field(default_factory=dict)
     """TPDO configs."""
@@ -137,7 +142,7 @@ def _add_rec(
         if obj.name == "config_version":
             var.default = __version__
         elif obj.default is None:
-            var.default = OD_DEFAULTS[obj.data_type]
+            var.default = OD_DEFAULTS[var.data_type]
         else:
             var.default = obj.default
         var.description = obj.description
@@ -176,10 +181,13 @@ def _add_tpdo_data(od: canopen.ObjectDictionary, config: OdConfig):
             )
             var.access_type = "const"
             var.data_type = canopen.objectdictionary.UNSIGNED32
-            try:
-                mapped_obj = od[Index.CARD_DATA.value][j]
-            except KeyError:
-                mapped_obj = od[Index.CORE_DATA.value][j]
+            if config.tpdos[i].fields[subindex - 1] == 'scet':
+                mapped_obj = od[Index.SCET.value]
+            else:
+                try:
+                    mapped_obj = od[Index.CARD_DATA.value][j]
+                except KeyError:
+                    mapped_obj = od[Index.CORE_DATA.value][j]
             mapped_subindex = mapped_obj.subindex
             value = mapped_obj.index << 16
             value += mapped_subindex << 8
@@ -255,14 +263,9 @@ def _add_rpdo_data(
 
     time_sync_tpdo = tpdo_node_od[tpdo_comm_index]["COB-ID"].default == 0x181
     if time_sync_tpdo:
-        try:
-            rpdo_mapped_index = Index.CORE_DATA.value
-            rpdo_mapped_rec = rpdo_node_od[rpdo_mapped_index]
-            rpdo_mapped_subindex = rpdo_mapped_rec["scet"].subindex
-        except KeyError:  # depends on OreSat #
-            rpdo_mapped_index = Index.CARD_DATA.value
-            rpdo_mapped_rec = rpdo_node_od[rpdo_mapped_index]
-            rpdo_mapped_subindex = rpdo_mapped_rec["scet"].subindex
+        rpdo_mapped_index = Index.SCET.value
+        rpdo_mapped_rec = rpdo_node_od[rpdo_mapped_index]
+        rpdo_mapped_subindex = 0
     else:
         rpdo_mapped_index = Index._OTHER_CARD_BASE_INDEX + tpdo_node_od.node_id
         if rpdo_mapped_index not in rpdo_node_od:
@@ -336,9 +339,7 @@ def _add_rpdo_data(
         tpdo_mapping_obj = tpdo_node_od[tpdo_mapping_index][j]
 
         # master node data
-        if time_sync_tpdo:
-            rpdo_mapped_subindex = rpdo_node_od[rpdo_mapped_index]["scet"].subindex
-        else:
+        if not time_sync_tpdo:
             rpdo_mapped_subindex = rpdo_mapped_rec[0].default + 1
             tpdo_mapped_index = (tpdo_mapping_obj.default >> 16) & 0xFFFF
             tpdo_mapped_subindex = (tpdo_mapping_obj.default >> 8) & 0xFF
@@ -362,13 +363,17 @@ def _add_rpdo_data(
         var.data_type = canopen.objectdictionary.UNSIGNED32
         value = rpdo_mapped_index << 16
         value += rpdo_mapped_subindex << 8
-        rpdo_mapped_obj = rpdo_node_od[rpdo_mapped_index][rpdo_mapped_subindex]
+        if rpdo_mapped_subindex == 0:
+            rpdo_mapped_obj = rpdo_node_od[rpdo_mapped_index]
+        else:
+            rpdo_mapped_obj = rpdo_node_od[rpdo_mapped_index][rpdo_mapped_subindex]
         value += OD_DATA_TYPE_SIZE[rpdo_mapped_obj.data_type]
         var.default = value
         rpdo_mapping_rec.add_member(var)
 
         # update these
-        rpdo_mapped_rec[0].default += 1
+        if not time_sync_tpdo:
+            rpdo_mapped_rec[0].default += 1
         rpdo_mapping_rec[0].default += 1
 
 
@@ -404,42 +409,77 @@ def read_json_od_config(file_path: str) -> OdConfig:
     return OdConfig.from_json(config)
 
 
-def _make_od(
-    node_id: NodeId, card_config: OdConfig, core_config: OdConfig, add_core_tpdos: bool = True
-) -> canopen.ObjectDictionary:
-    """Make the OD from a config."""
+def _load_std_objs(file_path: str) -> dict:
+    """Load the standard objects."""
 
-    od = canopen.ObjectDictionary()
-    od.bitrate = 1_000_000  # bps
-    od.node_id = node_id.value
-    od.device_information.allowed_baudrates = set([1000])
-    od.device_information.vendor_name = "PSAS"
-    od.device_information.vendor_number = 0
-    od.device_information.product_name = node_id.name.lower()
-    od.device_information.product_number = 0
-    od.device_information.revision_number = 0
-    od.device_information.order_code = 0
-    od.device_information.simple_boot_up_master = False
-    od.device_information.simple_boot_up_slave = False
-    od.device_information.granularity = 8
-    od.device_information.dynamic_channels_supported = False
-    od.device_information.group_messaging = False
-    od.device_information.nr_of_RXPDO = 0
-    od.device_information.nr_of_TXPDO = 0
-    od.device_information.LSS_supported = False
+    with open(file_path, "r") as f:
+        std_objs_raw = json.load(f)
 
-    _add_rec(od, core_config.objects, Index.CORE_DATA)
-    if add_core_tpdos:
-        _add_tpdo_data(od, core_config)
+    std_objs = {}
+    for key in std_objs_raw:
+        obj = std_objs_raw[key]
+        index = int(obj['index'], 16)
+        if obj['object_type'] == 'variable':
+            var = canopen.objectdictionary.Variable(key, index, 0x0)
+            var.data_type = OD_DATA_TYPES[obj['data_type']]
+            var.access_type = obj.get('access_type', "rw")
+            var.default = obj.get('default', OD_DEFAULTS[var.data_type])
+            var.description = obj.get('description', "")
+            std_objs[key] = var
+        elif obj['object_type'] == 'record':
+            rec = canopen.objectdictionary.Record(key, index)
 
-    _add_rec(od, card_config.objects, Index.CARD_DATA)
-    _add_tpdo_data(od, card_config)
+            var = canopen.objectdictionary.Variable("Highest index supported", index, 0x0)
+            var.data_type = canopen.objectdictionary.UNSIGNED8
+            var.access_type = "const"
+            var.default = 0
+            rec.add_member(var)
 
-    return od
+            for subindex_str in obj['subindexes']:
+                subindex = int(subindex_str, 16)
+                sub_obj = obj['subindexes'][subindex_str]
+                var = canopen.objectdictionary.Variable(sub_obj['name'], index, subindex)
+                var.data_type = OD_DATA_TYPES[sub_obj['data_type']]
+                var.access_type = sub_obj.get('access_type', "rw")
+                var.default = sub_obj.get('default', OD_DEFAULTS[var.data_type])
+                var.description = sub_obj.get('description', "")
+                rec.add_member(var)
+
+            rec[0].default = subindex
+            std_objs[key] = rec
+        elif obj['object_type'] == 'array':
+            arr = canopen.objectdictionary.Array(key, index)
+            data_type = OD_DATA_TYPES[obj['data_type']]
+            access_type = obj.get('access_type', "rw")
+            default = obj.get('default', OD_DEFAULTS[data_type])
+            subindexes = int(obj['subindexes'], 16)
+
+            var = canopen.objectdictionary.Variable("Highest index supported", index, 0x0)
+            var.data_type = canopen.objectdictionary.UNSIGNED8
+            var.access_type = "const"
+            var.default = subindexes
+            arr.add_member(var)
+
+            for subindex in range(subindexes + 1):
+                var_name = obj['name'] + f"_{subindex}"
+                var = canopen.objectdictionary.Variable(var_name, index, subindex)
+                var.data_type = data_type
+                var.access_type = access_type
+                var.default = default
+                arr.add_member(var)
+
+            std_objs[key] = arr
+        else:
+            raise ValueError(f'unknown object_type for object {key}')
+
+    return std_objs
 
 
 def gen_ods(oresat_id: OreSatId, beacon_def: dict, configs: dict) -> dict:
     """Generate all ODs for a OreSat mission."""
+
+    std_objs_file_name = f"{os.path.dirname(os.path.abspath(__file__))}/standard_objects.json"
+    std_objs = _load_std_objs(std_objs_file_name)
 
     ods = {}
 
@@ -447,11 +487,49 @@ def gen_ods(oresat_id: OreSatId, beacon_def: dict, configs: dict) -> dict:
     for node_id in configs:
         card_config = configs[node_id][0]
         core_config = configs[node_id][1]
-        _add_all_rpdos = node_id == NodeId.C3
-        ods[node_id] = _make_od(node_id, card_config, core_config, _add_all_rpdos)
-        ods[node_id]["core_data"]["satellite_id"].default = oresat_id.value
+
+        od = canopen.ObjectDictionary()
+        od.bitrate = 1_000_000  # bps
+        od.node_id = node_id.value
+        od.device_information.allowed_baudrates = set([1000])
+        od.device_information.vendor_name = "PSAS"
+        od.device_information.vendor_number = 0
+        od.device_information.product_name = node_id.name.lower()
+        od.device_information.product_number = 0
+        od.device_information.revision_number = 0
+        od.device_information.order_code = 0
+        od.device_information.simple_boot_up_master = False
+        od.device_information.simple_boot_up_slave = False
+        od.device_information.granularity = 8
+        od.device_information.dynamic_channels_supported = False
+        od.device_information.group_messaging = False
+        od.device_information.nr_of_RXPDO = 0
+        od.device_information.nr_of_TXPDO = 0
+        od.device_information.LSS_supported = False
+
+        # add core and card records
+        _add_rec(od, core_config.objects, Index.CORE_DATA)
+        _add_rec(od, card_config.objects, Index.CARD_DATA)
+
+        # add any standard objects
+        for key in card_config.std_objects:
+            od[std_objs[key].index] = deepcopy(std_objs[key])
+        for key in core_config.std_objects:
+            od[std_objs[key].index] = deepcopy(std_objs[key])
+            if key == 'cob_id_emergency_message':
+                od['cob_id_emergency_message'].default = 0x80 + node_id
+
+        # add TPDSs
+        _add_tpdo_data(od, card_config)
+        if node_id != NodeId.C3:
+            _add_tpdo_data(od, core_config)
+
+        # set specific obj defaults
+        od["core_data"]["satellite_id"].default = oresat_id.value
         if node_id == NodeId.C3:
-            ods[node_id]["card_data"]["beacon_revision"].default = beacon_def["revision"]
+            od["card_data"]["beacon_revision"].default = beacon_def["revision"]
+
+        ods[node_id] = od
 
     # add all RPDOs
     for node_id in configs:

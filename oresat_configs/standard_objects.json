@@ -1,0 +1,100 @@
+{
+  "device_type": {
+    "index": "0x1000",
+    "object_type": "variable",
+    "description": "- bits 16-31: additional information\n- bits 0-15: device profile number",
+    "data_type": "uint32",
+    "access_type": "ro"
+  },
+  "error_register": {
+    "index": "0x1001",
+    "object_type": "variable",
+    "description": "- bit 7: manufacturer specific\n- bit 6: reserved (always 0)\n- bit 5: device profile specific\n- bit 4: communication error (overrun, error state)\n- bit 3: temperature\n- bit 2: voltage\n- bit 1: current\n- bit 0: generic error",
+    "data_type": "uint8",
+    "access_type": "ro"
+  },
+  "identity": {
+    "index": "0x1008",
+    "object_type": "record",
+    "subindexes": {
+      "0x1": {
+        "name": "vendor_id",
+        "description": "manufacturer vendor id set by CiA",
+        "data_type": "uint32",
+        "access_type": "ro"
+      },
+      "0x2": {
+        "name": "product_code",
+        "description": "ids a specific type of CANopen devices",
+        "data_type": "uint32",
+        "access_type": "ro"
+      },
+      "0x3": {
+        "name": "revision_number",
+        "description": "major and minor version of CANopen device\n- bits 16-31: major version\n- bits 0-15: minor version",
+        "data_type": "uint32",
+        "access_type": "ro"
+      },
+      "0x4": {
+        "name": "serial_number",
+        "description": "unqiue device id for a product group or revision",
+        "data_type": "uint32",
+        "access_type": "ro"
+      }
+    }
+  },
+  "cob_id_emergency_message": {
+    "index": "0x1014",
+    "object_type": "variable",
+    "description": "- bit 31: not valid\n- bit 30: reserved\n- bits 29-11: always 0\n- bits 10-0: CAN-ID",
+    "data_type": "uint32",
+    "access_type": "rw",
+    "default": "0x80+$NODE_ID"
+  },
+  "producer_heartbeat_time": {
+    "index": "0x1017",
+    "object_type": "variable",
+    "description": "heartbeat producer time in ms; 0 = disable",
+    "data_type": "uint16",
+    "access_type": "rw",
+    "default": 1000
+  },
+  "os_command": {
+    "index": "0x1023",
+    "object_type": "record",
+    "subindexes": {
+      "0x1": {
+        "name": "command",
+        "description": "OS command",
+        "data_type": "str",
+        "access_type": "rw"
+      },
+      "0x2": {
+        "name": "status",
+        "description": "- 0x00: Command completed, no error, no reply\n- 0x01: Command completed, no error, reply\n- 0x02: Command completed, error, no reply\n- 0x03: Command completed, error, reply\n- 0xFF: Command executing",
+        "data_type": "uint32",
+        "access_type": "ro"
+      },
+      "0x3": {
+        "name": "reply",
+        "description": "OS command reply",
+        "data_type": "str",
+        "access_type": "ro"
+      }
+    }
+  },
+  "scet": {
+    "index": "0x2010",
+    "object_type": "variable",
+    "description": "CCSDS Unsegmented Time Code (CUC) object for Spacecraft Elapsed Time (SCET)",
+    "data_type": "uint64",
+    "access_type": "rw"
+  },
+  "utc": {
+    "index": "0x2011",
+    "object_type": "variable",
+    "description": "CCSDS Day Segmented Time Code (CDS) object for UTC time",
+    "data_type": "uint64",
+    "access_type": "rw"
+  }
+}

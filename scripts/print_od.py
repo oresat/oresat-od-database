@@ -12,6 +12,16 @@ import canopen
 from oresat_configs import NodeId, oresat0, oresat0_5
 from oresat_configs._json_to_od import OD_DATA_TYPES
 
+
+def format_default(value) -> str:
+    """Format default value based off of python data type."""
+    if isinstance(value, int) and not isinstance(value, bool):
+        value = hex(value)
+    elif isinstance(value, str):
+        value = f'"{value}"'
+    return value
+
+
 if __name__ == "__main__":
     parser = ArgumentParser()
     parser.add_argument("oresat", default="oresat0", help="oresat mission; oresat0 or oresat0.5")
@@ -30,18 +40,19 @@ if __name__ == "__main__":
         print("card not set")
         sys.exit()
 
+    inverted_od_data_types = {}
+    for key in OD_DATA_TYPES:
+        inverted_od_data_types[OD_DATA_TYPES[key]] = key
+
     od = ods[NodeId[args.card.upper()]]
     for i in od:
-        print(f"0x{i:04X}: {od[i].name}")
-        if not isinstance(od[i], canopen.objectdictionary.Variable):
+        if isinstance(od[i], canopen.objectdictionary.Variable):
+            data_type = inverted_od_data_types[od[i].data_type]
+            value = format_default(od[i].default)
+            print(f"0x{i:04X}: {od[i].name} - {data_type} - {value}")
+        else:
+            print(f"0x{i:04X}: {od[i].name}")
             for j in od[i]:
-                data_type = od[i][j].data_type
-                data_type_str = list(OD_DATA_TYPES.keys())[
-                    list(OD_DATA_TYPES.values()).index(data_type)
-                ]
-                value = od[i][j].default
-                if isinstance(value, int) and not isinstance(value, bool):
-                    value = hex(value)
-                elif isinstance(value, str):
-                    value = f'"{value}"'
-                print(f"  0x{i:04X} 0x{j:02X}: {od[i][j].name} - {data_type_str} - {value}")
+                data_type = inverted_od_data_types[od[i][j].data_type]
+                value = format_default(od[i][j].default)
+                print(f"  0x{i:04X} 0x{j:02X}: {od[i][j].name} - {data_type} - {value}")

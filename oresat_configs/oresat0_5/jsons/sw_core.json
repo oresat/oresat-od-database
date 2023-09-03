@@ -1,4 +1,14 @@
 {
+  "std_objects": [
+    "device_type",
+    "error_register",
+    "identity",
+    "cob_id_emergency_message",
+    "producer_heartbeat_time",
+    "os_command",
+    "scet",
+    "utc"
+  ],
   "objects": [
     {
       "name": "satellite_id",
@@ -23,12 +33,6 @@
       "data_type": "str",
       "description": "app sw version",
       "access_type": "const"
-    },
-    {
-      "name": "scet",
-      "data_type": "uint64",
-      "description": "scet timestamp of card",
-      "access_type": "rw"
     },
     {
       "name": "fread_cache_len",
@@ -89,23 +93,6 @@
       "data_type": "bool",
       "description": "write true to remove file",
       "access_type": "wo"
-    },
-    {
-      "name": "bash_command",
-      "data_type": "str",
-      "description": "bash command to run"
-    },
-    {
-      "name": "bash_command_status",
-      "data_type": "uint8",
-      "description": "the status of the bash command",
-      "access_type": "ro"
-    },
-    {
-      "name": "bash_command_reply",
-      "data_type": "str",
-      "description": "the reply of the bash command",
-      "access_type": "ro"
     },
     {
       "name": "updater_status",

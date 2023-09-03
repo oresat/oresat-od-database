@@ -40,6 +40,12 @@ class NodeId(IntEnum):
 class Index(IntEnum):
     """OD posible indexes."""
 
+    # standard object indexes
+    PRODUCER_HEARTBEAT_TIME = 0x1017
+    OS_COMMAND = 0x1023
+    SCET = 0x2010
+    UTC = 0x2011
+    # OreSat indexes
     CORE_DATA = 0x3000
     CARD_DATA = 0x6000
     _OTHER_CARD_BASE_INDEX = 0x7000
