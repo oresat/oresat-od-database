@@ -267,7 +267,7 @@ def _add_rpdo_data(
         rpdo_mapped_rec = rpdo_node_od[rpdo_mapped_index]
         rpdo_mapped_subindex = 0
     else:
-        rpdo_mapped_index = Index._OTHER_CARD_BASE_INDEX + tpdo_node_od.node_id
+        rpdo_mapped_index = Index.OTHER_CARD_BASE_INDEX + tpdo_node_od.node_id
         if rpdo_mapped_index not in rpdo_node_od:
             rpdo_mapped_rec = canopen.objectdictionary.Record(
                 f"{node_name}_data", rpdo_mapped_index
@@ -316,7 +316,7 @@ def _add_rpdo_data(
     var = canopen.objectdictionary.Variable("Highest index supported", rpdo_comm_index, 0x0)
     var.access_type = "const"
     var.data_type = canopen.objectdictionary.UNSIGNED8
-    var.default = sorted([k for k in rpdo_comm_rec.subindices.keys()])[-1]  # no subindex 3 or 4
+    var.default = sorted(list(rpdo_comm_rec.subindices))[-1]  # no subindex 3 or 4
     rpdo_comm_rec.add_member(var)
 
     rpdo_mapping_index = RPDO_PARA_START + rpdo_num - 1
@@ -406,7 +406,8 @@ def read_json_od_config(file_path: str) -> OdConfig:
     with open(file_path, "r") as f:
         config = f.read()
 
-    return OdConfig.from_json(config)
+    # pylint: disable=no-member
+    return OdConfig.from_json(config)  # type: ignore
 
 
 def _load_std_objs(file_path: str) -> dict:

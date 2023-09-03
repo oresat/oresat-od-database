@@ -64,13 +64,13 @@ def format_name(string: str) -> str:
         return ""  # nothing to do
 
     # remove invalid chars for variable names in C
-    s = string.replace("-", "_").replace("(", " ").replace(")", " ")
-    s = s.replace("  ", " ")
+    string = string.replace("-", "_").replace("(", " ").replace(")", " ")
+    string = string.replace("  ", " ")
 
-    s = s.split()
+    s_list = string.split()
 
     name = ""
-    for i in s:
+    for i in s_list:
         try:
             int(i)
         except ValueError:
@@ -114,11 +114,11 @@ def remove_node_id(default: str) -> str:
 
     if default == "":
         return "0"
-    elif len(temp) == 1:
+    if len(temp) == 1:
         return default  # does not include $NODEID
-    elif temp[0] == "$NODEID":
+    if temp[0] == "$NODEID":
         return temp[1].rsplit()[0]
-    elif temp[1] == "$NODEID":
+    if temp[1] == "$NODEID":
         return temp[0].rsplit()[0]
 
     return default  # does not include $NODEID
@@ -212,7 +212,8 @@ def attr_lines(od: canopen.ObjectDictionary, index: int) -> list:
 
             if obj[i].data_type == canopen.objectdictionary.datatypes.DOMAIN:
                 continue  # skip domains
-            elif obj[i].data_type == canopen.objectdictionary.datatypes.VISIBLE_STRING:
+
+            if obj[i].data_type == canopen.objectdictionary.datatypes.VISIBLE_STRING:
                 line = f"{INDENT8}.{name} = " + "{"
                 for i in obj[i].default:
                     line += f'"{i}", '
@@ -471,7 +472,7 @@ def _canopennode_h_lines(od: canopen.ObjectDictionary, index: int) -> list:
             lines.append(f"{INDENT4}{c_name} x{index:X}_{name};")
     elif isinstance(obj, canopen.objectdictionary.Array):
         c_name = DATA_TYPE_C_TYPES[obj.data_type]
-        length = f"OD_CNT_ARR_{index:X}"
+        length_str = f"OD_CNT_ARR_{index:X}"
         lines.append(f"{INDENT4}uint8_t x{index:X}_{name}_sub0;")
 
         if obj.data_type == canopen.objectdictionary.datatypes.DOMAIN:
@@ -480,12 +481,12 @@ def _canopennode_h_lines(od: canopen.ObjectDictionary, index: int) -> list:
             pass
         elif obj.data_type in DATA_TYPE_STR:
             sub_length = len(obj[1].default) + 1  # add 1 for '\0'
-            lines.append(f"{INDENT4}{c_name} x{index:X}_{name}[{length}][{sub_length}];")
+            lines.append(f"{INDENT4}{c_name} x{index:X}_{name}[{length_str}][{sub_length}];")
         elif obj.data_type == canopen.objectdictionary.datatypes.OCTET_STRING:
             sub_length = m.ceil(len(obj[1].default.replace(" ", "")) / 2)
-            lines.append(f"{INDENT4}{c_name} x{index:X}_{name}[{length}][{sub_length}];")
+            lines.append(f"{INDENT4}{c_name} x{index:X}_{name}[{length_str}][{sub_length}];")
         else:
-            lines.append(f"{INDENT4}{c_name} x{index:X}_{name}[{length}];")
+            lines.append(f"{INDENT4}{c_name} x{index:X}_{name}[{length_str}];")
     else:
         lines.append(INDENT4 + "struct {")
         for i in obj:
@@ -495,7 +496,8 @@ def _canopennode_h_lines(od: canopen.ObjectDictionary, index: int) -> list:
 
             if data_type == canopen.objectdictionary.datatypes.DOMAIN:
                 continue  # skip domains
-            elif data_type in DATA_TYPE_STR:
+
+            if data_type in DATA_TYPE_STR:
                 length = len(obj[i].default) + 1  # add 1 for '\0'
                 lines.append(f"{INDENT8}{c_name} {sub_name}[{length}];")
             elif data_type == canopen.objectdictionary.datatypes.OCTET_STRING:
@@ -615,7 +617,9 @@ OD_LIST = {
 }
 
 
-if __name__ == "__main__":
+def main():
+    """The main"""
+
     parser = ArgumentParser("generate CANopenNode OD.[c/h] files")
     parser.add_argument("oresat", help="oresat mission; oresat0 or oresat0.5")
     parser.add_argument("card", help="card name; c3, battery, solar, imu, or reaction_wheel")
@@ -630,3 +634,7 @@ if __name__ == "__main__":
 
     od = OD_LIST[(args.oresat.lower(), args.card)]
     write_canopennode(od, args.dir_path)
+
+
+if __name__ == "__main__":
+    main()

@@ -1,2 +1,4 @@
 canopen
 dataclasses_json
+pylama[toml]
+pylama[all]

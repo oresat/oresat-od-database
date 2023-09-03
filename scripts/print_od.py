@@ -4,6 +4,7 @@
 import os
 import sys
 from argparse import ArgumentParser
+from typing import Any
 
 _FILE_PATH = os.path.dirname(os.path.abspath(__file__))
 sys.path.append(f"{_FILE_PATH}/..")
@@ -13,13 +14,13 @@ from oresat_configs import NodeId, oresat0, oresat0_5
 from oresat_configs._json_to_od import OD_DATA_TYPES
 
 
-def format_default(value) -> str:
+def format_default(raw: Any) -> str:
     """Format default value based off of python data type."""
-    if isinstance(value, int) and not isinstance(value, bool):
-        value = hex(value)
+    if isinstance(raw, int) and not isinstance(raw, bool):
+        raw = hex(raw)
     elif isinstance(value, str):
-        value = f'"{value}"'
-    return value
+        raw = f'"{raw}"'
+    return raw
 
 
 if __name__ == "__main__":

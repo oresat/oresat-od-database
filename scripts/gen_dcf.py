@@ -223,7 +223,9 @@ def _record_lines(record: canopen.objectdictionary.Record, index: int) -> list:
     return lines
 
 
-if __name__ == "__main__":
+def main():
+    """The main"""
+
     parser = ArgumentParser()
     parser.add_argument("oresat", default="oresat0", help="oresat mission; oresat0 or oresat0.5")
     parser.add_argument("card", help="card name; all, c3, gps, star_tracker_1, etc")
@@ -244,3 +246,7 @@ if __name__ == "__main__":
     else:
         od = ods[NodeId[args.card.upper()]]
         write_od(od, args.dir_path)
+
+
+if __name__ == "__main__":
+    main()
