@@ -108,7 +108,7 @@ def write_canopennode(od: canopen.ObjectDictionary, dir_path=""):
 
 
 def remove_node_id(default: str) -> str:
-    """Remove "+$NODEID" or '$NODEID+" from the default value"""
+    """Remove "+$NODEID" or "$NODEID+" from the default value"""
 
     temp = default.split("+")
 
@@ -134,10 +134,12 @@ def attr_lines(od: canopen.ObjectDictionary, index: int) -> list:
         default = remove_node_id(obj.default)
         line = f"{INDENT4}.x{index:X}_{format_name(obj.name)} = "
 
-        if obj.data_type == canopen.objectdictionary.datatypes.VISIBLE_STRING:
+        if obj.name == "COB-ID":
+            line += f"0x{default - od.node_id}, "
+        elif obj.data_type == canopen.objectdictionary.datatypes.VISIBLE_STRING:
             line += "{"
             for i in obj.default:
-                line += f"'{i}', "
+                line += f"\"{i}\", "
             line += "0}, "
         elif obj.data_type == canopen.objectdictionary.datatypes.OCTET_STRING:
             line += "{"
@@ -173,7 +175,7 @@ def attr_lines(od: canopen.ObjectDictionary, index: int) -> list:
             if obj[i].data_type == canopen.objectdictionary.datatypes.VISIBLE_STRING:
                 line += "{"
                 for i in obj[i].default:
-                    line += f"'{i}', "
+                    line += f"\"{i}\", "
                 line += "0}, "
             elif obj[i].data_type == canopen.objectdictionary.datatypes.OCTET_STRING:
                 line += "{"
@@ -213,7 +215,7 @@ def attr_lines(od: canopen.ObjectDictionary, index: int) -> list:
             elif obj[i].data_type == canopen.objectdictionary.datatypes.VISIBLE_STRING:
                 line = f"{INDENT8}.{name} = " + "{"
                 for i in obj[i].default:
-                    line += f"'{i}', "
+                    line += f"\"{i}\", "
                 line += "0}, "
                 lines.append(line)
             elif obj[i].data_type == canopen.objectdictionary.datatypes.OCTET_STRING:
@@ -381,8 +383,8 @@ def write_canopennode_c(od: canopen.ObjectDictionary, dir_path=""):
         file_path = "OD.c"
 
     lines.append("#define OD_DEFINITION")
-    lines.append('#include "301/CO_ODinterface.h"')
-    lines.append('#include "OD.h"')
+    lines.append("#include \"301/CO_ODinterface.h\"")
+    lines.append("#include \"OD.h\"")
     lines.append("")
 
     lines.append("#if CO_VERSION_MAJOR < 4")
