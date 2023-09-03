@@ -377,12 +377,12 @@ def _add_rpdo_data(
         rpdo_mapping_rec[0].default += 1
 
 
-def _add_node_rpdo_data(config, od: canopen.ObjectDictionary, ods: dict):
+def _add_node_rpdo_data(config, od: canopen.ObjectDictionary, od_db: dict):
     """Add all configured RPDO object to OD based off of TPDO objects from another OD."""
 
     for i in config.rpdos:
         rpdo = config.rpdos[i]
-        _add_rpdo_data(int(rpdo.tpdo_num), od, ods[NodeId[rpdo.card.upper()]])
+        _add_rpdo_data(int(rpdo.tpdo_num), od, od_db[NodeId[rpdo.card.upper()]])
 
 
 def _add_all_rpdo_data(
@@ -476,13 +476,13 @@ def _load_std_objs(file_path: str) -> dict:
     return std_objs
 
 
-def gen_ods(oresat_id: OreSatId, beacon_def: dict, configs: dict) -> dict:
+def gen_od_db(oresat_id: OreSatId, beacon_def: dict, configs: dict) -> dict:
     """Generate all ODs for a OreSat mission."""
 
     std_objs_file_name = f"{os.path.dirname(os.path.abspath(__file__))}/standard_objects.json"
     std_objs = _load_std_objs(std_objs_file_name)
 
-    ods = {}
+    od_db = {}
 
     # make od with core and card objects and tpdos
     for node_id in configs:
@@ -530,18 +530,18 @@ def gen_ods(oresat_id: OreSatId, beacon_def: dict, configs: dict) -> dict:
         if node_id == NodeId.C3:
             od["card_data"]["beacon_revision"].default = beacon_def["revision"]
 
-        ods[node_id] = od
+        od_db[node_id] = od
 
     # add all RPDOs
     for node_id in configs:
         if node_id == NodeId.C3:
             continue
-        _add_all_rpdo_data(ods[NodeId.C3], ods[node_id])
-        _add_node_rpdo_data(configs[node_id][0], ods[node_id], ods)
-        _add_node_rpdo_data(configs[node_id][1], ods[node_id], ods)
+        _add_all_rpdo_data(od_db[NodeId.C3], od_db[node_id])
+        _add_node_rpdo_data(configs[node_id][0], od_db[node_id], od_db)
+        _add_node_rpdo_data(configs[node_id][1], od_db[node_id], od_db)
 
     # set all object values to its default value
-    for od in ods.values():
+    for od in od_db.values():
         for index in od:
             if not isinstance(od[index], canopen.objectdictionary.Variable):
                 for subindex in od[index]:
@@ -549,4 +549,4 @@ def gen_ods(oresat_id: OreSatId, beacon_def: dict, configs: dict) -> dict:
             else:
                 od[index].value = od[index].default
 
-    return ods
+    return od_db

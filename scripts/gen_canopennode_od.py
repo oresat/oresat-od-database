@@ -10,7 +10,7 @@ _FILE_PATH = os.path.dirname(os.path.abspath(__file__))
 sys.path.append(f"{_FILE_PATH}/..")
 
 import canopen
-from oresat_configs import oresat0, oresat0_5
+from oresat_od_db import oresat0, oresat0_5
 
 INDENT4 = " " * 4
 INDENT8 = " " * 8

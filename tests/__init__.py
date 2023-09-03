@@ -1,14 +1,14 @@
-"""Unit tests base for configs."""
+"""Unit tests base for all OreSat OD databases."""
 
 import unittest
 
 import canopen
-from oresat_configs import Index, NodeId
-from oresat_configs._json_to_od import TPDO_PARA_START, OD_DATA_TYPE_SIZE
+from oresat_od_db import Index, NodeId
+from oresat_od_db._json_to_od import TPDO_PARA_START, OD_DATA_TYPE_SIZE
 
 
 class TestConfig(unittest.TestCase):
-    """Test the OreSat0 configs."""
+    """Base class to test a OreSat OD databases."""
 
     def _test_tpdo_sizes(self, all_ods: dict):
         """Validate TPDO sizes."""
@@ -32,7 +32,7 @@ class TestConfig(unittest.TestCase):
                 self.assertLessEqual(size, 64)
 
     def _test_beacon(self, all_ods: dict, beacon_def: dict):
-        """Test all objects reference in the beacon definition exist."""
+        """Test all objects reference in the beacon definition exist in the C3's OD."""
 
         for i in beacon_def["fields"]:
             subindex = i[1]

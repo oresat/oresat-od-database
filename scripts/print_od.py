@@ -10,29 +10,31 @@ _FILE_PATH = os.path.dirname(os.path.abspath(__file__))
 sys.path.append(f"{_FILE_PATH}/..")
 
 import canopen
-from oresat_configs import NodeId, oresat0, oresat0_5
-from oresat_configs._json_to_od import OD_DATA_TYPES
+from oresat_od_db import NodeId, oresat0, oresat0_5
+from oresat_od_db._json_to_od import OD_DATA_TYPES
 
 
-def format_default(raw: Any) -> str:
+def format_default(value: Any) -> str:
     """Format default value based off of python data type."""
-    if isinstance(raw, int) and not isinstance(raw, bool):
-        raw = hex(raw)
+    if isinstance(value, int) and not isinstance(value, bool):
+        value = hex(value)
     elif isinstance(value, str):
-        raw = f'"{raw}"'
-    return raw
+        value = f'"{value}"'
+    return value
 
 
-if __name__ == "__main__":
+def main():
+    """The main"""
+
     parser = ArgumentParser()
     parser.add_argument("oresat", default="oresat0", help="oresat mission; oresat0 or oresat0.5")
     parser.add_argument("card", help="card name; c3, gps, star_tracker_1, etc")
     args = parser.parse_args()
 
     if args.oresat == "oresat0":
-        ods = oresat0.ALL_ODS
+        ods = oresat0.OD_DB
     elif args.oresat == "oresat0.5":
-        ods = oresat0_5.ALL_ODS
+        ods = oresat0_5.OD_DB
     else:
         print(f"invalid oresat mission {args.oresat}")
         sys.exit()
@@ -57,3 +59,7 @@ if __name__ == "__main__":
                 data_type = inverted_od_data_types[od[i][j].data_type]
                 value = format_default(od[i][j].default)
                 print(f"  0x{i:04X} 0x{j:02X}: {od[i][j].name} - {data_type} - {value}")
+
+
+if __name__ == "__main__":
+    main()

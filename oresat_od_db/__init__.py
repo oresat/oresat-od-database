@@ -1,4 +1,4 @@
-"""OreSat Configs"""
+"""OreSat OD database"""
 
 __version__ = "0.1.0"
 

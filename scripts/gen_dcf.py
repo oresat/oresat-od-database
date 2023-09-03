@@ -10,7 +10,7 @@ _FILE_PATH = os.path.dirname(os.path.abspath(__file__))
 sys.path.append(f"{_FILE_PATH}/..")
 
 import canopen
-from oresat_configs import NodeId, oresat0, oresat0_5
+from oresat_od_db import NodeId, oresat0, oresat0_5
 
 
 def write_od(od: canopen.ObjectDictionary, dir_path: str = "."):
@@ -233,9 +233,9 @@ def main():
     args = parser.parse_args()
 
     if args.oresat == "oresat0":
-        ods = oresat0.ALL_ODS
+        ods = oresat0.OD_DB
     elif args.oresat == "oresat0.5":
-        ods = oresat0_5.ALL_ODS
+        ods = oresat0_5.OD_DB
     else:
         print(f"invalid oresat mission {args.oresat}")
         sys.exit()

@@ -3,8 +3,8 @@ requires = ["setuptools"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "oresat-configs"
-description = "OreSat configs"
+name = "oresat-od-database"
+description = "OreSat object dictionary database"
 readme = "README.md"
 requires-python = ">=3.7"
 license = {text = "GPL-3.0"}
@@ -25,7 +25,7 @@ dependencies = [
 dynamic = ["version"]
 
 [tool.setuptools.dynamic]
-version = {attr = "oresat_configs.__version__"}
+version = {attr = "oresat_od_db.__version__"}
 
 [tool.setuptools.packages.find]
 exclude = ["docs*"] 
@@ -57,10 +57,13 @@ linters = "pycodestyle,pyflakes,pylint,mccabe,mypy,radon"
 ignore = "E402,C901,C0403,C0103,E203,R0912,R0915,R901,R901,R0914,C0413,C0206,R1716,W1514"
 max_line_length = 100
 
+[[tool.pylint]]
+ignore = "E402,C901,C0403,C0103,E203,R0912,R0915,R901,R901,R0914,C0413,C0206,R1716,W1514"
+
 [[tool.mypy.overrides]]
 module = "canopen"
 ignore_missing_imports = true
 
 [[tool.pylama.files]]
 path = "*/__init__.py"
-ignore = "F0401"  # unused imports
+ignore = "F0401"  # Unused imports

@@ -1,19 +1,19 @@
-"""Unit tests for OreSat0.5 configs"""
+"""Unit tests for OreSat0 OD database."""
 
-from oresat_configs.oresat0 import ALL_ODS, BEACON_DEF
+from oresat_od_db.oresat0 import OD_DB, BEACON_DEF
 
 from . import TestConfig
 
 
 class TestOreSat0(TestConfig):
-    """Test the OreSat0 configs."""
+    """Test the OreSat0 OD database."""
 
     def test_tpdo_sizes(self):
         """Validate OreSat0 TPDO sizes."""
 
-        self._test_tpdo_sizes(ALL_ODS)
+        self._test_tpdo_sizes(OD_DB)
 
     def test_beacon(self):
-        """Test all OreSat0 objects reference in the beacon definition exist."""
+        """Test all OreSat0 objects reference in the beacon definition exist in C3 OD."""
 
-        self._test_beacon(ALL_ODS, BEACON_DEF)
+        self._test_beacon(OD_DB, BEACON_DEF)
