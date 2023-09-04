@@ -52,26 +52,8 @@ Request to this repo to get all changes into the next release.
 
 ## Build and Install Local Package
 
-If it is already installed, uninstall the package.
+Just run the build_and_install.sh script.
 
 ```bash
-$ python3 -m pip uninstall oresat-od-database
-```
-
-Clear any previous builds.
-
-```bash
-$ rm -rf dist/ *.egg-info/
-```
-
-Build the package.
-
-```bash
-$ python3 -m build
-```
-
-Install the package.
-
-```bash
-$ python3 -m pip install dist/*.whl
+./build_and_install.sh
 ```

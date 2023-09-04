@@ -87,27 +87,27 @@
     },
     {
       "name": "pack_1_temperature",
-      "data_type": "int8",
+      "data_type": "int16",
       "access_type": "ro"
     },
     {
       "name": "pack_1_temperature_avg",
-      "data_type": "int8",
+      "data_type": "int16",
       "access_type": "ro"
     },
     {
       "name": "pack_1_temperature_max",
-      "data_type": "int8",
+      "data_type": "int16",
       "access_type": "ro"
     },
     {
       "name": "pack_1_temperature_min",
-      "data_type": "int8",
+      "data_type": "int16",
       "access_type": "ro"
     },
     {
       "name": "pack_1_status",
-      "data_type": "int8",
+      "data_type": "uint8",
       "access_type": "ro"
     },
     {
@@ -197,27 +197,27 @@
     },
     {
       "name": "pack_2_temperature",
-      "data_type": "int8",
+      "data_type": "int16",
       "access_type": "ro"
     },
     {
       "name": "pack_2_temperature_avg",
-      "data_type": "int8",
+      "data_type": "int16",
       "access_type": "ro"
     },
     {
       "name": "pack_2_temperature_max",
-      "data_type": "int8",
+      "data_type": "int16",
       "access_type": "ro"
     },
     {
       "name": "pack_2_temperature_min",
-      "data_type": "int8",
+      "data_type": "int16",
       "access_type": "ro"
     },
     {
       "name": "pack_2_status",
-      "data_type": "int8",
+      "data_type": "uint8",
       "access_type": "ro"
     },
     {

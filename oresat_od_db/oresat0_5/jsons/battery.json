@@ -107,7 +107,7 @@
     },
     {
       "name": "pack_1_status",
-      "data_type": "int8",
+      "data_type": "uint8",
       "access_type": "ro"
     },
     {
@@ -217,7 +217,7 @@
     },
     {
       "name": "pack_2_status",
-      "data_type": "int8",
+      "data_type": "uint8",
       "access_type": "ro"
     },
     {

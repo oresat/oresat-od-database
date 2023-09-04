@@ -35,8 +35,20 @@
       "access_type": "const"
     },
     {
+      "name": "storage_percent",
+      "data_type": "uint8",
+      "description": "the current storage percent used",
+      "access_type": "ro"
+    },
+    {
+      "name": "ram_percent",
+      "data_type": "uint8",
+      "description": "the current ram percent used",
+      "access_type": "ro"
+    },
+    {
       "name": "fread_cache_len",
-      "data_type": "uint16",
+      "data_type": "uint8",
       "description": "number of files in fread cache",
       "access_type": "ro"
     },
@@ -66,7 +78,7 @@
     },
     {
       "name": "fwrite_cache_len",
-      "data_type": "uint16",
+      "data_type": "uint8",
       "description": "number of files in fwrite cache",
       "access_type": "ro"
     },
@@ -137,9 +149,21 @@
       "access_type": "ro"
     },
     {
-      "name": "storage_percent",
+      "name": "total_daemons",
       "data_type": "uint8",
-      "description": "the current storage percent used",
+      "description": "number of oresat daemons",
+      "access_type": "ro"
+    },
+    {
+      "name": "daemons_active",
+      "data_type": "uint8",
+      "description": "number of oresat daemons running",
+      "access_type": "ro"
+    },
+    {
+      "name": "daemons_failed",
+      "data_type": "uint8",
+      "description": "number of oresat daemons that have failed",
       "access_type": "ro"
     }
   ],
@@ -147,8 +171,11 @@
     "1": {
       "fields": [
         "storage_percent",
+        "ram_percent",
         "fread_cache_len",
-        "fwrite_cache_len"
+        "fwrite_cache_len",
+        "daemons_active",
+        "daemons_failed"
       ],
       "delay_ms": 30000
     },

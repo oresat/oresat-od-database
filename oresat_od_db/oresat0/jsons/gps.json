@@ -136,9 +136,7 @@
   "tpdos": {
     "3": {
       "fields": [
-        "status",
-        "num_of_sv",
-        "time_syncd"
+        "time_since_midnight"
       ]
     },
     "4": {
@@ -161,7 +159,9 @@
     },
     "7": {
       "fields": [
-        "time_since_midnight"
+        "status",
+        "num_of_sv",
+        "time_syncd"
       ]
     },
     "16": {

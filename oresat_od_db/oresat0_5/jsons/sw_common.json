@@ -35,8 +35,27 @@
       "access_type": "const"
     },
     {
+      "name": "flight_mode",
+      "data_type": "bool",
+      "description": "card is in flight mode",
+      "access_type": "rw",
+      "default": true
+    },
+    {
+      "name": "storage_percent",
+      "data_type": "uint8",
+      "description": "the current storage percent used",
+      "access_type": "ro"
+    },
+    {
+      "name": "ram_percent",
+      "data_type": "uint8",
+      "description": "the current ram percent used",
+      "access_type": "ro"
+    },
+    {
       "name": "fread_cache_len",
-      "data_type": "uint16",
+      "data_type": "uint8",
       "description": "number of files in fread cache",
       "access_type": "ro"
     },
@@ -66,7 +85,7 @@
     },
     {
       "name": "fwrite_cache_len",
-      "data_type": "uint16",
+      "data_type": "uint8",
       "description": "number of files in fwrite cache",
       "access_type": "ro"
     },
@@ -135,18 +154,13 @@
       "data_type": "str",
       "description": "get the logs since boot",
       "access_type": "ro"
-    },
-    {
-      "name": "storage_percent",
-      "data_type": "uint8",
-      "description": "the current storage percent used",
-      "access_type": "ro"
     }
   ],
   "tpdos": {
     "1": {
       "fields": [
         "storage_percent",
+        "ram_percent",
         "fread_cache_len",
         "fwrite_cache_len"
       ],
