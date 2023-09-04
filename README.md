@@ -13,11 +13,11 @@ transfers.
 - All object dictionaries (OD) for a specific OreSat mission are defined
   by JSONs.
 - A `standard_object.json` contains some CANopen standard objects that any
-  `*_core.json` file can flag to include.
-- The `sw_core.json` defines all CANopen standard objects, core object,
-  and core PDOs for all Octavo A8-based cards for a OreSat mission.
-- The `fw_core.json` defines all CANopen standard objects, core object,
-  and core PDOs for all STM32-based cards for a OreSat mission.
+  `*_common.json` file can flag to include.
+- The `sw_common.json` defines all CANopen standard objects, common objects,
+  and common PDOs for all Octavo A8-based cards for a OreSat mission.
+- The `fw_common.json` defines all CANopen standard objects, common objects,
+  and common PDOs for all STM32-based cards for a OreSat mission.
 - All card specific configs are are named `<card_name>.json` format.
   They contian all card specific objects and PDOs.
   - **NOTE:** The cards JSON are simular to CANopen's `.eds` files; they are for

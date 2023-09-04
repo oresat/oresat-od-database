@@ -187,7 +187,7 @@ def _add_tpdo_data(od: canopen.ObjectDictionary, config: OdConfig):
                 try:
                     mapped_obj = od[Index.CARD_DATA.value][j]
                 except KeyError:
-                    mapped_obj = od[Index.CORE_DATA.value][j]
+                    mapped_obj = od[Index.COMMON_DATA.value][j]
             mapped_subindex = mapped_obj.subindex
             value = mapped_obj.index << 16
             value += mapped_subindex << 8
@@ -484,10 +484,10 @@ def gen_od_db(oresat_id: OreSatId, beacon_def: dict, configs: dict) -> dict:
 
     od_db = {}
 
-    # make od with core and card objects and tpdos
+    # make od with common and card objects and tpdos
     for node_id in configs:
         card_config = configs[node_id][0]
-        core_config = configs[node_id][1]
+        common_config = configs[node_id][1]
 
         od = canopen.ObjectDictionary()
         od.bitrate = 1_000_000  # bps
@@ -508,14 +508,14 @@ def gen_od_db(oresat_id: OreSatId, beacon_def: dict, configs: dict) -> dict:
         od.device_information.nr_of_TXPDO = 0
         od.device_information.LSS_supported = False
 
-        # add core and card records
-        _add_rec(od, core_config.objects, Index.CORE_DATA)
+        # add common and card records
+        _add_rec(od, common_config.objects, Index.COMMON_DATA)
         _add_rec(od, card_config.objects, Index.CARD_DATA)
 
         # add any standard objects
         for key in card_config.std_objects:
             od[std_objs[key].index] = deepcopy(std_objs[key])
-        for key in core_config.std_objects:
+        for key in common_config.std_objects:
             od[std_objs[key].index] = deepcopy(std_objs[key])
             if key == "cob_id_emergency_message":
                 od["cob_id_emergency_message"].default = 0x80 + node_id
@@ -523,10 +523,10 @@ def gen_od_db(oresat_id: OreSatId, beacon_def: dict, configs: dict) -> dict:
         # add TPDSs
         _add_tpdo_data(od, card_config)
         if node_id != NodeId.C3:
-            _add_tpdo_data(od, core_config)
+            _add_tpdo_data(od, common_config)
 
         # set specific obj defaults
-        od["core_data"]["satellite_id"].default = oresat_id.value
+        od["common_data"]["satellite_id"].default = oresat_id.value
         if node_id == NodeId.C3:
             od["card_data"]["beacon_revision"].default = beacon_def["revision"]
 

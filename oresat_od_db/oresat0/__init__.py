@@ -9,8 +9,8 @@ from .._json_to_od import read_json_od_config, gen_od_db
 ORESAT_ID = OreSatId.ORESAT0
 
 _JSON_DIR = f"{os.path.dirname(os.path.abspath(__file__))}/jsons"
-_FW_CORE_CONFIG = read_json_od_config(f"{_JSON_DIR}/fw_core.json")
-_SW_CORE_CONFIG = read_json_od_config(f"{_JSON_DIR}/sw_core.json")
+_FW_COMMON_CONFIG = read_json_od_config(f"{_JSON_DIR}/fw_common.json")
+_SW_COMMON_CONFIG = read_json_od_config(f"{_JSON_DIR}/sw_common.json")
 _C3_CONFIG = read_json_od_config(f"{_JSON_DIR}/c3.json")
 _BAT_CONFIG = read_json_od_config(f"{_JSON_DIR}/battery.json")
 _SOLAR_CONFIG = read_json_od_config(f"{_JSON_DIR}/solar.json")
@@ -28,16 +28,16 @@ OD_DB = gen_od_db(
     ORESAT_ID,
     BEACON_DEF,
     {
-        NodeId.C3: (_C3_CONFIG, _FW_CORE_CONFIG),
-        NodeId.BATTERY_1: (_BAT_CONFIG, _FW_CORE_CONFIG),
-        NodeId.SOLAR_MODULE_1: (_SOLAR_CONFIG, _FW_CORE_CONFIG),
-        NodeId.SOLAR_MODULE_2: (_SOLAR_CONFIG, _FW_CORE_CONFIG),
-        NodeId.SOLAR_MODULE_3: (_SOLAR_CONFIG, _FW_CORE_CONFIG),
-        NodeId.SOLAR_MODULE_4: (_SOLAR_CONFIG, _FW_CORE_CONFIG),
-        NodeId.IMU: (_IMU_CONFIG, _FW_CORE_CONFIG),
-        NodeId.GPS: (_GPS_CONFIG, _SW_CORE_CONFIG),
-        NodeId.STAR_TRACKER_1: (_ST_CONFIG, _SW_CORE_CONFIG),
-        NodeId.DXWIFI: (_DXWIFI_CONFIG, _SW_CORE_CONFIG),
+        NodeId.C3: (_C3_CONFIG, _FW_COMMON_CONFIG),
+        NodeId.BATTERY_1: (_BAT_CONFIG, _FW_COMMON_CONFIG),
+        NodeId.SOLAR_MODULE_1: (_SOLAR_CONFIG, _FW_COMMON_CONFIG),
+        NodeId.SOLAR_MODULE_2: (_SOLAR_CONFIG, _FW_COMMON_CONFIG),
+        NodeId.SOLAR_MODULE_3: (_SOLAR_CONFIG, _FW_COMMON_CONFIG),
+        NodeId.SOLAR_MODULE_4: (_SOLAR_CONFIG, _FW_COMMON_CONFIG),
+        NodeId.IMU: (_IMU_CONFIG, _FW_COMMON_CONFIG),
+        NodeId.GPS: (_GPS_CONFIG, _SW_COMMON_CONFIG),
+        NodeId.STAR_TRACKER_1: (_ST_CONFIG, _SW_COMMON_CONFIG),
+        NodeId.DXWIFI: (_DXWIFI_CONFIG, _SW_COMMON_CONFIG),
     },
 )
 

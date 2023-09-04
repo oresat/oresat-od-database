@@ -48,7 +48,7 @@ class Index(IntEnum):
     SCET = 0x2010
     UTC = 0x2011
     # OreSat indexes
-    CORE_DATA = 0x3000
+    COMMON_DATA = 0x3000
     CARD_DATA = 0x6000
     OTHER_CARD_BASE_INDEX = 0x7000
     C3_DATA = OTHER_CARD_BASE_INDEX + NodeId.C3

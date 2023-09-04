@@ -593,7 +593,7 @@ def write_canopennode_h(od: canopen.ObjectDictionary, dir_path: str = "."):
     # add nice #defines for indexes and subindex values
     for i in od:
         if i < 0x3000:
-            continue  # only card about core, card, and RPDO mapped objects
+            continue  # only card about common, card, and RPDO mapped objects
 
         name = format_name(od[i].name)
         lines.append(f"#define OD_INDEX_{name.upper()} 0x{i:X}")

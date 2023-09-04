@@ -40,5 +40,5 @@ class TestConfig(unittest.TestCase):
                 try:
                     obj = all_ods[NodeId.C3][Index.CARD_DATA][subindex]
                 except KeyError:
-                    obj = all_ods[NodeId.C3][Index.CORE_DATA][subindex]
+                    obj = all_ods[NodeId.C3][Index.COMMON_DATA][subindex]
                 self.assertIsNotNone(obj)
