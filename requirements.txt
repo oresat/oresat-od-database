@@ -1,4 +1,6 @@
+black
+build
 canopen
 dataclasses_json
-pylama[toml]
 pylama[all]
+pylama[toml]

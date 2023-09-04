@@ -6,7 +6,7 @@ build-backend = "setuptools.build_meta"
 name = "oresat-od-database"
 description = "OreSat object dictionary database"
 readme = "README.md"
-requires-python = ">=3.7"
+requires-python = ">=3.9"
 license = {text = "GPL-3.0"}
 classifiers = [
     "License :: OSI Approved :: GNU General Public License v3 (GPLv3)",
@@ -22,11 +22,16 @@ dependencies = [
 ]
 dynamic = ["version"]
 
+[project.scripts]
+oresat-gen-canopennode-od = "scripts.gen_canopennode_od:main"
+oresat-gen-dcf = "scripts.gen_dcf:main"
+oresat-print-od = "scripts.print_od:main"
+
 [tool.setuptools.dynamic]
 version = {attr = "oresat_od_db.__version__"}
 
 [tool.setuptools.packages.find]
-exclude = ["docs*"] 
+exclude = ["docs*", "tests*"] 
 
 [tool.setuptools.package-data]
 "*" = ["*.json"]

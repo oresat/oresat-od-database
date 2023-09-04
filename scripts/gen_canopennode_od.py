@@ -91,7 +91,7 @@ def format_name(string: str) -> str:
     return name
 
 
-def write_canopennode(od: canopen.ObjectDictionary, dir_path=""):
+def write_canopennode(od: canopen.ObjectDictionary, dir_path: str = "."):
     """Save an od/dcf as CANopenNode OD.[c/h] files
 
     Parameters
@@ -103,12 +103,18 @@ def write_canopennode(od: canopen.ObjectDictionary, dir_path=""):
         be used.
     """
 
+    if dir_path[-1] == "/":
+        dir_path = dir_path[:-1]
+
     write_canopennode_c(od, dir_path)
     write_canopennode_h(od, dir_path)
 
 
 def remove_node_id(default: str) -> str:
     """Remove "+$NODEID" or "$NODEID+" from the default value"""
+
+    if not isinstance(default, str):
+        return default
 
     temp = default.split("+")
 
@@ -134,9 +140,7 @@ def attr_lines(od: canopen.ObjectDictionary, index: int) -> list:
         default = remove_node_id(obj.default)
         line = f"{INDENT4}.x{index:X}_{format_name(obj.name)} = "
 
-        if obj.name == "COB-ID":
-            line += f"0x{default - od.node_id}, "
-        elif obj.data_type == canopen.objectdictionary.datatypes.VISIBLE_STRING:
+        if obj.data_type == canopen.objectdictionary.datatypes.VISIBLE_STRING:
             line += "{"
             for i in obj.default:
                 line += f'"{i}", '
@@ -213,7 +217,12 @@ def attr_lines(od: canopen.ObjectDictionary, index: int) -> list:
             if obj[i].data_type == canopen.objectdictionary.datatypes.DOMAIN:
                 continue  # skip domains
 
-            if obj[i].data_type == canopen.objectdictionary.datatypes.VISIBLE_STRING:
+            if obj[i].name == "COB-ID":
+                # oresat firmware only wants 0x180, 0x280, 0x380, 0x480
+                # no +node_id or +1, +2, +3 for TPDO nums > 4
+                cob_id = (default - od.node_id) & 0xFFC
+                lines.append(f"{INDENT8}.{name} = 0x{cob_id:X},")
+            elif obj[i].data_type == canopen.objectdictionary.datatypes.VISIBLE_STRING:
                 line = f"{INDENT8}.{name} = " + "{"
                 for i in obj[i].default:
                     line += f'"{i}", '
@@ -364,7 +373,7 @@ def obj_lines(od: canopen.ObjectDictionary, index) -> list:
     return lines
 
 
-def write_canopennode_c(od: canopen.ObjectDictionary, dir_path=""):
+def write_canopennode_c(od: canopen.ObjectDictionary, dir_path: str = "."):
     """Save an od/dcf as a CANopenNode OD.c file
 
     Parameters
@@ -511,7 +520,7 @@ def _canopennode_h_lines(od: canopen.ObjectDictionary, index: int) -> list:
     return lines
 
 
-def write_canopennode_h(od: canopen.ObjectDictionary, dir_path=""):
+def write_canopennode_h(od: canopen.ObjectDictionary, dir_path: str = "."):
     """Save an od/dcf as a CANopenNode OD.h file
 
     Parameters
@@ -624,7 +633,7 @@ def main():
     parser.add_argument("oresat", help="oresat mission; oresat0 or oresat0.5")
     parser.add_argument("card", help="card name; c3, battery, solar, imu, or reaction_wheel")
     parser.add_argument(
-        "-d", "--dir_path", default=".", help='output directory path, default: "."'
+        "-d", "--dir-path", default=".", help='output directory path, default: "."'
     )
     args = parser.parse_args()
 
@@ -633,6 +642,7 @@ def main():
         sys.exit()
 
     od = OD_LIST[(args.oresat.lower(), args.card)]
+
     write_canopennode(od, args.dir_path)
 
 
