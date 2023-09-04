@@ -134,6 +134,12 @@ def _add_rec(
 
     rec = canopen.objectdictionary.Record(index.name.lower(), index.value)
 
+    dynamic_len_data_types = [
+        canopen.objectdictionary.VISIBLE_STRING,
+        canopen.objectdictionary.OCTET_STRING,
+        canopen.objectdictionary.DOMAIN,
+    ]
+
     for obj in objects:
         subindex = objects.index(obj) + 1
         var = canopen.objectdictionary.Variable(obj.name, index, subindex)
@@ -146,6 +152,8 @@ def _add_rec(
         else:
             var.default = obj.default
         var.description = obj.description
+        if var.data_type not in dynamic_len_data_types:
+            var.pdo_mappable = True
         rec.add_member(var)
 
     # index 0
@@ -426,6 +434,8 @@ def _load_std_objs(file_path: str) -> dict:
             var.access_type = obj.get("access_type", "rw")
             var.default = obj.get("default", OD_DEFAULTS[var.data_type])
             var.description = obj.get("description", "")
+            if var.name == "scet":
+                var.pdo_mappable = True
             std_objs[key] = var
         elif obj["object_type"] == "record":
             rec = canopen.objectdictionary.Record(key, index)

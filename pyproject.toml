@@ -42,28 +42,24 @@ line_length = 99
 [tool.pylama]
 format = "pylint"
 skip = "*/.tox/*,*/.env/,*/.git/*,*/build/*"
+linters = "pycodestyle,pyflakes,pylint,mccabe,mypy,radon"
 # E402:     Module level import not at top of file
 # C901:     Function is too complex
 # C0403:    Invalid characters in docstring
-# C0103:    Arguments are snake_case naming style (also short name)
+# C0103:    Arguments are not snake_case naming style or too short
 # E203:     Whitespace before ':' (black does this)
 # R0912:    Too many branches
 # R0915:    Too many statements
 # R0901:    Function is too complex
 # R0914:    Too many local variables
 # R1716:    Simplify chained comparison between the operands
-# C0413:    Imports at top of module
+# C0413:    Imports not at top of module
 # C0206:    Consider iterating dictionaries with .items()
 # R1716:    Simplify chained comparison between the operands
 # W1514:    Using open without explicitly specifying an encoding
-linters = "pycodestyle,pyflakes,pylint,mccabe,mypy,radon"
 ignore = "E402,C901,C0403,C0103,E203,R0912,R0915,R901,R901,R0914,C0413,C0206,R1716,W1514"
 max_line_length = 100
 
 [[tool.mypy.overrides]]
 module = "canopen"
 ignore_missing_imports = true
-
-[[tool.pylama.files]]
-path = "*/__init__.py"
-ignore = "F0401"  # Unused imports
