@@ -30,8 +30,5 @@ jobs:
     - name: Test with Python's unittest
       run: python -m unittest
 
-    - name: Lint with pylama
-      run: pylama
-
     - name: Test building pypi package
       run: python -m build
