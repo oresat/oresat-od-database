@@ -108,7 +108,7 @@
       "description": "file name to write"
     },
     {
-      "name": "fwrite_cache_data",
+      "name": "fwrite_cache_file_data",
       "data_type": "domain",
       "description": "file data to write",
       "access_type": "wo"
