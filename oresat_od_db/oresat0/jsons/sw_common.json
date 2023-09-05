@@ -35,6 +35,12 @@
       "access_type": "const"
     },
     {
+      "name": "reset",
+      "data_type": "uint8",
+      "description": "reset the app; See the olaf.NodeStop enum for values",
+      "access_type": "rw"
+    },
+    {
       "name": "storage_percent",
       "data_type": "uint8",
       "description": "the current storage percent used",
@@ -83,7 +89,7 @@
       "access_type": "ro"
     },
     {
-      "name": "fwrite_cache_list_json",
+      "name": "fwrite_cache_files_json",
       "data_type": "str",
       "description": "all file names of files in fwrite cache as a JSON",
       "access_type": "ro",
@@ -119,7 +125,7 @@
       "access_type": "ro"
     },
     {
-      "name": "update_cache_list_json",
+      "name": "update_cache_files_json",
       "data_type": "str",
       "description": "list of updates cached as a JSON str in run order",
       "access_type": "ro"
