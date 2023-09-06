@@ -1,7 +1,7 @@
 # OreSat Object Dictionary Database
 
-A centeralize "database" for all OreSat card object dictionaries and beacon
-definition for each OreSat mission.
+A centeralize "database" for all OreSat card object dictionaries (OD) and
+beacon definition for each OreSat mission.
 
 Having all the OD defined in one place makes it much easier to update
 OD definitions without having to go to each repo to update each cards OD.
@@ -10,8 +10,7 @@ transfers.
 
 ## How This Works
 
-- All object dictionaries (OD) for a specific OreSat mission are defined
-  by JSONs.
+- All object dictionaries for a specific OreSat mission are defined by JSONs.
 - A `standard_object.json` contains some CANopen standard objects that any
   `*_common.json` file can flag to include.
 - The `sw_common.json` defines all CANopen standard objects, common objects,
@@ -19,7 +18,7 @@ transfers.
 - The `fw_common.json` defines all CANopen standard objects, common objects,
   and common PDOs for all STM32-based cards for a OreSat mission.
 - All card specific configs are are named `<card_name>.json` format.
-  They contian all card specific objects and PDOs.
+  They contain all card specific objects and PDOs.
   - **NOTE:** The cards JSON are simular to CANopen's `.eds` files; they are for
     a device type, not a unique device on a CAN network.
 - The `beacon.json` file defines the beacon definition as all the data is pull
@@ -29,10 +28,30 @@ transfers.
 - All python-based projects can just import their OreSat OD like:
   ```python
   from oresat_od_db.oresat0_5 import GPS_OD
+
+  print(GPS_OD["card_data"]["latitude"].value)
   ```
-- All ChibiOS-based generate their `OD.[c/h]` files by:
+- All ChibiOS-based projects generate their `OD.[c/h]` files by:
   ```bash
   $ oresat-gen-canopennode-od oresat0.5 imu -d path/to/output/dir
+  ```
+  And use it like:
+  ```c
+  #include "OD.h"
+  #include "CANopen.h"
+  #include <stdint.h>
+
+  /** Example function that sets a value in the OD. */
+  int main(void) {
+    uint8_t temp_c = 42;
+
+    // OD is a global provided by CANopen.h
+    // OD_INDEX_CARD_DATA and OD_SUBINDEX_TEMPERATURE are defined in OD.h
+    OD_entry_t *entry = OD_find(OD, OD_INDEX_CARD_DATA);
+
+    // boolean is a flag to bypass any OD callback functions and write strait to the OD
+    OD_set_u8(entry, OD_SUBINDEX_TEMPERATURE, temp_c, true);
+  }
   ```
 
 ## Updating a Config
