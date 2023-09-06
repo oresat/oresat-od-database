@@ -217,7 +217,7 @@ def attr_lines(od: canopen.ObjectDictionary, index: int) -> list:
             if obj[i].data_type == canopen.objectdictionary.datatypes.DOMAIN:
                 continue  # skip domains
 
-            if obj[i].name == "COB-ID":
+            if obj[i].name == "cob_id":
                 # oresat firmware only wants 0x180, 0x280, 0x380, 0x480
                 # no +node_id or +1, +2, +3 for TPDO nums > 4
                 cob_id = (default - od.node_id) & 0xFFC
