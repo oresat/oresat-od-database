@@ -10,6 +10,7 @@ _FILE_PATH = os.path.dirname(os.path.abspath(__file__))
 sys.path.append(f"{_FILE_PATH}/..")
 
 import canopen
+
 from oresat_od_db import NodeId, oresat0, oresat0_5
 
 

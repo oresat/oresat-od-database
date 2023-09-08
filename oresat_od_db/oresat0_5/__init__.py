@@ -1,10 +1,10 @@
 """OreSat0.5 object dictionary and beacon globals."""
 
-import os
 import json
+import os
 
 from .. import NodeId, OreSatId
-from .._json_to_od import read_json_od_config, gen_od_db
+from .._json_to_od import gen_od_db, read_json_od_config
 
 ORESAT_ID = OreSatId.ORESAT0_5
 

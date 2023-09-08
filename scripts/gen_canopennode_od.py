@@ -1,15 +1,16 @@
 #!/usr/bin/env python3
 """Generate a OreSat card's CANopenNode OD.[c/h] files"""
 
+import math as m
 import os
 import sys
 from argparse import ArgumentParser
-import math as m
 
 _FILE_PATH = os.path.dirname(os.path.abspath(__file__))
 sys.path.append(f"{_FILE_PATH}/..")
 
 import canopen
+
 from oresat_od_db import oresat0, oresat0_5
 
 INDENT4 = " " * 4

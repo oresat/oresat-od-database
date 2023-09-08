@@ -1,15 +1,15 @@
 """Convert OreSat JSON files to an canopen.ObjectDictionary object."""
 
-import os
 import json
+import os
 from copy import deepcopy
 from dataclasses import dataclass, field
-from typing import List, Dict, Any
+from typing import Any, Dict, List
 
 import canopen
-from dataclasses_json import dataclass_json, LetterCase
+from dataclasses_json import LetterCase, dataclass_json
 
-from . import __version__, Index, NodeId, OreSatId
+from . import Index, NodeId, OreSatId, __version__
 
 RPDO_COMM_START = 0x1400
 RPDO_PARA_START = 0x1600

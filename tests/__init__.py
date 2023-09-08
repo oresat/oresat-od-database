@@ -4,7 +4,8 @@ import re
 import unittest
 
 import canopen
-from oresat_od_db import OreSatId, Index, NodeId
+
+from oresat_od_db import Index, NodeId, OreSatId
 from oresat_od_db._json_to_od import OD_DATA_TYPE_SIZE, TPDO_COMM_START, TPDO_PARA_START
 
 

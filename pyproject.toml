@@ -63,3 +63,8 @@ max_line_length = 100
 [[tool.mypy.overrides]]
 module = "canopen"
 ignore_missing_imports = true
+
+[tool.isort]
+profile = "black"
+#src_paths = ["."]
+line_length = 100
