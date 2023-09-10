@@ -9,7 +9,7 @@ from typing import Any, Dict, List
 import canopen
 from dataclasses_json import LetterCase, dataclass_json
 
-from . import Index, NodeId, OreSatId, __version__
+from . import NODE_NICE_NAMES, Index, NodeId, OreSatId, __version__
 
 RPDO_COMM_START = 0x1400
 RPDO_PARA_START = 0x1600
@@ -265,7 +265,7 @@ def _add_tpdo_data(od: canopen.ObjectDictionary, config: OdConfig):
 def _add_rpdo_data(
     tpdo_num: int, rpdo_node_od: canopen.ObjectDictionary, tpdo_node_od: canopen.ObjectDictionary
 ):
-    node_name = tpdo_node_od.device_information.product_name
+    node_name = NodeId(tpdo_node_od.node_id).name.lower()
     tpdo_comm_index = TPDO_COMM_START + tpdo_num - 1
     tpdo_mapping_index = TPDO_PARA_START + tpdo_num - 1
 
@@ -505,7 +505,7 @@ def gen_od_db(oresat_id: OreSatId, beacon_def: dict, configs: dict) -> dict:
         od.device_information.allowed_baudrates = set([1000])
         od.device_information.vendor_name = "PSAS"
         od.device_information.vendor_number = 0
-        od.device_information.product_name = node_id.name.lower()
+        od.device_information.product_name = NODE_NICE_NAMES[node_id]
         od.device_information.product_number = 0
         od.device_information.revision_number = 0
         od.device_information.order_code = 0

@@ -39,6 +39,32 @@ class NodeId(IntEnum):
     CFC = 0x50
 
 
+NODE_NICE_NAMES = {
+    NodeId.C3: "C3",
+    NodeId.BATTERY_1: "Battery 1",
+    NodeId.BATTERY_2: "Battery 2",
+    NodeId.SOLAR_MODULE_1: "Solar Module 1",
+    NodeId.SOLAR_MODULE_2: "Solar Module 2",
+    NodeId.SOLAR_MODULE_3: "Solar Module 3",
+    NodeId.SOLAR_MODULE_4: "Solar Module 4",
+    NodeId.SOLAR_MODULE_5: "Solar Module 5",
+    NodeId.SOLAR_MODULE_6: "Solar Module 6",
+    NodeId.SOLAR_MODULE_7: "Solar Module 7",
+    NodeId.SOLAR_MODULE_8: "Solar Module 8",
+    NodeId.STAR_TRACKER_1: "Star Tracker 1",
+    NodeId.STAR_TRACKER_2: "Star Tracker 2",
+    NodeId.GPS: "GPS",
+    NodeId.IMU: "IMU",
+    NodeId.REACTION_WHEEL_1: "Reaction Wheel 1",
+    NodeId.REACTION_WHEEL_2: "Reaction Wheel 2",
+    NodeId.REACTION_WHEEL_3: "Reaction Wheel 3",
+    NodeId.REACTION_WHEEL_4: "Reaction Wheel 4",
+    NodeId.DXWIFI: "DxWiFi",
+    NodeId.CFC: "CFC",
+}
+"""Nice name for CANopen Nodes."""
+
+
 class Index(IntEnum):
     """OD posible indexes."""
 
