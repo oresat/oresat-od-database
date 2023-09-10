@@ -70,7 +70,7 @@
       "data_type": "str",
       "description": "all file names of files in fread cache as a JSON",
       "access_type": "ro",
-      "default": "{}"
+      "default": "[]"
     },
     {
       "name": "fread_cache_file_name",
