@@ -13,6 +13,21 @@
     "data_type": "uint8",
     "access_type": "ro"
   },
+  "cob_id_sync": {
+    "index": "0x1005",
+    "object_type": "variable",
+    "description": "COB-ID of the SYNC message",
+    "data_type": "uint32",
+    "access_type": "rw",
+    "default": "0x80"
+  },
+  "communication_cycle_period": {
+    "index": "0x1006",
+    "object_type": "variable",
+    "description": "SYNC interval in mircoseconds",
+    "data_type": "uint32",
+    "access_type": "rw"
+  },
   "cob_id_emergency_message": {
     "index": "0x1014",
     "object_type": "variable",
@@ -20,6 +35,14 @@
     "data_type": "uint32",
     "access_type": "rw",
     "default": "0x80+$NODE_ID"
+  },
+  "consumer_heartbeat_time": {
+    "index": "0x1016",
+    "object_type": "array",
+    "description": "expected heartbeat cycle times in milliseconds for all other nodes",
+    "length": 127,
+    "data_type": "uint32",
+    "default": 1000
   },
   "producer_heartbeat_time": {
     "index": "0x1017",
@@ -56,6 +79,54 @@
         "description": "unqiue device id for a product group or revision",
         "data_type": "uint32",
         "access_type": "ro"
+      }
+    }
+  },
+  "sdo_server_parameter": {
+    "index": "0x1200",
+    "object_type": "record",
+    "subindexes": {
+      "0x1": {
+        "name": "cob_id_client_to_server",
+        "data_type": "uint32",
+        "access_type": "rw",
+        "default": "0x80000000"
+      },
+      "0x2": {
+        "name": "cob_id_server_to_client",
+        "data_type": "uint32",
+        "access_type": "rw",
+        "default": "0x80000000"
+      },
+      "0x3": {
+        "name": "node_id_od_sdo_client",
+        "data_type": "uint32",
+        "access_type": "rw",
+        "default": 1
+      }
+    }
+  },
+  "sdo_client_parameter": {
+    "index": "0x1280",
+    "object_type": "record",
+    "subindexes": {
+      "0x1": {
+        "name": "cob_id_client_to_server",
+        "data_type": "uint32",
+        "access_type": "rw",
+        "default": "0x80000000"
+      },
+      "0x2": {
+        "name": "cob_id_server_to_client",
+        "data_type": "uint32",
+        "access_type": "rw",
+        "default": "0x80000000"
+      },
+      "0x3": {
+        "name": "node_id_od_sdo_client",
+        "data_type": "uint32",
+        "access_type": "rw",
+        "default": 1
       }
     }
   },

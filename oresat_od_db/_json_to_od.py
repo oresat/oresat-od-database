@@ -149,6 +149,10 @@ def _add_rec(
             var.default = __version__
         elif obj.default is None:
             var.default = OD_DEFAULTS[var.data_type]
+        elif var.data_type in canopen.objectdictionary.INTEGER_TYPES and isinstance(
+            obj.default, str
+        ):  # fix hex values data types
+            var.default = int(obj.default, 16)
         else:
             var.default = obj.default
         var.description = obj.description
@@ -433,6 +437,14 @@ def _load_std_objs(file_path: str) -> dict:
             var.data_type = OD_DATA_TYPES[obj["data_type"]]
             var.access_type = obj.get("access_type", "rw")
             var.default = obj.get("default", OD_DEFAULTS[var.data_type])
+            if var.data_type in canopen.objectdictionary.INTEGER_TYPES and isinstance(
+                var.default, str
+            ):  # fix hex values data types
+                if "+$NODE_ID" in var.default:
+                    var.default = var.default.split("+")[0]
+                elif "$NODE_ID+" in var.default:
+                    var.default = var.default.split("+")[1]
+                var.default = int(var.default, 16)
             var.description = obj.get("description", "")
             if var.name == "scet":
                 var.pdo_mappable = True
@@ -453,6 +465,10 @@ def _load_std_objs(file_path: str) -> dict:
                 var.data_type = OD_DATA_TYPES[sub_obj["data_type"]]
                 var.access_type = sub_obj.get("access_type", "rw")
                 var.default = sub_obj.get("default", OD_DEFAULTS[var.data_type])
+                if var.data_type in canopen.objectdictionary.INTEGER_TYPES and isinstance(
+                    var.default, str
+                ):  # fix hex values data types
+                    var.default = int(var.default, 16)
                 var.description = sub_obj.get("description", "")
                 rec.add_member(var)
 
@@ -463,16 +479,16 @@ def _load_std_objs(file_path: str) -> dict:
             data_type = OD_DATA_TYPES[obj["data_type"]]
             access_type = obj.get("access_type", "rw")
             default = obj.get("default", OD_DEFAULTS[data_type])
-            subindexes = int(obj["subindexes"], 16)
+            length = obj["length"]
 
             var = canopen.objectdictionary.Variable("highest_index_supported", index, 0x0)
             var.data_type = canopen.objectdictionary.UNSIGNED8
             var.access_type = "const"
-            var.default = subindexes
+            var.default = length + 1
             arr.add_member(var)
 
-            for subindex in range(subindexes + 1):
-                var_name = obj["name"] + f"_{subindex}"
+            for subindex in range(1, length + 1):
+                var_name = key + f"_{subindex}"
                 var = canopen.objectdictionary.Variable(var_name, index, subindex)
                 var.data_type = data_type
                 var.access_type = access_type
@@ -522,10 +538,39 @@ def gen_od_db(oresat_id: OreSatId, beacon_def: dict, configs: dict) -> dict:
         _add_rec(od, common_config.objects, Index.COMMON_DATA)
         _add_rec(od, card_config.objects, Index.CARD_DATA)
 
+        # this object's subindexes are dependent on node id of all nodes on the bus
+        # subindex corresponds to node_id (don't add subindexes for node id that do not exist)
+        # all nodes other than the c3 really only need the c3
+        #
+        # without this firmware binary size for STM32M0-base cards becomes too large
+        std_objects = set(card_config.std_objects + common_config.std_objects)
+        if "consumer_heartbeat_time" in std_objects:
+            obj = std_objs["consumer_heartbeat_time"]
+
+            arr = canopen.objectdictionary.Array(obj.name, obj.index)
+            od[obj.index] = arr
+
+            var = canopen.objectdictionary.Variable("highest_index_supported", obj.index, 0x0)
+            var.data_type = canopen.objectdictionary.UNSIGNED8
+            var.access_type = "const"
+            arr.add_member(var)
+
+            if node_id != NodeId.C3:
+                # add only the subindex for the c3 for non-c3 nodes
+                arr.add_member(deepcopy(std_objs[obj.name][1]))
+                var.default = 1
+            else:
+                # add all node_ids to c3
+                for key in configs.keys():
+                    if key == NodeId.C3:
+                        continue  # skip itself
+                    arr.add_member(deepcopy(std_objs[obj.name][key.value]))
+                    var.default = key.value
+
         # add any standard objects
-        for key in card_config.std_objects:
-            od[std_objs[key].index] = deepcopy(std_objs[key])
-        for key in common_config.std_objects:
+        for key in std_objects:
+            if key == "consumer_heartbeat_time":
+                continue  # added above, skip this
             od[std_objs[key].index] = deepcopy(std_objs[key])
             if key == "cob_id_emergency_message":
                 od["cob_id_emergency_message"].default = 0x80 + node_id

@@ -2,9 +2,12 @@
   "std_objects": [
     "device_type",
     "error_register",
+    "cob_id_sync",
     "identity",
     "cob_id_emergency_message",
+    "consumer_heartbeat_time",
     "producer_heartbeat_time",
+    "sdo_server_parameter",
     "os_command",
     "scet",
     "utc"
