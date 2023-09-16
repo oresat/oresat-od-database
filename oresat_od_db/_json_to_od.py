@@ -178,7 +178,7 @@ def _add_tpdo_data(od: canopen.ObjectDictionary, config: OdConfig):
         comm_rec = canopen.objectdictionary.Record(
             f"tpdo_{num}_communication_parameters", comm_index
         )
-        map_rec = canopen.objectdictionary.Record(f"rpdo_{num}_mapping_parameters", map_index)
+        map_rec = canopen.objectdictionary.Record(f"tpdo_{num}_mapping_parameters", map_index)
         od.add_object(map_rec)
         od.add_object(comm_rec)
 
