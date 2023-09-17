@@ -95,6 +95,24 @@
       "data_type": "uint32",
       "description": "edl sequence count",
       "access_type": "ro"
+    },
+    {
+      "name": "opd_enable",
+      "data_type": "bool",
+      "description": "opd enable status",
+      "access_type": "ro"
+    },
+    {
+      "name": "opd_fault",
+      "data_type": "uint8",
+      "description": "opd circuit has a fault",
+      "access_type": "ro"
+    },
+    {
+      "name": "opd_current",
+      "data_type": "uint8",
+      "description": "opd current draw in 0.02mA",
+      "access_type": "ro"
     }
   ],
   "tpdos": {
