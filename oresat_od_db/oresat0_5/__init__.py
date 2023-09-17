@@ -5,23 +5,23 @@ import os
 
 from .. import NodeId, OreSatId
 from .._json_to_od import gen_od_db, read_json_od_config
+from ..base import (
+    BAT_CONFIG,
+    C3_CONFIG,
+    CFC_CONFIG,
+    DXWIFI_CONFIG,
+    FW_COMMON_CONFIG,
+    GPS_CONFIG,
+    IMU_CONFIG,
+    RW_CONFIG,
+    SOLAR_CONFIG,
+    ST_CONFIG,
+    SW_COMMON_CONFIG,
+)
 
 ORESAT_ID = OreSatId.ORESAT0_5
 
 _JSON_DIR = f"{os.path.dirname(os.path.abspath(__file__))}/jsons"
-_FW_COMMON_CONFIG = read_json_od_config(f"{_JSON_DIR}/fw_common.json")
-_SW_COMMON_CONFIG = read_json_od_config(f"{_JSON_DIR}/sw_common.json")
-_C3_CONFIG = read_json_od_config(f"{_JSON_DIR}/c3.json")
-_BAT_CONFIG = read_json_od_config(f"{_JSON_DIR}/battery.json")
-_SOLAR_CONFIG = read_json_od_config(f"{_JSON_DIR}/solar.json")
-_IMU_CONFIG = read_json_od_config(f"{_JSON_DIR}/imu.json")
-_RW_CONFIG = read_json_od_config(f"{_JSON_DIR}/reaction_wheel.json")
-_GPS_CONFIG = read_json_od_config(f"{_JSON_DIR}/gps.json")
-_ST_CONFIG = read_json_od_config(f"{_JSON_DIR}/star_tracker.json")
-_DXWIFI_CONFIG = read_json_od_config(f"{_JSON_DIR}/dxwifi.json")
-_CFC_CONFIG = read_json_od_config(f"{_JSON_DIR}/cfc.json")
-
-
 with open(f"{_JSON_DIR}/beacon.json", "r") as f:
     BEACON_DEF = json.load(f)
 
@@ -30,23 +30,23 @@ OD_DB = gen_od_db(
     ORESAT_ID,
     BEACON_DEF,
     {
-        NodeId.C3: (_C3_CONFIG, _SW_COMMON_CONFIG),
-        NodeId.BATTERY_1: (_BAT_CONFIG, _FW_COMMON_CONFIG),
-        NodeId.SOLAR_MODULE_1: (_SOLAR_CONFIG, _FW_COMMON_CONFIG),
-        NodeId.SOLAR_MODULE_2: (_SOLAR_CONFIG, _FW_COMMON_CONFIG),
-        NodeId.SOLAR_MODULE_3: (_SOLAR_CONFIG, _FW_COMMON_CONFIG),
-        NodeId.SOLAR_MODULE_4: (_SOLAR_CONFIG, _FW_COMMON_CONFIG),
-        NodeId.SOLAR_MODULE_5: (_SOLAR_CONFIG, _FW_COMMON_CONFIG),
-        NodeId.SOLAR_MODULE_6: (_SOLAR_CONFIG, _FW_COMMON_CONFIG),
-        NodeId.IMU: (_IMU_CONFIG, _FW_COMMON_CONFIG),
-        NodeId.REACTION_WHEEL_1: (_RW_CONFIG, _FW_COMMON_CONFIG),
-        NodeId.REACTION_WHEEL_2: (_RW_CONFIG, _FW_COMMON_CONFIG),
-        NodeId.REACTION_WHEEL_3: (_RW_CONFIG, _FW_COMMON_CONFIG),
-        NodeId.REACTION_WHEEL_4: (_RW_CONFIG, _FW_COMMON_CONFIG),
-        NodeId.GPS: (_GPS_CONFIG, _SW_COMMON_CONFIG),
-        NodeId.STAR_TRACKER_1: (_ST_CONFIG, _SW_COMMON_CONFIG),
-        NodeId.DXWIFI: (_DXWIFI_CONFIG, _SW_COMMON_CONFIG),
-        NodeId.CFC: (_CFC_CONFIG, _SW_COMMON_CONFIG),
+        NodeId.C3: (C3_CONFIG, SW_COMMON_CONFIG),
+        NodeId.BATTERY_1: (BAT_CONFIG, FW_COMMON_CONFIG),
+        NodeId.SOLAR_MODULE_1: (SOLAR_CONFIG, FW_COMMON_CONFIG),
+        NodeId.SOLAR_MODULE_2: (SOLAR_CONFIG, FW_COMMON_CONFIG),
+        NodeId.SOLAR_MODULE_3: (SOLAR_CONFIG, FW_COMMON_CONFIG),
+        NodeId.SOLAR_MODULE_4: (SOLAR_CONFIG, FW_COMMON_CONFIG),
+        NodeId.SOLAR_MODULE_5: (SOLAR_CONFIG, FW_COMMON_CONFIG),
+        NodeId.SOLAR_MODULE_6: (SOLAR_CONFIG, FW_COMMON_CONFIG),
+        NodeId.IMU: (IMU_CONFIG, FW_COMMON_CONFIG),
+        NodeId.REACTION_WHEEL_1: (RW_CONFIG, FW_COMMON_CONFIG),
+        NodeId.REACTION_WHEEL_2: (RW_CONFIG, FW_COMMON_CONFIG),
+        NodeId.REACTION_WHEEL_3: (RW_CONFIG, FW_COMMON_CONFIG),
+        NodeId.REACTION_WHEEL_4: (RW_CONFIG, FW_COMMON_CONFIG),
+        NodeId.GPS: (GPS_CONFIG, SW_COMMON_CONFIG),
+        NodeId.STAR_TRACKER_1: (ST_CONFIG, SW_COMMON_CONFIG),
+        NodeId.DXWIFI: (DXWIFI_CONFIG, SW_COMMON_CONFIG),
+        NodeId.CFC: (CFC_CONFIG, SW_COMMON_CONFIG),
     },
 )
 

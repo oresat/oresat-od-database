@@ -1,0 +1,70 @@
+{
+  "objects": [
+    {
+      "name": "num_of_images",
+      "data_type": "uint8",
+      "description": "number of images to capture, 0 for endless"
+    },
+    {
+      "name": "delay_ms",
+      "data_type": "uint32",
+      "description": "delay between captures in ms"
+    },
+    {
+      "name": "status",
+      "data_type": "uint8",
+      "description": "the camera status"
+    },
+    {
+      "name": "camera_last_capture",
+      "data_type": "domain",
+      "description": "the last raw capture",
+      "access_type": "ro"
+    },
+    {
+      "name": "camera_last_display_image",
+      "data_type": "domain",
+      "description": "the last capture convert to nice display image",
+      "access_type": "ro"
+    },
+    {
+      "name": "right_ascension",
+      "data_type": "int16",
+      "description": "the right ascension of the satellite in degrees",
+      "access_type": "ro"
+    },
+    {
+      "name": "declination",
+      "data_type": "int16",
+      "description": "the delination of the satellite in degrees",
+      "access_type": "ro"
+    },
+    {
+      "name": "roll",
+      "data_type": "int16",
+      "description": "the roll of the satellite in degrees",
+      "access_type": "ro"
+    },
+    {
+      "name": "time_since_midnight",
+      "data_type": "uint32",
+      "description": "the number of milliseconds since midnight",
+      "access_type": "ro"
+    }
+  ],
+  "tpdos": {
+    "3": {
+      "fields": [
+        "status",
+        "right_ascension",
+        "declination",
+        "roll"
+      ]
+    },
+    "4": {
+      "fields": [
+        "time_since_midnight"
+      ]
+    }
+  }
+}

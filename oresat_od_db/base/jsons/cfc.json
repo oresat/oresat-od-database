@@ -1,0 +1,119 @@
+{
+  "objects": [
+    {
+      "name": "sw_version",
+      "data_type": "str",
+      "description": "software version",
+      "access_type": "const"
+    },
+    {
+      "name": "num_of_images",
+      "data_type": "uint8",
+      "description": "number of images to capture, 0 for endless"
+    },
+    {
+      "name": "camera_delay_ms",
+      "data_type": "uint32",
+      "description": "delay between captures in ms"
+    },
+    {
+      "name": "camera_status",
+      "data_type": "uint8",
+      "description": "the camera status"
+    },
+    {
+      "name": "camera_last_capture",
+      "data_type": "domain",
+      "description": "the last raw capture",
+      "access_type": "ro"
+    },
+    {
+      "name": "camera_last_display_image",
+      "data_type": "domain",
+      "description": "the last capture convert to nice display image",
+      "access_type": "ro"
+    },
+    {
+      "name": "camera_temperature",
+      "data_type": "int8",
+      "description": "the camera temperature in celsius",
+      "access_type": "ro"
+    },
+    {
+      "name": "tec_status",
+      "data_type": "bool",
+      "description": "the tec controller status"
+    },
+    {
+      "name": "tec_target_temperature",
+      "data_type": "int8",
+      "description": "the tec target temperature in celsius"
+    },
+    {
+      "name": "tec_saturated",
+      "data_type": "bool",
+      "description": "the tec is saturated",
+      "access_type": "ro"
+    },
+    {
+      "name": "tec_pid_p",
+      "data_type": "float32",
+      "description": "the PID proportional",
+      "access_type": "const",
+      "value": 0.5
+    },
+    {
+      "name": "tec_pid_i",
+      "data_type": "float32",
+      "description": "the PID intergral",
+      "access_type": "const",
+      "value": 0.0
+    },
+    {
+      "name": "tec_pid_d",
+      "data_type": "float32",
+      "description": "the PID derivative",
+      "access_type": "const",
+      "value": 0.1
+    },
+    {
+      "name": "tec_pid_delay",
+      "data_type": "uint32",
+      "description": "the delay between PID loops in milliseconds",
+      "access_type": "rw",
+      "value": 250
+    },
+    {
+      "name": "tec_moving_avg_samples",
+      "data_type": "uint8",
+      "description": "the number of reading used to calcuate the moving average to determine if saturated",
+      "access_type": "rw",
+      "value": 4
+    },
+    {
+      "name": "tec_saturation_diff",
+      "data_type": "uint8",
+      "description": "the difference between the lowest and current temperature (in celsius) to flag as saturated",
+      "access_type": "rw",
+      "value": 3
+    },
+    {
+      "name": "tec_cooldown_temperature",
+      "data_type": "int8",
+      "description": "once saturated, the TEC controller cannot be enable until the camera temperature (in celsius) is greater this value",
+      "access_type": "rw",
+      "value": 40
+    }
+  ],
+  "tpdos": {
+    "3": {
+      "fields": [
+        "camera_status",
+        "camera_temperature",
+        "tec_status",
+        "tec_saturated"
+      ],
+      "delay_ms": 10000
+    }
+  }
+}
