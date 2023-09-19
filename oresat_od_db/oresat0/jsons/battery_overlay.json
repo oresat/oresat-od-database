@@ -1,0 +1,36 @@
+{
+  "objects": [
+    {
+      "name": "pack_1_temperature",
+      "data_type": "int16"
+    },
+    {
+      "name": "pack_1_temperature_avg",
+      "data_type": "int16"
+    },
+    {
+      "name": "pack_1_temperature_max",
+      "data_type": "int16"
+    },
+    {
+      "name": "pack_1_temperature_min",
+      "data_type": "int16"
+    },
+    {
+      "name": "pack_2_temperature",
+      "data_type": "int16"
+    },
+    {
+      "name": "pack_2_temperature_avg",
+      "data_type": "int16"
+    },
+    {
+      "name": "pack_2_temperature_max",
+      "data_type": "int16"
+    },
+    {
+      "name": "pack_2_temperature_min",
+      "data_type": "int16"
+    }
+  ]
+}

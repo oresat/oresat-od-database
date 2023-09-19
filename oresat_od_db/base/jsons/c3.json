@@ -1,4 +1,10 @@
 {
+  "std_objects": [
+    "cob_id_sync",
+    "communication_cycle_period",
+    "consumer_heartbeat_time",
+    "sdo_client_parameter"
+  ],
   "objects": [
     {
       "name": "beacon_revision",

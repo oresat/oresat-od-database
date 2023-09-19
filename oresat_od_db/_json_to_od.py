@@ -510,10 +510,35 @@ def gen_od_db(oresat_id: OreSatId, beacon_def: dict, configs: dict) -> dict:
 
     od_db = {}
 
+    # don't apply overlays to original configs
+    configs = deepcopy(configs)
+
     # make od with common and card objects and tpdos
     for node_id in configs:
         card_config = configs[node_id][0]
         common_config = configs[node_id][1]
+
+        # deal with overlays
+        if len(configs[node_id]) > 2:
+            overlay_config = configs[node_id][2]
+
+            # overlay objects
+            for obj in overlay_config.objects:
+                for obj2 in card_config.objects:
+                    if obj.name == obj2.name:
+                        obj2.data_type = obj.data_type
+                        break  # obj was found, search for next one
+
+            # overlay tpdos
+            for tpdo in overlay_config.tpdos:
+                card_config.tpdos[tpdo].fields = overlay_config.tpdos[tpdo].fields
+                card_config.tpdos[tpdo].delay_ms = overlay_config.tpdos[tpdo].delay_ms
+                card_config.tpdos[tpdo].sync = overlay_config.tpdos[tpdo].sync
+
+            # overlay rpdos
+            for rpdo in overlay_config.rpdos:
+                card_config.rpdos[rpdo].card = overlay_config.rpdos[rpdo].card
+                card_config.rpdos[rpdo].tpdo_num = overlay_config.rpdos[rpdo].tpdo_num
 
         od = canopen.ObjectDictionary()
         od.bitrate = 1_000_000  # bps

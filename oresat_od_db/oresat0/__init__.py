@@ -20,16 +20,17 @@ from ..base import (
 ORESAT_ID = OreSatId.ORESAT0
 
 _JSON_DIR = f"{os.path.dirname(os.path.abspath(__file__))}/jsons"
+BAT_CONFIG_OVERLAY = read_json_od_config(f"{_JSON_DIR}/battery_overlay.json")
+
 with open(f"{_JSON_DIR}/beacon.json", "r") as f:
     BEACON_DEF = json.load(f)
-
 
 OD_DB = gen_od_db(
     ORESAT_ID,
     BEACON_DEF,
     {
         NodeId.C3: (C3_CONFIG, FW_COMMON_CONFIG),
-        NodeId.BATTERY_1: (BAT_CONFIG, FW_COMMON_CONFIG),
+        NodeId.BATTERY_1: (BAT_CONFIG, FW_COMMON_CONFIG, BAT_CONFIG_OVERLAY),
         NodeId.SOLAR_MODULE_1: (SOLAR_CONFIG, FW_COMMON_CONFIG),
         NodeId.SOLAR_MODULE_2: (SOLAR_CONFIG, FW_COMMON_CONFIG),
         NodeId.SOLAR_MODULE_3: (SOLAR_CONFIG, FW_COMMON_CONFIG),
