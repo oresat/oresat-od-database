@@ -23,13 +23,22 @@
       "name": "db_version",
       "data_type": "str",
       "description": "oresat od db version",
-      "access_type": "const"
+      "access_type": "const",
+      "default": "0.0.0"
     },
     {
       "name": "fw_version",
       "data_type": "str",
       "description": "app fw version",
-      "access_type": "const"
+      "access_type": "const",
+      "default": "0.0"
+    },
+    {
+      "name": "hw_version",
+      "data_type": "str",
+      "description": "card hw version",
+      "access_type": "const",
+      "default": "0.0"
     },
     {
       "name": "mcu_temperature",

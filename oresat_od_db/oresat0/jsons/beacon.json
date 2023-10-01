@@ -96,7 +96,7 @@
     ["gps", "updater_status"],
     ["gps", "update_cache_len"],
     ["gps", "status"],
-    ["gps", "num_of_sv"],
+    ["gps", "number_of_sv"],
     ["gps", "ecef_x"],
     ["gps", "ecef_y"],
     ["gps", "ecef_z"],

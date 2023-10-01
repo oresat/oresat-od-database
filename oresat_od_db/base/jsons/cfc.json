@@ -1,20 +1,20 @@
 {
   "objects": [
     {
-      "name": "sw_version",
-      "data_type": "str",
-      "description": "software version",
-      "access_type": "const"
-    },
-    {
-      "name": "num_of_images",
+      "name": "camera_num_of_capture",
       "data_type": "uint8",
-      "description": "number of images to capture, 0 for endless"
+      "description": "number of images to capture, 0 for endless",
+      "default": 1
     },
     {
-      "name": "camera_delay_ms",
+      "name": "camera_delay",
       "data_type": "uint32",
-      "description": "delay between captures in ms"
+      "description": "delay between captures in milliseconds"
+    },
+    {
+      "name": "camera_integration",
+      "data_type": "uint32",
+      "description": "camera integration time in milliseconds"
     },
     {
       "name": "camera_status",
@@ -34,6 +34,19 @@
       "access_type": "ro"
     },
     {
+      "name": "camera_last_capture_time",
+      "data_type": "uint64",
+      "description": "the last capture timestamp",
+      "access_type": "ro"
+    },
+    {
+      "name": "camera_save_captures",
+      "data_type": "bool",
+      "description": "flag to save captured images",
+      "access_type": "rw",
+      "default": true
+    },
+    {
       "name": "camera_temperature",
       "data_type": "int8",
       "description": "the camera temperature in celsius",
@@ -45,15 +58,15 @@
       "description": "the tec controller status"
     },
     {
-      "name": "tec_target_temperature",
-      "data_type": "int8",
-      "description": "the tec target temperature in celsius"
-    },
-    {
       "name": "tec_saturated",
       "data_type": "bool",
       "description": "the tec is saturated",
       "access_type": "ro"
+    },
+    {
+      "name": "tec_pid_setpoint",
+      "data_type": "int8",
+      "description": "the tec target temperature in celsius"
     },
     {
       "name": "tec_pid_p",

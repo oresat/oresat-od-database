@@ -104,7 +104,7 @@
     ["star_tracker_1", "time_since_midnight"],
     ["gps", "storage_percent"],
     ["gps", "status"],
-    ["gps", "num_of_sv"],
+    ["gps", "number_of_sv"],
     ["gps", "ecef_x"],
     ["gps", "ecef_y"],
     ["gps", "ecef_z"],

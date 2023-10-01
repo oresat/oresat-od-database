@@ -23,19 +23,29 @@
       "name": "db_version",
       "data_type": "str",
       "description": "oresat od db version",
-      "access_type": "const"
+      "access_type": "const",
+      "default": "0.0.0"
     },
     {
       "name": "olaf_version",
       "data_type": "str",
       "description": "olaf lib version",
-      "access_type": "const"
+      "access_type": "const",
+      "default": "0.0.0"
     },
     {
       "name": "sw_version",
       "data_type": "str",
       "description": "app sw version",
-      "access_type": "const"
+      "access_type": "const",
+      "default": "0.0.0"
+    },
+    {
+      "name": "hw_version",
+      "data_type": "str",
+      "description": "card hw version",
+      "access_type": "const",
+      "default": "0.0"
     },
     {
       "name": "flight_mode",
@@ -103,7 +113,7 @@
       "data_type": "str",
       "description": "all file names of files in fwrite cache as a JSON",
       "access_type": "ro",
-      "default": "{}"
+      "default": "[]"
     },
     {
       "name": "fwrite_cache_file_name",

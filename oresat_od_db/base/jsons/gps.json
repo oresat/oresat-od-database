@@ -19,7 +19,7 @@
       "access_type": "ro"
     },
     {
-      "name": "num_of_sv",
+      "name": "number_of_sv",
       "data_type": "uint8",
       "description": "number of gps satellites locked onto. max 12",
       "access_type": "ro"
@@ -160,7 +160,7 @@
     "7": {
       "fields": [
         "status",
-        "num_of_sv",
+        "number_of_sv",
         "time_syncd"
       ]
     },

@@ -117,8 +117,26 @@
     {
       "name": "opd_current",
       "data_type": "uint8",
-      "description": "opd current draw in 0.02mA",
+      "description": "opd current draw in mA",
       "access_type": "ro"
+    },
+    {
+      "name": "tx_enable",
+      "data_type": "bool",
+      "description": "tx status",
+      "access_type": "ro"
+    },
+    {
+      "name": "beacon_delay",
+      "data_type": "uint32",
+      "description": "delay between beacons in seconds",
+      "access_type": "const"
+    },
+    {
+      "name": "beacon_send",
+      "data_type": "bool",
+      "description": "send a beacon",
+      "access_type": "wo"
     }
   ],
   "tpdos": {
