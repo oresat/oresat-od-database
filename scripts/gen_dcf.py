@@ -11,7 +11,7 @@ sys.path.append(f"{_FILE_PATH}/..")
 
 import canopen
 
-from oresat_od_db import NodeId, oresat0, oresat0_5
+from oresat_od_db import OD_DB, NodeId, OreSatId
 
 
 def write_od(od: canopen.ObjectDictionary, dir_path: str = "."):
@@ -234,18 +234,18 @@ def main():
     args = parser.parse_args()
 
     if args.oresat == "oresat0":
-        ods = oresat0.OD_DB
+        od_db = OD_DB[OreSatId.ORESAT0]
     elif args.oresat == "oresat0.5":
-        ods = oresat0_5.OD_DB
+        od_db = OD_DB[OreSatId.ORESAT0_5]
     else:
         print(f"invalid oresat mission {args.oresat}")
         sys.exit()
 
     if args.card.lower() == "all":
-        for od in ods.values():
+        for od in od_db.values():
             write_od(od, args.dir_path)
     else:
-        od = ods[NodeId[args.card.upper()]]
+        od = od_db[NodeId[args.card.upper()]]
         write_od(od, args.dir_path)
 
 

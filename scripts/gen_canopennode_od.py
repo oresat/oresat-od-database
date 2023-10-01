@@ -11,7 +11,7 @@ sys.path.append(f"{_FILE_PATH}/..")
 
 import canopen
 
-from oresat_od_db import oresat0, oresat0_5
+from oresat_od_db import OD_DB, NodeId, OreSatId
 from oresat_od_db._json_to_od import (
     RPDO_COMM_START,
     RPDO_PARA_START,
@@ -120,7 +120,7 @@ def write_canopennode(od: canopen.ObjectDictionary, dir_path: str = "."):
     write_canopennode_h(od, dir_path)
 
 
-def remove_node_id(default: str) -> str:
+def remove_node_id(default: str):
     """Remove "+$NODEID" or "$NODEID+" from the default value"""
 
     if not isinstance(default, str):
@@ -629,14 +629,16 @@ def write_canopennode_h(od: canopen.ObjectDictionary, dir_path: str = "."):
 
 
 OD_LIST = {
-    ("oresat0", "c3"): oresat0.C3_OD,
-    ("oresat0", "battery"): oresat0.BATTERY_1_OD,
-    ("oresat0", "solar"): oresat0.SOLAR_MODULE_1_OD,
-    ("oresat0", "imu"): oresat0.IMU_OD,
-    ("oresat0.5", "battery"): oresat0_5.BATTERY_1_OD,
-    ("oresat0.5", "solar"): oresat0_5.SOLAR_MODULE_1_OD,
-    ("oresat0.5", "imu"): oresat0_5.IMU_OD,
-    ("oresat0.5", "reaction_wheel"): oresat0_5.REACTION_WHEEL_1_OD,
+    # OreSat0
+    ("oresat0", "c3"): OD_DB[OreSatId.ORESAT0][NodeId.C3],
+    ("oresat0", "battery"): OD_DB[OreSatId.ORESAT0][NodeId.BATTERY_1],
+    ("oresat0", "solar"): OD_DB[OreSatId.ORESAT0][NodeId.SOLAR_MODULE_1],
+    ("oresat0", "imu"): OD_DB[OreSatId.ORESAT0][NodeId.IMU],
+    # OreSat0.5
+    ("oresat0.5", "battery"): OD_DB[OreSatId.ORESAT0_5][NodeId.BATTERY_1],
+    ("oresat0.5", "solar"): OD_DB[OreSatId.ORESAT0_5][NodeId.SOLAR_MODULE_1],
+    ("oresat0.5", "imu"): OD_DB[OreSatId.ORESAT0_5][NodeId.IMU],
+    ("oresat0.5", "reaction_wheel"): OD_DB[OreSatId.ORESAT0_5][NodeId.REACTION_WHEEL_1],
 }
 
 

@@ -12,7 +12,7 @@ from argparse import ArgumentParser
 
 import canopen
 
-from oresat_od_db import NodeId, oresat0, oresat0_5
+from oresat_od_db import OD_DB, NodeId, OreSatId
 
 
 def main():
@@ -46,9 +46,9 @@ def main():
     args = parser.parse_args()
 
     if args.oresat == "oresat0":
-        od_db = oresat0.OD_DB
+        od_db = OD_DB[OreSatId.ORESAT0]
     elif args.oresat == "oresat0.5":
-        od_db = oresat0_5.OD_DB
+        od_db = OD_DB[OreSatId.ORESAT0_5]
     else:
         print(f"invalid oresat mission {args.oresat}")
         sys.exit()

@@ -1,3 +1,5 @@
+"""OreSat od base configs."""
+
 import os
 
 from .._json_to_od import read_json_od_config

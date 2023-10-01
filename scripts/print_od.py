@@ -11,7 +11,7 @@ sys.path.append(f"{_FILE_PATH}/..")
 
 import canopen
 
-from oresat_od_db import NodeId, oresat0, oresat0_5
+from oresat_od_db import OD_DB, NodeId, OreSatId
 from oresat_od_db._json_to_od import OD_DATA_TYPES
 
 
@@ -33,9 +33,9 @@ def main():
     args = parser.parse_args()
 
     if args.oresat == "oresat0":
-        ods = oresat0.OD_DB
+        od_db = OD_DB[OreSatId.ORESAT0]
     elif args.oresat == "oresat0.5":
-        ods = oresat0_5.OD_DB
+        od_db = OD_DB[OreSatId.ORESAT0_5]
     else:
         print(f"invalid oresat mission {args.oresat}")
         sys.exit()
@@ -48,7 +48,7 @@ def main():
     for key in OD_DATA_TYPES:
         inverted_od_data_types[OD_DATA_TYPES[key]] = key
 
-    od = ods[NodeId[args.card.upper()]]
+    od = od_db[NodeId[args.card.upper()]]
     for i in od:
         if isinstance(od[i], canopen.objectdictionary.Variable):
             data_type = inverted_od_data_types[od[i].data_type]

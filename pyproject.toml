@@ -29,7 +29,7 @@ oresat-print-od = "scripts.print_od:main"
 oresat-sdo-transfer = "scripts.sdo_transfer:main"
 
 [tool.setuptools.dynamic]
-version = {attr = "oresat_od_db.__version__"}
+version = {attr = "oresat_od_db.constants.__version__"}
 
 [tool.setuptools.packages.find]
 exclude = ["docs*", "tests*"] 
@@ -59,6 +59,11 @@ linters = "pycodestyle,pyflakes,pylint,mccabe,mypy,radon"
 # W1514:    Using open without explicitly specifying an encoding
 ignore = "E402,C901,C0103,E203,R0912,R0915,R901,R901,R0914,C0413,C0206,R1716,W1514"
 max_line_length = 100
+
+[[tool.pylama.files]]
+path = "*/__init__.py"
+# W0611: imported but unused 
+ignore = "W0611"
 
 [[tool.mypy.overrides]]
 module = "canopen"
