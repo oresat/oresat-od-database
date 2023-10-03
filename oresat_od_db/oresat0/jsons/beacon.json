@@ -112,6 +112,6 @@
     ["dxwifi", "fread_cache_len"],
     ["dxwifi", "updater_status"],
     ["dxwifi", "update_cache_len"],
-    ["dxwifi", "transmitting"]
+    ["dxwifi", "status"]
   ]
 }

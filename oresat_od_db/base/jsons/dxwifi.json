@@ -1,16 +1,23 @@
 {
   "objects": [
     {
-      "name": "transmitting",
-      "data_type": "bool",
-      "description": "the card is currently transmitting",
+      "name": "status",
+      "data_type": "uint8",
+      "description": "the dxwifi status",
+      "access_type": "rw"
+    },
+    {
+      "name": "radio_temperature",
+      "data_type": "uint8",
+      "description": "the temperature of the ar9271 chip in celsius",
       "access_type": "ro"
     }
   ],
   "tpdos": {
     "3": {
       "fields": [
-        "transmitting"
+        "status",
+        "radio_temperature"
       ],
       "delay_ms": 1000
     }
