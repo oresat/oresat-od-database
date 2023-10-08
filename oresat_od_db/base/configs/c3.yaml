@@ -127,17 +127,17 @@ objects:
         data_type: uint32
         description: uhf received byte count
         access_type: ro
-      
+
       - name: rx_packets
         data_type: uint32
         description: uhf received packet count
         access_type: ro
-      
+
       - name: rssi
         data_type: int8
         description: uhf rssi of last packet received after lna, filters, and digital channel filter in dB
         access_type: ro
-  
+
   - name: edl
     object_type: record
     subindexes:
@@ -145,7 +145,7 @@ objects:
         data_type: uint32
         description: edl sequence count
         access_type: ro
-      
+
       - name: rejected_count
         data_type: uint32
         description: edl sequence count
@@ -176,7 +176,7 @@ objects:
         description: edl timeout in seconds
         access_type: const
         default: 60
-  
+
   - name: opd
     object_type: record
     subindexes:
@@ -184,12 +184,12 @@ objects:
         data_type: bool
         description: opd system enable status
         access_type: rw
-      
+
       - name: has_fault
         data_type: uint8
         description: opd system circuit has a fault
         access_type: ro
-      
+
       - name: current
         data_type: uint8
         description: opd system current draw in mA
@@ -235,7 +235,7 @@ objects:
         description: the beacon destination callsign
         access_type: const
         default: "SPACE"
-      
+
       - name: start_chars
         data_type: str
         description: the beacon start characters
@@ -247,7 +247,7 @@ objects:
         description: delay between beacons in seconds or 0 to disable
         access_type: const
         default: 30
-      
+
       - name: send_now
         data_type: bool
         description: send a beacon now

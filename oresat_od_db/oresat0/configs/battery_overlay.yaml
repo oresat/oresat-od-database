@@ -3,26 +3,26 @@ objects:
     subindexes:
       - name: temperature
         data_type: int16
-  
+
       - name: temperature_avg
         data_type: int16
-  
+
       - name: temperature_max
         data_type: int16
-  
+
       - name: temperature_min
         data_type: int16
-  
+
   - name: pack_2
     subindexes:
       - name: temperature
         data_type: int16
-      
+
       - name: temperature_avg
         data_type: int16
-      
+
       - name: temperature_max
         data_type: int16
-      
+
       - name: temperature_min
         data_type: int16

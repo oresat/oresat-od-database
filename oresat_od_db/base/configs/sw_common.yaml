@@ -110,7 +110,7 @@ objects:
         data_type: bool
         description: write true to remove file
         access_type: wo
-          
+
   - name: fwrite_cache
     object_type: record
     subindexes:
@@ -118,27 +118,27 @@ objects:
         data_type: uint8
         description: number of files in fwrite cache
         access_type: ro
-      
+
       - name: files_json
         data_type: str
         description: all file names of files in fwrite cache as a JSON
         access_type: ro
         default: "[]"
-      
+
       - name: file_name
         data_type: str
         description: file name to write
-      
+
       - name: file_data
         data_type: domain
         description: file data to write
         access_type: wo
-      
+
       - name: remove
         data_type: bool
         description: write true to remove file
         access_type: wo
-      
+
   - name: updater
     object_type: record
     subindexes:
@@ -146,28 +146,28 @@ objects:
         data_type: uint8
         description: status of the updater
         access_type: ro
-      
+
       - name: cache_length
         data_type: uint8
         description: number of updates cached
         access_type: ro
-      
+
       - name: cache_files_json
         data_type: str
         description: list of updates cached as a JSON str in run order
         access_type: ro
         default: "[]"
-      
+
       - name: update
         data_type: bool
         description: start an update
         access_type: wo
-      
+
       - name: make_status_file
         data_type: bool
         description: add a updater system status file to the fread cache
         access_type: wo
-    
+
   - name: logs
     object_type: record
     subindexes:
@@ -175,12 +175,12 @@ objects:
         data_type: bool
         description: copy the logs to a tar and add to the fread cache
         access_type: wo
-      
+
       - name: since_boot
         data_type: str
         description: the logs since boot
         access_type: ro
-  
+
   - name: daemons
     description: oresat systemd daemon info
     object_type: record
@@ -189,18 +189,18 @@ objects:
         data_type: uint8
         description: number of oresat daemons
         access_type: ro
-      
+
       - name: active
         data_type: uint8
         description: number of oresat daemons running
         access_type: ro
-      
+
       - name: failed
         data_type: uint8
         description: number of oresat daemons that have failed
         access_type: ro
-    
-tpdos: 
+
+tpdos:
   - num: 1
     fields:
       - [system, storage_percent]
@@ -210,14 +210,14 @@ tpdos:
       - [daemons, active]
       - [daemons, failed]
     delay_ms: 30000
-    
+
   - num: 2
     fields:
       - [updater, status]
       - [updater, cache_length]
     delay_ms: 5000
-    
-rpdos: 
+
+rpdos:
   - num: 1  # the time sync TPDO
     card: c3
     tpdo_num: 1

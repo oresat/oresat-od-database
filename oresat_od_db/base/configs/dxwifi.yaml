@@ -3,13 +3,13 @@ objects:
     data_type: uint8
     description: the dxwifi status
     access_type: rw
-    
+
   - name: radio_temperature
     data_type: uint8
     description: the temperature of the ar9271 chip in celsius
     access_type: ro
-  
-tpdos: 
+
+tpdos:
   - num: 3
     fields:
       - [status]

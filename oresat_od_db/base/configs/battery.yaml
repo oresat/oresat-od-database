@@ -10,87 +10,87 @@ objects:
       - name: vcell_max
         data_type: uint16
         access_type: ro
-      
+
       - name: vcell_min
         data_type: uint16
         access_type: ro
-      
+
       - name: vcell
         data_type: uint16
         access_type: ro
-      
+
       - name: vcell_1
         data_type: uint16
         access_type: ro
-      
+
       - name: vcell_2
         data_type: uint16
         access_type: ro
-      
+
       - name: vcell_avg
         data_type: uint16
         access_type: ro
-      
+
       - name: current
         data_type: int16
         access_type: ro
-      
+
       - name: current_avg
         data_type: int16
         access_type: ro
-      
+
       - name: current_max
         data_type: int16
         access_type: ro
-      
+
       - name: current_min
         data_type: int16
         access_type: ro
-      
+
       - name: full_capacity
         data_type: uint16
         access_type: ro
-      
+
       - name: reported_capacity
         data_type: uint16
         access_type: ro
-      
+
       - name: time_to_empty
         data_type: uint16
         access_type: ro
-      
+
       - name: time_to_full
         data_type: uint16
         access_type: ro
-      
+
       - name: cycles
         data_type: uint16
         access_type: ro
-      
+
       - name: reported_state_of_charge
         data_type: uint8
         access_type: ro
-      
+
       - name: temperature
         data_type: int8
         access_type: ro
-      
+
       - name: temperature_avg
         data_type: int8
         access_type: ro
-      
+
       - name: temperature_max
         data_type: int8
         access_type: ro
-      
+
       - name: temperature_min
         data_type: int8
         access_type: ro
-      
+
       - name: status
         data_type: uint8
         access_type: ro
-    
+
   - name: pack_2
     description: battery pack 2 telemetry
     object_type: record
@@ -98,97 +98,97 @@ objects:
       - name: vbatt
         data_type: uint16
         access_type: ro
-      
+
       - name: vcell_max
         data_type: uint16
         access_type: ro
-      
+
       - name: vcell_min
         data_type: uint16
         access_type: ro
-      
+
       - name: vcell
         data_type: uint16
         access_type: ro
-      
+
       - name: vcell_1
         data_type: uint16
         access_type: ro
-      
+
       - name: vcell_2
         data_type: uint16
         access_type: ro
-      
+
       - name: vcell_avg
         data_type: uint16
         access_type: ro
-      
+
       - name: current
         data_type: int16
         access_type: ro
-      
+
       - name: current_avg
         data_type: int16
         access_type: ro
-      
+
       - name: current_max
         data_type: int16
         access_type: ro
-      
+
       - name: current_min
         data_type: int16
         access_type: ro
-      
+
       - name: full_capacity
         data_type: uint16
         access_type: ro
-      
+
       - name: reported_capacity
         data_type: uint16
         access_type: ro
-      
+
       - name: time_to_empty
         data_type: uint16
         access_type: ro
-      
+
       - name: time_to_full
         data_type: uint16
         access_type: ro
-      
+
       - name: cycles
         data_type: uint16
         access_type: ro
-      
+
       - name: reported_state_of_charge
         data_type: uint8
         access_type: ro
-      
+
       - name: temperature
         data_type: int8
         access_type: ro
-      
+
       - name: temperature_avg
         data_type: int8
         access_type: ro
-      
+
       - name: temperature_max
         data_type: int8
         access_type: ro
-      
+
       - name: temperature_min
         data_type: int8
         access_type: ro
-      
+
       - name: status
         data_type: uint8
         access_type: ro
-  
+
   - name: model_gauge_alg_status
     data_type: uint16
     access_type: rw
 
-tpdos: 
-  - num: 1 
+tpdos:
+  - num: 1
     fields:
       - [pack_1, vbatt]
       - [pack_1, vcell_max]
@@ -202,7 +202,7 @@ tpdos:
       - [pack_1, vcell_2]
       - [pack_1, vcell_avg]
     delay_ms: 10000
-    
+
   - num: 3
     fields:
       - [pack_1, current]
@@ -210,23 +210,23 @@ tpdos:
       - [pack_1, current_max]
       - [pack_1, current_min]
     delay_ms: 10000
-    
+
   - num: 4
     fields:
       - [pack_1, temperature]
       - [pack_1, temperature_avg]
       - [pack_1, temperature_max]
     delay_ms: 10000
-    
+
   - num: 5
-    fields: 
+    fields:
       - [pack_1, temperature_min]
       - [pack_1, full_capacity]
       - [pack_1, reported_capacity]
       - [pack_1, reported_state_of_charge]
       - [pack_1, status]
     delay_ms: 10000
-    
+
   - num: 6
     fields:
       - [pack_2, vbatt]
@@ -234,14 +234,14 @@ tpdos:
       - [pack_2, vcell_min]
       - [pack_2, vcell]
     delay_ms: 10000
-    
+
   - num: 7
     fields:
       - [pack_2, vcell_1]
       - [pack_2, vcell_2]
       - [pack_2, vcell_avg]
     delay_ms: 10000
-    
+
   - num: 8
     fields:
       - [pack_2, current]
@@ -249,7 +249,7 @@ tpdos:
       - [pack_2, current_max]
       - [pack_2, current_min]
     delay_ms: 10000
-    
+
   - num: 9
     fields:
       - [pack_2, temperature]
@@ -257,7 +257,7 @@ tpdos:
       - [pack_2, temperature_max]
       - [pack_2, temperature_min]
     delay_ms: 10000
-    
+
   - num: 10
     fields:
       - [pack_2, full_capacity]

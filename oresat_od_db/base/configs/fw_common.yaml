@@ -16,7 +16,7 @@ objects:
     data_type: uint8
     description: the unique oresat satellite id
     access_type: const
-  
+
   - name: versions
     object_type: record
     subindexes:
@@ -25,19 +25,19 @@ objects:
         description: oresat od db version
         access_type: const
         default: "0.0.0"
-      
+
       - name: fw_version
         data_type: str
         description: app fw version
         access_type: const
         default: "0.0"
-      
+
       - name: hw_version
         data_type: str
         description: card hw version
         access_type: const
         default: "0.0"
-  
+
   - name: mcu
     description: microcontroller unit info
     object_type: record
@@ -46,7 +46,7 @@ objects:
         data_type: int8
         description: the temperature of the MCU in celsius
         access_type: ro
-      
+
       - name: vrefint
         data_type: uint8
         access_type: ro
