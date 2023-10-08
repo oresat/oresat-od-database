@@ -76,21 +76,21 @@ objects:
         description: deploy the helical antenna now
         access_type: wo
 
-      - name: test_good_threshold
+      - name: good_test_threshold
         data_type: uint16
         description: when testing the antenna, any voltage (in millivolts) above this threshold is consisder good
         access_type: const
         default: 100
 
-      - name: test_monopole_now
+      - name: test_monopole_is_good
         data_type: bool
-        description: deploy the monopole antennas now
-        access_type: wo
+        description: test the monopole antennas
+        access_type: ro
 
-      - name: test_helical_now
+      - name: test_helical_is_good
         data_type: bool
-        description: deploy the helical antenna now
-        access_type: wo
+        description: test the helical antenna
+        access_type: ro
 
       - name: monopole_voltage
         data_type: uint16
@@ -259,6 +259,6 @@ objects:
         access_type: ro
 
 tpdos:
-  - num: 1
+  - num: 1 # time sync TPDO
     fields:
       - [scet]

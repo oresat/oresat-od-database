@@ -8,9 +8,9 @@ objects:
     subindexes:
       - name: num_of_images
         data_type: uint8
-        description: number of images to capture 0 for endless
+        description: number of images to capture or 0 for endless
 
-      - name: delay_ms
+      - name: delay
         data_type: uint32
         description: delay between captures in ms
 

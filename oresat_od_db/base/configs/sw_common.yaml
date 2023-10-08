@@ -26,6 +26,12 @@ objects:
   - name: versions
     object_type: record
     subindexes:
+      - name: hw_version
+        data_type: str
+        description: card hardware version
+        access_type: const
+        default: "0.0"
+
       - name: db_version
         data_type: str
         description: oresat od db version
@@ -44,18 +50,12 @@ objects:
         access_type: const
         default: "0.0.0"
 
-      - name: hw_version
-        data_type: str
-        description: card hardware version
-        access_type: const
-        default: "0.0"
-
   - name: system
     object_type: record
     subindexes:
       - name: reset
         data_type: uint8
-        description: reset the app; See the olaf.NodeStop enum for values
+        description: reset the app. See the olaf.NodeStop enum for values
         access_type: wo
 
       - name: storage_percent
@@ -70,12 +70,12 @@ objects:
 
       - name: unix_time
         data_type: uint32
-        description: unix time in seconds for beacon
+        description: unix time in seconds
         access_type: ro
 
       - name: uptime
         data_type: uint32
-        description: uptime in seconds for beacon
+        description: uptime in seconds
         access_type: ro
 
       - name: power_cycles
@@ -108,7 +108,7 @@ objects:
 
       - name: remove
         data_type: bool
-        description: write true to remove file
+        description: write true to remove selected file
         access_type: wo
 
   - name: fwrite_cache
@@ -136,7 +136,7 @@ objects:
 
       - name: remove
         data_type: bool
-        description: write true to remove file
+        description: write true to remove selected file
         access_type: wo
 
   - name: updater
