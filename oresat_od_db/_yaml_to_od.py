@@ -550,7 +550,7 @@ def gen_od_db(oresat_id: OreSatId, beacon_def: dict, configs: dict) -> dict:
                     overlayed = True
                     break  # obj was found, search for next one
                 if not overlayed:  # add it
-                    card_config['objects'].append(deepcopy(obj))
+                    card_config["objects"].append(deepcopy(obj))
 
             # overlay tpdos
             for overlay_tpdo in overlay_config.get("tpdos", []):
@@ -563,7 +563,7 @@ def gen_od_db(oresat_id: OreSatId, beacon_def: dict, configs: dict) -> dict:
                         overlayed = True
                         break
                 if not overlayed:  # add it
-                    card_config['tpdos'].append(deepcopy(overlay_tpdo))
+                    card_config["tpdos"].append(deepcopy(overlay_tpdo))
 
             # overlay rpdos
             for overlay_rpdo in overlay_config.get("rpdos", []):
@@ -575,7 +575,7 @@ def gen_od_db(oresat_id: OreSatId, beacon_def: dict, configs: dict) -> dict:
                         overlayed = True
                         break
                 if not overlayed:  # add it
-                    card_config['rpdos'].append(deepcopy(overlay_rpdo))
+                    card_config["rpdos"].append(deepcopy(overlay_rpdo))
 
         od = canopen.ObjectDictionary()
         od.bitrate = 1_000_000  # bps

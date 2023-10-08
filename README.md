@@ -10,18 +10,18 @@ transfers.
 
 ## How This Works
 
-- All object dictionaries for a specific OreSat mission are defined by JSONs.
-- A `standard_object.json` contains some CANopen standard objects that any
-  `*_common.json` file can flag to include.
-- The `sw_common.json` defines all CANopen standard objects, common objects,
+- All object dictionaries for a specific OreSat mission are defined by YAMLs.
+- A `standard_object.yaml` contains some CANopen standard objects that any
+  `*_common.yaml` file can flag to include.
+- The `sw_common.yaml` defines all CANopen standard objects, common objects,
   and common PDOs for all Octavo A8-based cards for a OreSat mission.
-- The `fw_common.json` defines all CANopen standard objects, common objects,
+- The `fw_common.yaml` defines all CANopen standard objects, common objects,
   and common PDOs for all STM32-based cards for a OreSat mission.
-- All card specific configs are are named `<card_name>.json` format.
+- All card specific configs are are named `<card_name>.yaml` format.
   They contain all card specific objects and PDOs.
-  - **NOTE:** The cards JSON are simular to CANopen's `.eds` files; they are for
+  - **NOTE:** The cards YAML are simular to CANopen's `.eds` files; they are for
     a device type, not a unique device on a CAN network.
-- The `beacon.json` file defines the beacon definition as all the data is pull
+- The `beacon.yaml` file defines the beacon definition as all the data is pull
   strait out the the C3 OD, which is mostly build from all other ODs.
 - All the configs are passed to `gen_od_db()` that reads in all configs
   cross reference so all OD definition of PDOs match.
@@ -29,7 +29,7 @@ transfers.
   ```python
   from oresat_od_db.oresat0_5 import GPS_OD
 
-  print(GPS_OD["card_data"]["latitude"].value)
+  print(GPS_OD["skytraq"]["latitude"].value)
   ```
 - All ChibiOS-based projects generate their `OD.[c/h]` files by:
   ```bash
@@ -41,16 +41,17 @@ transfers.
   #include "CANopen.h"
   #include <stdint.h>
 
-  /** Example function that sets a value in the OD. */
+  /** Example function that gets a value from the OD. */
   int main(void) {
-    uint8_t temp_c = 42;
+    int16_t gryo_yaw = 0;
 
     // OD is a global provided by CANopen.h
-    // OD_INDEX_CARD_DATA and OD_SUBINDEX_TEMPERATURE are defined in OD.h
-    OD_entry_t *entry = OD_find(OD, OD_INDEX_CARD_DATA);
+    // OD_INDEX_GYROSCOPE and OD_SUBINDEX_GYROSCOPE_YAW are defined in OD.h
+    OD_entry_t *entry = OD_find(OD, OD_INDEX_GYROSCOPE);
 
-    // boolean is a flag to bypass any OD callback functions and write strait to the OD
-    OD_set_u8(entry, OD_SUBINDEX_TEMPERATURE, temp_c, true);
+    // boolean is a flag to bypass any OD callback functions and read strait
+    // from the OD
+    gryo_yaw = OD_get_u8(entry, OD_SUBINDEX_GYROSCOPE_YAW, true);
   }
   ```
 
