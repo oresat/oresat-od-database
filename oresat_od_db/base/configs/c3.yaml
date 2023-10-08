@@ -10,15 +10,97 @@ objects:
     description: the c3 state
     access_type: ro
 
+  - name: reset_timeout
+    data_type: uint32
+    description: the reset system timeout in seconds
+    access_type: const
+    default: 86400 # 24 hours
+
   - name: mode
     data_type: uint8
     description: the oresat system mode
     access_type: ro
 
-  - name: tx_enable
-    data_type: bool
-    description: tx status
-    access_type: ro
+  - name: tx_control
+    object_type: record
+    subindexes:
+      - name: enable
+        data_type: bool
+        description: tx status
+        access_type: ro
+
+      - name: timeout
+        data_type: uint32
+        description: tx enable timeout in seconds
+        access_type: const
+        default: 1209600 # 2 weeks
+
+      - name: last_enable_timestamp
+        data_type: uint32
+        description: last tx enable timestamp in seconds
+        access_type: ro
+
+  - name: antennas
+    object_type: record
+    subindexes:
+      - name: deployed
+        data_type: bool
+        description: antennas are deployed
+        access_type: ro
+
+      - name: attempts
+        data_type: uint8
+        description: number of deployment attempts before continuing
+        access_type: const
+        default: 3
+
+      - name: pre_attempt_timeout
+        data_type: uint8
+        description: number of seconds before trying to deploy the antennas
+        access_type: const
+        default: 2700 # 45 minutes
+
+      - name: attempt_timeout
+        data_type: uint8
+        description: number of seconds between deployment attempts
+        access_type: const
+        default: 15
+
+      - name: deploy_monopole_now
+        data_type: bool
+        description: deploy the monopole antennas now
+        access_type: wo
+
+      - name: deploy_helical_now
+        data_type: bool
+        description: deploy the helical antenna now
+        access_type: wo
+
+      - name: test_good_threshold
+        data_type: uint16
+        description: when testing the antenna, any voltage (in millivolts) above this threshold is consisder good
+        access_type: const
+        default: 100
+
+      - name: test_monopole_now
+        data_type: bool
+        description: deploy the monopole antennas now
+        access_type: wo
+
+      - name: test_helical_now
+        data_type: bool
+        description: deploy the helical antenna now
+        access_type: wo
+
+      - name: monopole_voltage
+        data_type: uint16
+        description: monopole voltage in millivolts
+        access_type: ro
+
+      - name: helical_voltage
+        data_type: uint16
+        description: helical voltage in millivolts
+        access_type: ro
 
   - name: lband
     object_type: record
@@ -35,7 +117,7 @@ objects:
 
       - name: rssi
         data_type: int8
-        description: lband rssi
+        description: lband rssi of last packet received after lna, filters, and digital channel filter in dB
         access_type: ro
 
   - name: uhf
@@ -53,7 +135,7 @@ objects:
       
       - name: rssi
         data_type: int8
-        description: uhf rssi
+        description: uhf rssi of last packet received after lna, filters, and digital channel filter in dB
         access_type: ro
   
   - name: edl
@@ -68,25 +150,72 @@ objects:
         data_type: uint32
         description: edl sequence count
         access_type: ro
+
+      - name: vc1_sequence_count
+        data_type: uint32
+        description: edl virtual channel 1 sequence count
+        access_type: ro
+
+      - name: vc1_rejected_count
+        data_type: uint32
+        description: edl virtual channel 1 reject count
+        access_type: ro
+
+      - name: vc1_expedite_count
+        data_type: uint32
+        description: edl virtual channel 1 expedite count
+        access_type: ro
+
+      - name: last_timestamp
+        data_type: uint64
+        description: scet timestamp of last valid edl command
+        access_type: ro
+
+      - name: timeout
+        data_type: uint32
+        description: edl timeout in seconds
+        access_type: const
+        default: 60
   
   - name: opd
     object_type: record
     subindexes:
       - name: enable
         data_type: bool
-        description: opd enable status
+        description: opd system enable status
         access_type: rw
       
-      - name: fault
+      - name: has_fault
         data_type: uint8
-        description: opd circuit has a fault
+        description: opd system circuit has a fault
         access_type: ro
       
       - name: current
         data_type: uint8
-        description: opd current draw in mA
+        description: opd system current draw in mA
         access_type: ro
-  
+
+      - name: scan
+        data_type: bool
+        description: scan for opd nodes
+        access_type: wo
+
+      - name: nodes_status_json
+        data_type: str
+        description: status of all node as a json string
+        access_type: ro
+        default: "{}"
+
+      - name: node_select
+        data_type: uint8
+        description: select a opd node
+        access_type: rw
+
+      - name: node_enable
+        data_type: bool
+        description: enable/disable a node on write or get current state by read
+        access_type: rw
+
   - name: beacon
     object_type: record
     subindexes:
@@ -94,16 +223,40 @@ objects:
         data_type: uint8
         description: the beacon revision number
         access_type: const
+
+      - name: src_callsign
+        data_type: str
+        description: the beacon source callsign
+        access_type: const
+        default: "KJ7SAT"
+
+      - name: dest_callsign
+        data_type: str
+        description: the beacon destination callsign
+        access_type: const
+        default: "SPACE"
       
+      - name: start_chars
+        data_type: str
+        description: the beacon start characters
+        access_type: const
+        default: "{{z"
+
       - name: delay
         data_type: uint32
-        description: delay between beacons in seconds
+        description: delay between beacons in seconds or 0 to disable
         access_type: const
+        default: 30
       
       - name: send_now
         data_type: bool
-        description: send a beacon
+        description: send a beacon now
         access_type: wo
+
+      - name: last_timestamp
+        data_type: uint64
+        description: scet timestamp of last beacon
+        access_type: ro
 
 tpdos:
   - num: 1
