@@ -18,7 +18,7 @@ classifiers = [
 ]
 dependencies = [
     "canopen",
-    "dataclasses_json",
+    "pyyaml",
 ]
 dynamic = ["version"]
 
@@ -35,10 +35,10 @@ version = {attr = "oresat_od_db.constants.__version__"}
 exclude = ["docs*", "tests*"] 
 
 [tool.setuptools.package-data]
-"*" = ["*.json"]
+"*" = ["*.yaml"]
 
 [tool.black]
-line_length = 99
+line_length = 100
 
 [tool.pylama]
 format = "pylint"
@@ -66,7 +66,7 @@ path = "*/__init__.py"
 ignore = "W0611"
 
 [[tool.mypy.overrides]]
-module = "canopen"
+module = "canopen,yaml"
 ignore_missing_imports = true
 
 [tool.isort]

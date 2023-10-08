@@ -1,0 +1,30 @@
+objects:
+  - name: system
+    object_type: record
+    subindexes:
+      - name: storage_percent
+        data_type: uint8
+        description: the current storage percent used
+        access_type: ro
+
+      - name: unix_time
+        data_type: uint32
+        description: unix time in seconds for beacon
+        access_type: ro
+
+      - name: uptime
+        data_type: uint32
+        description: uptime in seconds for beacon
+        access_type: ro
+
+      - name: power_cycles
+        data_type: uint16
+        description: the number of power cycles
+        access_type: ro
+
+      - name: bank_status
+        data_type: uint8
+        description: |
+          - bit 0: current back
+          - bit 1: next bank
+        access_type: ro

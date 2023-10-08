@@ -152,9 +152,7 @@ def _objects_lines(od: canopen.ObjectDictionary, indexes: list) -> list:
     return lines
 
 
-def _variable_lines(
-    variable: canopen.objectdictionary.Variable, index: int, subindex=None
-) -> list:
+def _variable_lines(variable: canopen.objectdictionary.Variable, index: int, subindex=None) -> list:
     lines = []
 
     if variable.description:

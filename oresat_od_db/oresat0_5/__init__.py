@@ -1,10 +1,11 @@
 """OreSat0.5 object dictionary and beacon globals."""
 
-import json
 import os
 
+import yaml
+
 from .. import NodeId, OreSatId
-from .._json_to_od import gen_od_db
+from .._yaml_to_od import gen_od_db
 from ..base import (
     BAT_CONFIG,
     C3_CONFIG,
@@ -19,9 +20,9 @@ from ..base import (
     SW_COMMON_CONFIG,
 )
 
-_JSON_DIR = f"{os.path.dirname(os.path.abspath(__file__))}/jsons"
-with open(f"{_JSON_DIR}/beacon.json", "r") as f:
-    ORESAT0_5_BEACON_DEF = json.load(f)
+_CONFIGS_DIR = f"{os.path.dirname(os.path.abspath(__file__))}/configs"
+with open(f"{_CONFIGS_DIR}/beacon.yaml", "r") as f:
+    ORESAT0_5_BEACON_DEF = yaml.safe_load(f)
 
 
 ORESAT0_5_OD_DB = gen_od_db(

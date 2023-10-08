@@ -12,7 +12,7 @@ sys.path.append(f"{_FILE_PATH}/..")
 import canopen
 
 from oresat_od_db import OD_DB, NodeId, OreSatId
-from oresat_od_db._json_to_od import OD_DATA_TYPES
+from oresat_od_db._yaml_to_od import OD_DATA_TYPES
 
 
 def format_default(value: Any) -> str:

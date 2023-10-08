@@ -1,0 +1,223 @@
+std_objects:
+  - device_type
+  - error_register
+  - cob_id_sync
+  - identity
+  - cob_id_emergency_message
+  - consumer_heartbeat_time
+  - producer_heartbeat_time
+  - sdo_server_parameter
+  - os_command
+  - scet
+  - utc
+
+objects:
+  - name: satellite_id
+    data_type: uint8
+    description: the unique oresat satellite id
+    access_type: const
+
+  - name: flight_mode
+    data_type: bool
+    description: card is in flight mode
+    access_type: rw
+    default: true
+
+  - name: versions
+    object_type: record
+    subindexes:
+      - name: db_version
+        data_type: str
+        description: oresat od db version
+        access_type: const
+        default: "0.0.0"
+
+      - name: olaf_version
+        data_type: str
+        description: olaf library version
+        access_type: const
+        default: "0.0.0"
+
+      - name: sw_version
+        data_type: str
+        description: software app version
+        access_type: const
+        default: "0.0.0"
+
+      - name: hw_version
+        data_type: str
+        description: card hardware version
+        access_type: const
+        default: "0.0"
+
+  - name: system
+    object_type: record
+    subindexes:
+      - name: reset
+        data_type: uint8
+        description: reset the app; See the olaf.NodeStop enum for values
+        access_type: wo
+
+      - name: storage_percent
+        data_type: uint8
+        description: the current storage percent used
+        access_type: ro
+
+      - name: ram_percent
+        data_type: uint8
+        description: the current ram percent used
+        access_type: ro
+
+      - name: unix_time
+        data_type: uint32
+        description: unix time in seconds for beacon
+        access_type: ro
+
+      - name: uptime
+        data_type: uint32
+        description: uptime in seconds for beacon
+        access_type: ro
+
+      - name: power_cycles
+        data_type: uint16
+        description: the number of power cycles
+        access_type: ro
+
+  - name: fread_cache
+    object_type: record
+    subindexes:
+      - name: length
+        data_type: uint8
+        description: number of files in fread cache
+        access_type: ro
+
+      - name: files_json
+        data_type: str
+        description: all file names of files in fread cache as a JSON
+        access_type: ro
+        default: "[]"
+
+      - name: file_name
+        data_type: str
+        description: file name to read
+
+      - name: file_data
+        data_type: domain
+        description: file data to read
+        access_type: ro
+
+      - name: remove
+        data_type: bool
+        description: write true to remove file
+        access_type: wo
+          
+  - name: fwrite_cache
+    object_type: record
+    subindexes:
+      - name: length
+        data_type: uint8
+        description: number of files in fwrite cache
+        access_type: ro
+      
+      - name: files_json
+        data_type: str
+        description: all file names of files in fwrite cache as a JSON
+        access_type: ro
+        default: "[]"
+      
+      - name: file_name
+        data_type: str
+        description: file name to write
+      
+      - name: file_data
+        data_type: domain
+        description: file data to write
+        access_type: wo
+      
+      - name: remove
+        data_type: bool
+        description: write true to remove file
+        access_type: wo
+      
+  - name: updater
+    object_type: record
+    subindexes:
+      - name: status
+        data_type: uint8
+        description: status of the updater
+        access_type: ro
+      
+      - name: cache_length
+        data_type: uint8
+        description: number of updates cached
+        access_type: ro
+      
+      - name: cache_files_json
+        data_type: str
+        description: list of updates cached as a JSON str in run order
+        access_type: ro
+        default: "[]"
+      
+      - name: update
+        data_type: bool
+        description: start an update
+        access_type: wo
+      
+      - name: make_status_file
+        data_type: bool
+        description: add a updater system status file to the fread cache
+        access_type: wo
+    
+  - name: logs
+    object_type: record
+    subindexes:
+      - name: make_file
+        data_type: bool
+        description: copy the logs to a tar and add to the fread cache
+        access_type: wo
+      
+      - name: since_boot
+        data_type: str
+        description: the logs since boot
+        access_type: ro
+  
+  - name: daemons
+    description: oresat systemd daemon info
+    object_type: record
+    subindexes:
+      - name: total
+        data_type: uint8
+        description: number of oresat daemons
+        access_type: ro
+      
+      - name: active
+        data_type: uint8
+        description: number of oresat daemons running
+        access_type: ro
+      
+      - name: failed
+        data_type: uint8
+        description: number of oresat daemons that have failed
+        access_type: ro
+    
+tpdos: 
+  - num: 1
+    fields:
+      - [system, storage_percent]
+      - [system, ram_percent]
+      - [fread_cache, length]
+      - [fwrite_cache, length]
+      - [daemons, active]
+      - [daemons, failed]
+    delay_ms: 30000
+    
+  - num: 2
+    fields:
+      - [updater, status]
+      - [updater, cache_length]
+    delay_ms: 5000
+    
+rpdos: 
+  - num: 1  # the time sync TPDO
+    card: c3
+    tpdo_num: 1

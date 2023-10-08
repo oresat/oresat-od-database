@@ -1,0 +1,52 @@
+std_objects:
+  - device_type
+  - error_register
+  - cob_id_sync
+  - communication_cycle_period
+  - identity
+  - cob_id_emergency_message
+  - consumer_heartbeat_time
+  - producer_heartbeat_time
+  - sdo_server_parameter
+  - scet
+  - utc
+
+objects:
+  - name: satellite_id
+    data_type: uint8
+    description: the unique oresat satellite id
+    access_type: const
+  
+  - name: versions
+    object_type: record
+    subindexes:
+      - name: db_version
+        data_type: str
+        description: oresat od db version
+        access_type: const
+        default: "0.0.0"
+      
+      - name: fw_version
+        data_type: str
+        description: app fw version
+        access_type: const
+        default: "0.0"
+      
+      - name: hw_version
+        data_type: str
+        description: card hw version
+        access_type: const
+        default: "0.0"
+  
+  - name: mcu
+    description: microcontroller unit info
+    object_type: record
+    subindexes:
+      - name: temperature
+        data_type: int8
+        description: the temperature of the MCU in celsius
+        access_type: ro
+      
+      - name: vrefint
+        data_type: uint8
+        access_type: ro

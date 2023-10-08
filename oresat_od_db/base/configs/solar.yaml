@@ -1,0 +1,114 @@
+objects:
+  - name: output
+    object_type: record
+    subindexes:
+      - name: voltage
+        data_type: uint16
+        access_type: ro
+      
+      - name: current
+        data_type: int16
+        access_type: ro
+      
+      - name: power
+        data_type: uint16
+        access_type: ro
+      
+      - name: voltage_avg
+        data_type: uint16
+        access_type: ro
+      
+      - name: current_avg
+        data_type: int16
+        access_type: ro
+      
+      - name: power_avg
+        data_type: uint16
+        access_type: ro
+      
+      - name: voltage_max
+        data_type: uint16
+        access_type: ro
+      
+      - name: current_max
+        data_type: int16
+        access_type: ro
+      
+      - name: power_max
+        data_type: uint16
+        access_type: ro
+      
+      - name: energy
+        data_type: uint16
+        access_type: ro
+      
+  - name: cell_1
+    object_type: record
+    subindexes:
+      - name: temperature
+        data_type: int8
+        access_type: ro
+      
+      - name: temperature_min
+        data_type: int8
+        access_type: ro
+
+      - name: temperature_max
+        data_type: int8
+        access_type: ro
+      
+  - name: cell_2
+    object_type: record
+    subindexes:
+      - name: temperature
+        data_type: int8
+        access_type: ro
+
+      - name: temperature_min
+        data_type: int8
+        access_type: ro
+      
+      - name: temperature_max
+        data_type: int8
+        access_type: ro
+  
+  - name: mppt_alg
+    data_type: uint8
+    access_type: rww
+  
+  - name: lt1618_iadj
+    data_type: uint16
+    access_type: ro
+
+tpdos: 
+  - num: 1
+    fields:
+      - [output, voltage]
+      - [output, current]
+      - [output, power]
+      - [output, voltage_avg]
+    delay_ms: 10000
+      
+  - num: 2
+    fields:
+      - [output, current_avg]
+      - [output, power_avg]
+      - [output, voltage_max]
+      - [output, current_max]
+    delay_ms: 10000
+      
+  - num: 3
+    fields:
+      - [output, power_max]
+      - [output, energy]
+    delay_ms: 10000
+      
+  - num: 4
+    fields:
+      - [cell_1, temperature]
+      - [cell_2, temperature]
+      - [cell_1, temperature_min]
+      - [cell_2, temperature_min]
+      - [cell_1, temperature_max]
+      - [cell_2, temperature_max]
+    delay_ms: 10000

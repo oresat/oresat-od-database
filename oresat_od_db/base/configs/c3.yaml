@@ -1,0 +1,111 @@
+std_objects:
+  - cob_id_sync
+  - communication_cycle_period
+  - consumer_heartbeat_time
+  - sdo_client_parameter
+
+objects:
+  - name: status
+    data_type: uint8
+    description: the c3 state
+    access_type: ro
+
+  - name: mode
+    data_type: uint8
+    description: the oresat system mode
+    access_type: ro
+
+  - name: tx_enable
+    data_type: bool
+    description: tx status
+    access_type: ro
+
+  - name: lband
+    object_type: record
+    subindexes:
+      - name: rx_bytes
+        data_type: uint32
+        description: lband received byte count
+        access_type: ro
+
+      - name: rx_packets
+        data_type: uint32
+        description: lband received packet count
+        access_type: ro
+
+      - name: rssi
+        data_type: int8
+        description: lband rssi
+        access_type: ro
+
+  - name: uhf
+    object_type: record
+    subindexes :
+      - name: rx_bytes
+        data_type: uint32
+        description: uhf received byte count
+        access_type: ro
+      
+      - name: rx_packets
+        data_type: uint32
+        description: uhf received packet count
+        access_type: ro
+      
+      - name: rssi
+        data_type: int8
+        description: uhf rssi
+        access_type: ro
+  
+  - name: edl
+    object_type: record
+    subindexes:
+      - name: sequence_count
+        data_type: uint32
+        description: edl sequence count
+        access_type: ro
+      
+      - name: rejected_count
+        data_type: uint32
+        description: edl sequence count
+        access_type: ro
+  
+  - name: opd
+    object_type: record
+    subindexes:
+      - name: enable
+        data_type: bool
+        description: opd enable status
+        access_type: rw
+      
+      - name: fault
+        data_type: uint8
+        description: opd circuit has a fault
+        access_type: ro
+      
+      - name: current
+        data_type: uint8
+        description: opd current draw in mA
+        access_type: ro
+  
+  - name: beacon
+    object_type: record
+    subindexes:
+      - name: revision
+        data_type: uint8
+        description: the beacon revision number
+        access_type: const
+      
+      - name: delay
+        data_type: uint32
+        description: delay between beacons in seconds
+        access_type: const
+      
+      - name: send_now
+        data_type: bool
+        description: send a beacon
+        access_type: wo
+
+tpdos:
+  - num: 1
+    fields:
+      - [scet]

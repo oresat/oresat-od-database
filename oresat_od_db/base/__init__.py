@@ -2,17 +2,17 @@
 
 import os
 
-from .._json_to_od import read_json_od_config
+from .._yaml_to_od import read_yaml_od_config
 
-_JSON_DIR = f"{os.path.dirname(os.path.abspath(__file__))}/jsons"
-FW_COMMON_CONFIG = read_json_od_config(f"{_JSON_DIR}/fw_common.json")
-SW_COMMON_CONFIG = read_json_od_config(f"{_JSON_DIR}/sw_common.json")
-C3_CONFIG = read_json_od_config(f"{_JSON_DIR}/c3.json")
-BAT_CONFIG = read_json_od_config(f"{_JSON_DIR}/battery.json")
-SOLAR_CONFIG = read_json_od_config(f"{_JSON_DIR}/solar.json")
-IMU_CONFIG = read_json_od_config(f"{_JSON_DIR}/imu.json")
-RW_CONFIG = read_json_od_config(f"{_JSON_DIR}/reaction_wheel.json")
-GPS_CONFIG = read_json_od_config(f"{_JSON_DIR}/gps.json")
-ST_CONFIG = read_json_od_config(f"{_JSON_DIR}/star_tracker.json")
-DXWIFI_CONFIG = read_json_od_config(f"{_JSON_DIR}/dxwifi.json")
-CFC_CONFIG = read_json_od_config(f"{_JSON_DIR}/cfc.json")
+_CONFIGS_DIR = f"{os.path.dirname(os.path.abspath(__file__))}/configs"
+FW_COMMON_CONFIG = read_yaml_od_config(f"{_CONFIGS_DIR}/fw_common.yaml")
+SW_COMMON_CONFIG = read_yaml_od_config(f"{_CONFIGS_DIR}/sw_common.yaml")
+C3_CONFIG = read_yaml_od_config(f"{_CONFIGS_DIR}/c3.yaml")
+BAT_CONFIG = read_yaml_od_config(f"{_CONFIGS_DIR}/battery.yaml")
+SOLAR_CONFIG = read_yaml_od_config(f"{_CONFIGS_DIR}/solar.yaml")
+IMU_CONFIG = read_yaml_od_config(f"{_CONFIGS_DIR}/imu.yaml")
+RW_CONFIG = read_yaml_od_config(f"{_CONFIGS_DIR}/reaction_wheel.yaml")
+GPS_CONFIG = read_yaml_od_config(f"{_CONFIGS_DIR}/gps.yaml")
+ST_CONFIG = read_yaml_od_config(f"{_CONFIGS_DIR}/star_tracker.yaml")
+DXWIFI_CONFIG = read_yaml_od_config(f"{_CONFIGS_DIR}/dxwifi.yaml")
+CFC_CONFIG = read_yaml_od_config(f"{_CONFIGS_DIR}/cfc.yaml")

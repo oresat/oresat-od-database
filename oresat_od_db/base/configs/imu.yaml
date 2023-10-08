@@ -1,0 +1,153 @@
+objects:
+  - name: gyroscope
+    object_type: record
+    subindexes:
+      - name: pitch_rate
+        data_type: int16
+        access_type: ro
+      
+      - name: yaw_rate
+        data_type: int16
+        access_type: ro
+      
+      - name: roll_rate
+        data_type: int16
+        access_type: ro
+      
+      - name: pitch_rate_raw
+        data_type: uint16
+        access_type: ro
+      
+      - name: yaw_rate_raw
+        data_type: uint16
+        access_type: ro
+      
+      - name: roll_rate_raw
+        data_type: uint16
+        access_type: ro
+  
+  - name: accelerometer
+    object_type: record
+    subindexes:
+      - name: x
+        data_type: int16
+        access_type: ro
+      
+      - name: y
+        data_type: int16
+        access_type: ro
+      
+      - name: z
+        data_type: int16
+        access_type: ro
+      
+      - name: x_raw
+        data_type: uint16
+        access_type: ro
+      
+      - name: y_raw
+        data_type: uint16
+        access_type: ro
+      
+      - name: z_raw
+        data_type: uint16
+        access_type: ro
+  
+  - name: temperature
+    data_type: int8
+    access_type: ro
+  
+  - name: magnetometer
+    object_type: record
+    subindexes:
+      - name: pz_1_x
+        data_type: int16
+        access_type: ro
+      
+      - name: pz_1_y
+        data_type: int16
+        access_type: ro
+      
+      - name: pz_1_z
+        data_type: int16
+        access_type: ro
+      
+      - name: pz_2_x
+        data_type: int16
+        access_type: ro
+      
+      - name: pz_2_y
+        data_type: int16
+        access_type: ro
+      
+      - name: pz_2_z
+        data_type: int16
+        access_type: ro
+      
+      - name: mz_1_x
+        data_type: int16
+        access_type: ro
+
+      - name: mz_1_y
+        data_type: int16
+        access_type: ro
+      
+      - name: mz_1_z
+        data_type: int16
+        access_type: ro
+      
+      - name: mz_2_x
+        data_type: int16
+        access_type: ro
+      
+      - name: mz_2_y
+        data_type: int16
+        access_type: ro
+      
+      - name: mz_2_z
+        data_type: int16
+        access_type: ro
+
+tpdos: 
+  - num: 1
+    fields:
+      - [gyroscope, pitch_rate]
+      - [gyroscope, yaw_rate]
+      - [gyroscope, roll_rate]
+    delay_ms: 1000
+  
+  - num: 2 
+    fields:
+      - [accelerometer, x]
+      - [accelerometer, y]
+      - [accelerometer, z]
+    delay_ms: 1000
+  
+  - num: 3 
+    fields:
+      - [temperature]
+    delay_ms: 1000
+  
+  - num: 4
+    fields:
+      - [magnetometer, pz_1_x]
+      - [magnetometer, pz_1_y]
+      - [magnetometer, pz_1_z]
+  
+  - num: 5
+    fields:
+      - [magnetometer, pz_2_x]
+      - [magnetometer, pz_2_y]
+      - [magnetometer, pz_2_z]
+
+  - num: 6
+    fields:
+      - [magnetometer, mz_1_x]
+      - [magnetometer, mz_1_y]
+      - [magnetometer, mz_1_z]
+
+  - num: 7
+    fields:
+      - [magnetometer, mz_2_x]
+      - [magnetometer, mz_2_y]
+      - [magnetometer, mz_2_z]

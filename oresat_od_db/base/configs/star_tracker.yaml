@@ -1,0 +1,63 @@
+objects:
+  - name: status
+    data_type: uint8
+    description: the star tracker status
+
+  - name: capture
+    object_type: record
+    subindexes:
+      - name: num_of_images
+        data_type: uint8
+        description: number of images to capture 0 for endless
+      
+      - name: delay_ms
+        data_type: uint32
+        description: delay between captures in ms
+      
+      - name: last_capture
+        data_type: domain
+        description: the last raw capture
+        access_type: ro
+      
+      - name: last_display_image
+        data_type: domain
+        description: the last capture convert to nice display image
+        access_type: ro
+    
+  - name: orientation
+    object_type: record
+    subindexes:
+      - name: right_ascension
+        data_type: int16
+        description: the right ascension of the satellite in degrees
+        access_type: ro
+      
+      - name: declination
+        data_type: int16
+        description: the delination of the satellite in degrees
+        access_type: ro
+      
+      - name: roll
+        data_type: int16
+        description: the roll of the satellite in degrees
+        access_type: ro
+      
+      - name: time_since_midnight
+        data_type: uint32
+        description: the number of milliseconds since midnight when the image was captured
+        access_type: ro
+
+tpdos: 
+  - num: 3
+    fields:
+      - [status]
+      - [orientation, right_ascension]
+      - [orientation, declination]
+      - [orientation, roll]
+  
+  - num: 4 
+    fields:
+      - [orientation, time_since_midnight]
+  
+
+

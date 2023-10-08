@@ -25,9 +25,7 @@ def main():
     parser.add_argument("node", metavar="NODE", help="device node name (e.g. gps, solar_module_1)")
     parser.add_argument("mode", metavar="MODE", help="r[ead] or w[rite] (e.g. r, read, w, write)")
     parser.add_argument("index", metavar="INDEX", help="object dictionary index")
-    parser.add_argument(
-        "subindex", metavar="SUBINDEX", help='object dictionary subindex or "none"'
-    )
+    parser.add_argument("subindex", metavar="SUBINDEX", help='object dictionary subindex or "none"')
     parser.add_argument(
         "value",
         metavar="VALUE",

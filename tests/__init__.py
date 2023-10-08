@@ -5,8 +5,8 @@ import unittest
 
 import canopen
 
-from oresat_od_db import Index, NodeId, OreSatId
-from oresat_od_db._json_to_od import OD_DATA_TYPE_SIZE, TPDO_COMM_START, TPDO_PARA_START
+from oresat_od_db import NodeId, OreSatId
+from oresat_od_db._yaml_to_od import OD_DATA_TYPE_SIZE, TPDO_COMM_START, TPDO_PARA_START
 
 
 class TestConfig(unittest.TestCase):
@@ -71,22 +71,15 @@ class TestConfig(unittest.TestCase):
 
         c3_od = self.od_db[NodeId.C3]
 
-        for i in self.beacon_def["fields"]:
-            name = i[0]
-            subindex = i[1]
-            if name == "c3":
-                # can be in either index for the c3
-                try:
-                    obj = c3_od[Index.CARD_DATA][subindex]
-                except KeyError:
-                    obj = c3_od[Index.COMMON_DATA][subindex]
+        for field in self.beacon_def["fields"]:
+            if len(field) == 1:
+                obj = c3_od[field[0]]
             else:
-                index = Index[f"{name.upper()}_DATA"].value
-                obj = c3_od[index][subindex]
+                obj = c3_od[field[0]][field[1]]
             self.assertNotIn(
                 obj.data_type,
                 dynamic_len_data_types,
-                f"{self.id.name} {name} {obj.name} is a dynamic length data type",
+                f"{self.id.name} {obj.name} is a dynamic length data type",
             )
             length += OD_DATA_TYPE_SIZE[obj.data_type] // 8  # bits to bytes
 
@@ -118,19 +111,46 @@ class TestConfig(unittest.TestCase):
         self.assertIsInstance(obj.data_type, int)
         self._test_snake_case(obj.name)
 
+        if not isinstance(obj.parent, canopen.ObjectDictionary):
+            node_name = obj.parent.parent.device_information.product_name
+        else:
+            node_name = obj.parent.device_information.product_name
+
         # test variable's default value match the data type
         if obj.data_type == canopen.objectdictionary.BOOLEAN:
-            self.assertIsInstance(obj.default, bool)
+            self.assertIsInstance(
+                obj.default,
+                bool,
+                f"{node_name} object 0x{obj.index:X} 0x{obj.subindex:02X} was not a bool",
+            )
         elif obj.data_type in canopen.objectdictionary.INTEGER_TYPES:
-            self.assertIsInstance(obj.default, int)
+            self.assertIsInstance(
+                obj.default,
+                int,
+                f"{node_name} object 0x{obj.index:X} 0x{obj.subindex:02X} was not a int",
+            )
         elif obj.data_type in canopen.objectdictionary.FLOAT_TYPES:
-            self.assertIsInstance(obj.default, float)
+            self.assertIsInstance(
+                obj.default,
+                float,
+                f"{node_name} object 0x{obj.index:X} 0x{obj.subindex:02X} was not a float",
+            )
         elif obj.data_type == canopen.objectdictionary.VISIBLE_STRING:
-            self.assertIsInstance(obj.default, str)
+            self.assertIsInstance(
+                obj.default,
+                str,
+                f"{node_name} object 0x{obj.index:X} 0x{obj.subindex:02X} was not a str",
+            )
         elif obj.data_type == canopen.objectdictionary.OCTET_STRING:
-            self.assertIsInstance(obj.default, bytes)
+            self.assertIsInstance(
+                obj.default,
+                bytes,
+                f"{node_name} object 0x{obj.index:X} 0x{obj.subindex:02X} was not a bytes",
+            )
         elif obj.data_type == canopen.objectdictionary.DOMAIN:
-            self.assertIsNone(obj.default)
+            self.assertIsNone(
+                obj.default, f"{node_name} object 0x{obj.index:X} 0x{obj.subindex:02X} was not None"
+            )
         else:
             raise ValueError(f"unsupported data_type {obj.data_type}")
 
@@ -149,7 +169,11 @@ class TestConfig(unittest.TestCase):
                     # test subindex 0
                     self.assertIn(0, od[index])
                     self.assertEqual(od[index][0].data_type, canopen.objectdictionary.UNSIGNED8)
-                    self.assertEqual(od[index][0].default, max(list(od[index])))
+                    self.assertEqual(
+                        od[index][0].default,
+                        max(list(od[index])),
+                        f"index 0x{index:X} mismatch highest subindex",
+                    )
 
                     # test all other subindexes
                     array_data_types = []

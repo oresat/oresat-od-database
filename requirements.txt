@@ -1,9 +1,9 @@
 black
 build
 canopen
-dataclasses_json
 isort
 pylama[all]
 pylama[toml]
+pyyaml
 setuptools
 wheel

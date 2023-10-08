@@ -1,15 +1,12 @@
 """Convert OreSat JSON files to an canopen.ObjectDictionary object."""
 
-import json
 import os
 from copy import deepcopy
-from dataclasses import dataclass, field
-from typing import Any, Dict, List
 
 import canopen
-from dataclasses_json import LetterCase, dataclass_json
+import yaml
 
-from . import NODE_NICE_NAMES, Index, NodeId, OreSatId, __version__
+from . import NODE_NICE_NAMES, NodeId, OreSatId, __version__
 
 RPDO_COMM_START = 0x1400
 RPDO_PARA_START = 0x1600
@@ -68,115 +65,99 @@ OD_DEFAULTS = {
 }
 
 
-@dataclass_json(letter_case=LetterCase.SNAKE)
-@dataclass
-class OdConfigEntry:
-    """OD entry info."""
-
-    name: str
-    """Name of the entry in snake_case."""
-    data_type: str
-    """Data type of the entry."""
-    description: str = ""
-    """Description of the entry."""
-    access_type: str = "rw"
-    """Access type of the entry; can be: ro, wo, rw, rwr, rww, or const."""
-    default: Any = None
-    """Optional default value of the entry. If not set, value from OD_DEFAULTS is used."""
-
-
-@dataclass_json(letter_case=LetterCase.SNAKE)
-@dataclass
-class OdConfigRpdo:
-    """TPDO info to build RPDO data from."""
-
-    card: str
-    """Card the TPDO is from."""
-    tpdo_num: int
-    """TPDO number."""
-
-
-@dataclass_json(letter_case=LetterCase.SNAKE)
-@dataclass
-class OdConfigTpdo:
-    """TPDO data."""
-
-    fields: List[str]
-    """Fields to tpdos, must match names of entries."""
-    delay_ms: int = 0
-    """
-    Delay between tpdosing in milliseconds, if both delay_ms and sync are non-zero delay_ms
-    is ignored and sync is used.
-    """
-    sync: int = 0
-    """Number of sync messages required before sending TPDO message."""
-
-
-@dataclass_json(letter_case=LetterCase.SNAKE)
-@dataclass
-class OdConfig:
-    """OD data info."""
-
-    std_objects: List[str] = field(default_factory=list)
-    """List of standard object to add."""
-    objects: List[OdConfigEntry] = field(default_factory=list)
-    """List of objects/entries in OD."""
-    tpdos: Dict[str, OdConfigTpdo] = field(default_factory=dict)
-    """TPDO configs."""
-    rpdos: Dict[str, OdConfigRpdo] = field(default_factory=dict)
-    """RPDO configs."""
-
-
-def _add_rec(
-    od: canopen.ObjectDictionary, objects: list, index: Index
+def _add_objects(
+    od: canopen.ObjectDictionary, objects: list, base_index: int
 ) -> canopen.objectdictionary.Record:
     """Add a Record tothe OD based off the config objects."""
-
-    rec = canopen.objectdictionary.Record(index.name.lower(), index.value)
 
     dynamic_len_data_types = [
         canopen.objectdictionary.VISIBLE_STRING,
         canopen.objectdictionary.OCTET_STRING,
         canopen.objectdictionary.DOMAIN,
     ]
+    int_types = canopen.objectdictionary.INTEGER_TYPES
 
+    index = base_index
     for obj in objects:
-        subindex = objects.index(obj) + 1
-        var = canopen.objectdictionary.Variable(obj.name, index, subindex)
-        var.access_type = obj.access_type
-        var.data_type = OD_DATA_TYPES[obj.data_type]
-        if obj.name == "db_version":
-            var.default = __version__
-        elif obj.default is None:
-            var.default = OD_DEFAULTS[var.data_type]
-        elif var.data_type in canopen.objectdictionary.INTEGER_TYPES and isinstance(
-            obj.default, str
-        ):  # fix hex values data types
-            var.default = int(obj.default, 16)
-        else:
-            var.default = obj.default
-        var.description = obj.description
-        if var.data_type not in dynamic_len_data_types:
-            var.pdo_mappable = True
-        rec.add_member(var)
+        subindex = 0
+        if obj["object_type"] == "variable":
+            var = canopen.objectdictionary.Variable(obj["name"], index)
+            var.access_type = obj["access_type"]
+            var.description = obj["description"]
+            var.data_type = OD_DATA_TYPES[obj["data_type"]]
+            if obj["default"] is None:
+                var.default = OD_DEFAULTS[var.data_type]
+            elif var.data_type in int_types and isinstance(obj["default"], str):
+                var.default = int(obj["default"], 16)  # fix hex values data types
+            else:
+                var.default = obj["default"]
+            if var.data_type not in dynamic_len_data_types:
+                var.pdo_mappable = True
+            od.add_object(var)
+        elif obj["object_type"] == "record":
+            rec = canopen.objectdictionary.Record(obj["name"], index)
 
-    # index 0
-    var = canopen.objectdictionary.Variable("highest_index_supported", index, 0x0)
-    var.access_type = "const"
-    var.data_type = canopen.objectdictionary.UNSIGNED8
-    var.default = len(rec)
-    rec.add_member(var)
+            var0 = canopen.objectdictionary.Variable("highest_index_supported", index, subindex)
+            var0.access_type = "const"
+            var0.data_type = canopen.objectdictionary.UNSIGNED8
+            rec.add_member(var0)
 
-    od.add_object(rec)
+            for sub_obj in obj.get("subindexes", []):
+                subindex += 1
+                var = canopen.objectdictionary.Variable(sub_obj["name"], index, subindex)
+                var.access_type = sub_obj["access_type"]
+                var.description = sub_obj["description"]
+                var.data_type = OD_DATA_TYPES[sub_obj["data_type"]]
+                if sub_obj["default"] is None:
+                    var.default = OD_DEFAULTS[var.data_type]
+                elif var.data_type in int_types and isinstance(sub_obj["default"], str):
+                    var.default = int(sub_obj["default"], 16)  # fix hex values data types
+                else:
+                    var.default = sub_obj["default"]
+                if var.data_type not in dynamic_len_data_types:
+                    var.pdo_mappable = True
+                rec.add_member(var)
+
+            var0.default = subindex
+            od.add_object(rec)
+        elif obj["object_type"] == "array":
+            arr = canopen.objectdictionary.Array(obj["name"], index)
+
+            var0 = canopen.objectdictionary.Variable("highest_index_supported", index, subindex)
+            var0.access_type = "const"
+            var0.data_type = canopen.objectdictionary.UNSIGNED8
+            arr.add_member(var0)
+
+            for sub_obj in range(obj.get("length", 0)):
+                subindex += 1
+                sub_name = obj["name"] + f"_{subindex}"
+                var = canopen.objectdictionary.Variable(sub_name, index, subindex)
+                var.access_type = obj["access_type"]
+                var.data_type = OD_DATA_TYPES[obj["data_type"]]
+                if sub_obj["default"] is None:
+                    var.default = OD_DEFAULTS[var.data_type]
+                elif var.data_type in int_types and isinstance(sub_obj["default"], str):
+                    var.default = int(sub_obj["default"], 16)  # fix hex values data types
+                else:
+                    var.default = sub_obj["default"]
+                if var.data_type not in dynamic_len_data_types:
+                    var.pdo_mappable = True
+                arr.add_member(var)
+
+            var0.default = subindex
+            od.add_object(arr)
+        index += 1
 
 
-def _add_tpdo_data(od: canopen.ObjectDictionary, config: OdConfig):
+def _add_tpdo_data(od: canopen.ObjectDictionary, config: dict):
     """Add tpdo objects to OD."""
 
-    for i in config.tpdos:
+    tpdos = config.get("tpdos", [])
+
+    for tpdo in tpdos:
         od.device_information.nr_of_TXPDO += 1
 
-        num = int(i)
+        num = tpdo.get("num")
         comm_index = TPDO_COMM_START + num - 1
         map_index = TPDO_PARA_START + num - 1
         comm_rec = canopen.objectdictionary.Record(
@@ -186,20 +167,25 @@ def _add_tpdo_data(od: canopen.ObjectDictionary, config: OdConfig):
         od.add_object(map_rec)
         od.add_object(comm_rec)
 
-        for j in config.tpdos[i].fields:
-            subindex = config.tpdos[i].fields.index(j) + 1
+        # index 0 for mapping index
+        var0 = canopen.objectdictionary.Variable("highest_index_supported", map_index, 0x0)
+        var0.access_type = "const"
+        var0.data_type = canopen.objectdictionary.UNSIGNED8
+        map_rec.add_member(var0)
+
+        for field in tpdo.get("fields", []):
+            subindex = tpdo["fields"].index(field) + 1
             var = canopen.objectdictionary.Variable(
                 f"mapping_object_{subindex}", map_index, subindex
             )
             var.access_type = "const"
             var.data_type = canopen.objectdictionary.UNSIGNED32
-            if config.tpdos[i].fields[subindex - 1] == "scet":
-                mapped_obj = od[Index.SCET.value]
+            if len(field) == 1:
+                mapped_obj = od[field[0]]
+            elif len(field) == 2:
+                mapped_obj = od[field[0]][field[1]]
             else:
-                try:
-                    mapped_obj = od[Index.CARD_DATA.value][j]
-                except KeyError:
-                    mapped_obj = od[Index.COMMON_DATA.value][j]
+                raise ValueError("tpdo field must be a 1 or 2 values")
             mapped_subindex = mapped_obj.subindex
             value = mapped_obj.index << 16
             value += mapped_subindex << 8
@@ -207,12 +193,13 @@ def _add_tpdo_data(od: canopen.ObjectDictionary, config: OdConfig):
             var.default = value
             map_rec.add_member(var)
 
-        # index 0 for mapping index
-        var = canopen.objectdictionary.Variable("highest_index_supported", map_index, 0x0)
-        var.access_type = "const"
-        var.data_type = canopen.objectdictionary.UNSIGNED8
-        var.default = len(map_rec)
-        map_rec.add_member(var)
+        var0.default = len(map_rec) - 1
+
+        # index 0 for comms index
+        var0 = canopen.objectdictionary.Variable("highest_index_supported", comm_index, 0x0)
+        var0.access_type = "const"
+        var0.data_type = canopen.objectdictionary.UNSIGNED8
+        comm_rec.add_member(var0)
 
         var = canopen.objectdictionary.Variable("cob_id", comm_index, 0x1)
         var.access_type = "const"
@@ -228,10 +215,7 @@ def _add_tpdo_data(od: canopen.ObjectDictionary, config: OdConfig):
         var = canopen.objectdictionary.Variable("transmission_type", comm_index, 0x2)
         var.access_type = "const"
         var.data_type = canopen.objectdictionary.UNSIGNED8
-        if config.tpdos[i].sync != 0:
-            var.default = config.tpdos[i].sync
-        else:
-            var.default = 255  # event driven (delay-based or app specific)
+        var.default = tpdo.get("sync", 255)
         comm_rec.add_member(var)
 
         var = canopen.objectdictionary.Variable("inhibit_time", comm_index, 0x3)
@@ -249,7 +233,7 @@ def _add_tpdo_data(od: canopen.ObjectDictionary, config: OdConfig):
         var = canopen.objectdictionary.Variable("event_timer", comm_index, 0x5)
         var.access_type = "const"
         var.data_type = canopen.objectdictionary.UNSIGNED16
-        var.default = config.tpdos[i].delay_ms
+        var.default = tpdo.get("delay_ms", 0)
         comm_rec.add_member(var)
 
         var = canopen.objectdictionary.Variable("sync_start_value", comm_index, 0x6)
@@ -258,12 +242,7 @@ def _add_tpdo_data(od: canopen.ObjectDictionary, config: OdConfig):
         var.default = 0
         comm_rec.add_member(var)
 
-        # index 0 for comms index
-        var = canopen.objectdictionary.Variable("highest_index_supported", comm_index, 0x0)
-        var.access_type = "const"
-        var.data_type = canopen.objectdictionary.UNSIGNED8
-        var.default = len(comm_rec)
-        comm_rec.add_member(var)
+        var0.default = len(comm_rec) - 1
 
 
 def _add_rpdo_data(
@@ -275,15 +254,13 @@ def _add_rpdo_data(
 
     time_sync_tpdo = tpdo_node_od[tpdo_comm_index]["cob_id"].default == 0x181
     if time_sync_tpdo:
-        rpdo_mapped_index = Index.SCET.value
+        rpdo_mapped_index = 0x2010
         rpdo_mapped_rec = rpdo_node_od[rpdo_mapped_index]
         rpdo_mapped_subindex = 0
     else:
-        rpdo_mapped_index = Index.OTHER_CARD_BASE_INDEX + tpdo_node_od.node_id
+        rpdo_mapped_index = 0x7000 + tpdo_node_od.node_id
         if rpdo_mapped_index not in rpdo_node_od:
-            rpdo_mapped_rec = canopen.objectdictionary.Record(
-                f"{node_name}_data", rpdo_mapped_index
-            )
+            rpdo_mapped_rec = canopen.objectdictionary.Record(node_name, rpdo_mapped_index)
             rpdo_node_od.add_object(rpdo_mapped_rec)
 
             # index 0 for node data index
@@ -355,10 +332,13 @@ def _add_rpdo_data(
             rpdo_mapped_subindex = rpdo_mapped_rec[0].default + 1
             tpdo_mapped_index = (tpdo_mapping_obj.default >> 16) & 0xFFFF
             tpdo_mapped_subindex = (tpdo_mapping_obj.default >> 8) & 0xFF
-            tpdo_mapped_obj = tpdo_node_od[tpdo_mapped_index][tpdo_mapped_subindex]
-            var = canopen.objectdictionary.Variable(
-                tpdo_mapped_obj.name, rpdo_mapped_index, rpdo_mapped_subindex
-            )
+            if isinstance(tpdo_node_od[tpdo_mapped_index], canopen.objectdictionary.Variable):
+                tpdo_mapped_obj = tpdo_node_od[tpdo_mapped_index]
+                name = tpdo_mapped_obj.name
+            else:
+                tpdo_mapped_obj = tpdo_node_od[tpdo_mapped_index][tpdo_mapped_subindex]
+                name = tpdo_node_od[tpdo_mapped_index].name + "_" + tpdo_mapped_obj.name
+            var = canopen.objectdictionary.Variable(name, rpdo_mapped_index, rpdo_mapped_subindex)
             var.access_type = "const"
             var.data_type = tpdo_mapped_obj.data_type
             var.default = tpdo_mapped_obj.default
@@ -392,14 +372,13 @@ def _add_rpdo_data(
 def _add_node_rpdo_data(config, od: canopen.ObjectDictionary, od_db: dict):
     """Add all configured RPDO object to OD based off of TPDO objects from another OD."""
 
-    for i in config.rpdos:
-        rpdo = config.rpdos[i]
-        _add_rpdo_data(int(rpdo.tpdo_num), od, od_db[NodeId[rpdo.card.upper()]])
+    for rpdo in config.get("rpdos", []):
+        tpdo_num = rpdo["tpdo_num"]
+        node_id = NodeId[rpdo["card"].upper()]
+        _add_rpdo_data(tpdo_num, od, od_db[node_id])
 
 
-def _add_all_rpdo_data(
-    master_node_od: canopen.ObjectDictionary, node_od: canopen.ObjectDictionary
-):
+def _add_all_rpdo_data(master_node_od: canopen.ObjectDictionary, node_od: canopen.ObjectDictionary):
     """Add all RPDO object to OD based off of TPDO objects from another OD."""
 
     if not node_od.device_information.nr_of_TXPDO:
@@ -412,28 +391,59 @@ def _add_all_rpdo_data(
         _add_rpdo_data(i, master_node_od, node_od)
 
 
-def read_json_od_config(file_path: str) -> OdConfig:
+def read_yaml_od_config(file_path: str) -> dict:
     """read the od JSON in."""
 
     with open(file_path, "r") as f:
-        config = f.read()
+        config = yaml.safe_load(f)
 
-    # pylint: disable=no-member
-    return OdConfig.from_json(config)  # type: ignore
+    for obj in config.get("objects", []):
+        if "description" not in obj:
+            obj["description"] = ""
+        if "object_type" not in obj:
+            obj["object_type"] = "variable"
+
+        if obj["object_type"] == "variable":
+            if "data_type" not in obj:
+                obj["data_type"] = "uint32"
+            if "access_type" not in obj:
+                obj["access_type"] = "rw"
+            if "default" not in obj:
+                obj["default"] = None
+        elif "subindexes" not in obj:
+            config["subindexes"] = []
+        else:
+            for sub_obj in obj["subindexes"]:
+                if "data_type" not in sub_obj:
+                    sub_obj["data_type"] = "uint32"
+                if "access_type" not in sub_obj:
+                    sub_obj["access_type"] = "rw"
+                if "description" not in sub_obj:
+                    sub_obj["description"] = ""
+                if "default" not in sub_obj:
+                    sub_obj["default"] = None
+
+    if "tpdos" not in config:
+        config["tpdos"] = []
+
+    if "rpdos" not in config:
+        config["rpdos"] = []
+
+    return config
 
 
 def _load_std_objs(file_path: str) -> dict:
     """Load the standard objects."""
 
     with open(file_path, "r") as f:
-        std_objs_raw = json.load(f)
+        std_objs_raw = yaml.safe_load(f)
 
     std_objs = {}
-    for key in std_objs_raw:
-        obj = std_objs_raw[key]
-        index = int(obj["index"], 16)
-        if obj["object_type"] == "variable":
-            var = canopen.objectdictionary.Variable(key, index, 0x0)
+    for obj in std_objs_raw:
+        index = obj["index"]
+        obj_type = obj.get("object_type", "variable")
+        if obj_type == "variable":
+            var = canopen.objectdictionary.Variable(obj["name"], index, 0x0)
             var.data_type = OD_DATA_TYPES[obj["data_type"]]
             var.access_type = obj.get("access_type", "rw")
             var.default = obj.get("default", OD_DEFAULTS[var.data_type])
@@ -448,9 +458,9 @@ def _load_std_objs(file_path: str) -> dict:
             var.description = obj.get("description", "")
             if var.name == "scet":
                 var.pdo_mappable = True
-            std_objs[key] = var
-        elif obj["object_type"] == "record":
-            rec = canopen.objectdictionary.Record(key, index)
+            std_objs[obj["name"]] = var
+        elif obj_type == "record":
+            rec = canopen.objectdictionary.Record(obj["name"], index)
 
             var = canopen.objectdictionary.Variable("highest_index_supported", index, 0x0)
             var.data_type = canopen.objectdictionary.UNSIGNED8
@@ -458,9 +468,8 @@ def _load_std_objs(file_path: str) -> dict:
             var.default = 0
             rec.add_member(var)
 
-            for subindex_str in obj["subindexes"]:
-                subindex = int(subindex_str, 16)
-                sub_obj = obj["subindexes"][subindex_str]
+            for sub_obj in obj.get("subindexes", []):
+                subindex = sub_obj["subindex"]
                 var = canopen.objectdictionary.Variable(sub_obj["name"], index, subindex)
                 var.data_type = OD_DATA_TYPES[sub_obj["data_type"]]
                 var.access_type = sub_obj.get("access_type", "rw")
@@ -473,9 +482,9 @@ def _load_std_objs(file_path: str) -> dict:
                 rec.add_member(var)
 
             rec[0].default = subindex
-            std_objs[key] = rec
-        elif obj["object_type"] == "array":
-            arr = canopen.objectdictionary.Array(key, index)
+            std_objs[obj["name"]] = rec
+        elif obj_type == "array":
+            arr = canopen.objectdictionary.Array(obj["name"], index)
             data_type = OD_DATA_TYPES[obj["data_type"]]
             access_type = obj.get("access_type", "rw")
             default = obj.get("default", OD_DEFAULTS[data_type])
@@ -488,16 +497,14 @@ def _load_std_objs(file_path: str) -> dict:
             arr.add_member(var)
 
             for subindex in range(1, length + 1):
-                var_name = key + f"_{subindex}"
+                var_name = obj["name"] + f"_{subindex}"
                 var = canopen.objectdictionary.Variable(var_name, index, subindex)
                 var.data_type = data_type
                 var.access_type = access_type
                 var.default = default
                 arr.add_member(var)
 
-            std_objs[key] = arr
-        else:
-            raise ValueError(f"unknown object_type for object {key}")
+            std_objs[obj["name"]] = arr
 
     return std_objs
 
@@ -505,12 +512,12 @@ def _load_std_objs(file_path: str) -> dict:
 def gen_od_db(oresat_id: OreSatId, beacon_def: dict, configs: dict) -> dict:
     """Generate all ODs for a OreSat mission."""
 
-    std_objs_file_name = f"{os.path.dirname(os.path.abspath(__file__))}/standard_objects.json"
+    std_objs_file_name = f"{os.path.dirname(os.path.abspath(__file__))}/standard_objects.yaml"
     std_objs = _load_std_objs(std_objs_file_name)
 
     od_db = {}
 
-    # don't apply overlays to original configs
+    # don"t apply overlays to original configs
     configs = deepcopy(configs)
 
     # make od with common and card objects and tpdos
@@ -523,22 +530,52 @@ def gen_od_db(oresat_id: OreSatId, beacon_def: dict, configs: dict) -> dict:
             overlay_config = configs[node_id][2]
 
             # overlay objects
-            for obj in overlay_config.objects:
-                for obj2 in card_config.objects:
-                    if obj.name == obj2.name:
-                        obj2.data_type = obj.data_type
-                        break  # obj was found, search for next one
+            for obj in overlay_config.get("objects", []):
+                overlayed = False
+                for obj2 in card_config.get("objects", []):
+                    if obj["name"] != obj2["name"]:
+                        continue
+
+                    if obj["object_type"] == "variable":
+                        obj2["data_type"] = obj["data_type"]
+                        obj2["access_type"] = obj.get("access_type", "rw")
+                    else:
+                        for sub_obj in obj["subindexes"]:
+                            for sub_obj2 in obj2["subindexes"]:
+                                if sub_obj[""] != sub_obj2["name"]:
+                                    sub_obj2["data_type"] = sub_obj["data_type"]
+                                    sub_obj2["access_type"] = sub_obj.get("access_type", "rw")
+                                    overlayed = True
+                                    break  # obj was found, search for next one
+                    overlayed = True
+                    break  # obj was found, search for next one
+                if not overlayed:  # add it
+                    card_config['objects'].append(deepcopy(obj))
 
             # overlay tpdos
-            for tpdo in overlay_config.tpdos:
-                card_config.tpdos[tpdo].fields = overlay_config.tpdos[tpdo].fields
-                card_config.tpdos[tpdo].delay_ms = overlay_config.tpdos[tpdo].delay_ms
-                card_config.tpdos[tpdo].sync = overlay_config.tpdos[tpdo].sync
+            for overlay_tpdo in overlay_config.get("tpdos", []):
+                overlayed = False
+                for card_tpdo in card_config.get("tpdos", []):
+                    if card_tpdo["num"] == card_tpdo["num"]:
+                        card_tpdo["fields"] = overlay_tpdo["fields"]
+                        card_tpdo["delay_ms"] = overlay_tpdo.get("delay_ms", 0)
+                        card_tpdo["sync"] = overlay_tpdo.get("sync", 0)
+                        overlayed = True
+                        break
+                if not overlayed:  # add it
+                    card_config['tpdos'].append(deepcopy(overlay_tpdo))
 
             # overlay rpdos
-            for rpdo in overlay_config.rpdos:
-                card_config.rpdos[rpdo].card = overlay_config.rpdos[rpdo].card
-                card_config.rpdos[rpdo].tpdo_num = overlay_config.rpdos[rpdo].tpdo_num
+            for overlay_rpdo in overlay_config.get("rpdos", []):
+                overlayed = False
+                for card_rpdo in card_config.get("rpdos", []):
+                    if card_rpdo["num"] == card_rpdo["num"]:
+                        card_rpdo["card"] = overlay_rpdo["card"]
+                        card_rpdo["tpdo_num"] = overlay_rpdo["tpdo_num"]
+                        overlayed = True
+                        break
+                if not overlayed:  # add it
+                    card_config['rpdos'].append(deepcopy(overlay_rpdo))
 
         od = canopen.ObjectDictionary()
         od.bitrate = 1_000_000  # bps
@@ -560,15 +597,15 @@ def gen_od_db(oresat_id: OreSatId, beacon_def: dict, configs: dict) -> dict:
         od.device_information.LSS_supported = False
 
         # add common and card records
-        _add_rec(od, common_config.objects, Index.COMMON_DATA)
-        _add_rec(od, card_config.objects, Index.CARD_DATA)
+        _add_objects(od, common_config.get("objects", []), 0x3000)
+        _add_objects(od, card_config.get("objects", []), 0x6000)
 
-        # this object's subindexes are dependent on node id of all nodes on the bus
-        # subindex corresponds to node_id (don't add subindexes for node id that do not exist)
+        # this object"s subindexes are dependent on node id of all nodes on the bus
+        # subindex corresponds to node_id (don"t add subindexes for node id that do not exist)
         # all nodes other than the c3 really only need the c3
         #
         # without this firmware binary size for STM32M0-base cards becomes too large
-        std_objects = set(card_config.std_objects + common_config.std_objects)
+        std_objects = set(card_config.get("std_objects", []) + common_config.get("std_objects", []))
         if "consumer_heartbeat_time" in std_objects:
             obj = std_objs["consumer_heartbeat_time"]
 
@@ -606,9 +643,10 @@ def gen_od_db(oresat_id: OreSatId, beacon_def: dict, configs: dict) -> dict:
             _add_tpdo_data(od, common_config)
 
         # set specific obj defaults
-        od["common_data"]["satellite_id"].default = oresat_id.value
+        od["versions"]["db_version"].default = __version__
+        od["satellite_id"].default = oresat_id.value
         if node_id == NodeId.C3:
-            od["card_data"]["beacon_revision"].default = beacon_def["revision"]
+            od["beacon"]["revision"].default = beacon_def["revision"]
 
         od_db[node_id] = od
 

@@ -1,0 +1,151 @@
+objects:
+  - name: status
+    data_type: uint8
+    description: the gps status
+    access_type: ro
+  
+  - name: time_syncd
+    data_type: bool
+    description: system time has syncd to gps time
+    access_type: ro
+
+  - name: skytraq
+    object_type: record
+    subindexes:
+      - name: fix_mode
+        data_type: uint8
+        description: |
+          quality of fix:
+            - 0: no fix
+            - 1: 2d
+            - 2: 3d
+            - 3: 3d+dgps
+        access_type: ro
+      
+      - name: number_of_sv
+        data_type: uint8
+        description: number of gps satellites locked onto. max 12
+        access_type: ro
+      
+      - name: gps_week
+        data_type: uint16
+        description: gps week number
+        access_type: ro
+      
+      - name: tow
+        data_type: uint32
+        description: time of the week in 0.01 seconds scaling
+        access_type: ro
+      
+      - name: latitude
+        data_type: int32
+        description: latitude in 1e-7 degrees
+        access_type: ro
+      
+      - name: longitude
+        data_type: int32
+        description: longitude in 1e-7 degrees
+        access_type: ro
+      
+      - name: ellipsoid_alt
+        data_type: uint32
+        description: height above ellipsoid in cm
+        access_type: ro
+      
+      - name: mean_sea_lvl_alt
+        data_type: uint32
+        description: mean sea level in cm
+        access_type: ro
+      
+      - name: gdop
+        data_type: uint16
+        description: geometric diluttion of precision in 0.01 scaling
+        access_type: ro
+      
+      - name: pdop
+        data_type: uint16
+        description: position diluttion of precision in 0.01 scaling
+        access_type: ro
+      
+      - name: hdop
+        data_type: uint16
+        description: height diluttion of precision in 0.01 scaling
+        access_type: ro
+      
+      - name: vdop
+        data_type: uint16
+        description: vertical diluttion of precision in 0.01 scaling
+        access_type: ro
+      
+      - name: tdop
+        data_type: uint16
+        description: time diluttion of precision in 0.01 scaling
+        access_type: ro
+      
+      - name: ecef_x
+        data_type: int32
+        description: ecef x coordinate in cm
+        access_type: ro
+      
+      - name: ecef_y
+        data_type: int32
+        description: ecef y coordinate in cm
+        access_type: ro
+      
+      - name: ecef_z
+        data_type: int32
+        description: ecef z coordinate in cm
+        access_type: ro
+      
+      - name: ecef_vx
+        data_type: int32
+        description: ecef y velocity in cm/s
+        access_type: ro
+      
+      - name: ecef_vy
+        data_type: int32
+        description: ecef y velocity in cm/s
+        access_type: ro
+      
+      - name: ecef_vz
+        data_type: int32
+        description: ecef z velocity in cm/s
+        access_type: ro
+      
+      - name: time_since_midnight
+        data_type: uint32
+        description: the number of milliseconds since midnight when the gps data was received
+        access_type: ro
+      
+tpdos: 
+  - num: 3
+    fields:
+      -  [skytraq, time_since_midnight]
+  - num: 4 
+    fields:
+      - [skytraq, ecef_x]
+      - [skytraq, ecef_y]
+  
+  - num: 5
+    fields:
+      - [skytraq, ecef_z]
+      - [skytraq, ecef_vx]
+  
+  - num: 6
+    fields:
+      - [skytraq, ecef_vy]
+      - [skytraq, ecef_vz]
+  
+  - num: 7
+    fields:
+      - [status]
+      - [skytraq, number_of_sv]
+      - [time_syncd]
+  
+  - num: 16 # the time sync TPDO
+    fields:
+      - [scet]
+    sync: 1
+  
+
+

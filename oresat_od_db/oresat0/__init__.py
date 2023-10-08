@@ -1,10 +1,11 @@
 """OreSat0 object dictionary and beacon globals."""
 
-import json
 import os
 
+import yaml
+
 from .. import NodeId, OreSatId
-from .._json_to_od import gen_od_db, read_json_od_config
+from .._yaml_to_od import gen_od_db, read_yaml_od_config
 from ..base import (
     BAT_CONFIG,
     C3_CONFIG,
@@ -17,17 +18,18 @@ from ..base import (
     SW_COMMON_CONFIG,
 )
 
-_JSON_DIR = f"{os.path.dirname(os.path.abspath(__file__))}/jsons"
-BAT_CONFIG_OVERLAY = read_json_od_config(f"{_JSON_DIR}/battery_overlay.json")
+_CONFIGS_DIR = f"{os.path.dirname(os.path.abspath(__file__))}/configs"
+C3_CONFIG_OVERLAY = read_yaml_od_config(f"{_CONFIGS_DIR}/c3_overlay.yaml")
+BAT_CONFIG_OVERLAY = read_yaml_od_config(f"{_CONFIGS_DIR}/battery_overlay.yaml")
 
-with open(f"{_JSON_DIR}/beacon.json", "r") as f:
-    ORESAT0_BEACON_DEF = json.load(f)
+with open(f"{_CONFIGS_DIR}/beacon.yaml", "r") as f:
+    ORESAT0_BEACON_DEF = yaml.safe_load(f)
 
 ORESAT0_OD_DB = gen_od_db(
     OreSatId.ORESAT0,
     ORESAT0_BEACON_DEF,
     {
-        NodeId.C3: (C3_CONFIG, FW_COMMON_CONFIG),
+        NodeId.C3: (C3_CONFIG, FW_COMMON_CONFIG, C3_CONFIG_OVERLAY),
         NodeId.BATTERY_1: (BAT_CONFIG, FW_COMMON_CONFIG, BAT_CONFIG_OVERLAY),
         NodeId.SOLAR_MODULE_1: (SOLAR_CONFIG, FW_COMMON_CONFIG),
         NodeId.SOLAR_MODULE_2: (SOLAR_CONFIG, FW_COMMON_CONFIG),

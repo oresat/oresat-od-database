@@ -12,7 +12,7 @@ sys.path.append(f"{_FILE_PATH}/..")
 import canopen
 
 from oresat_od_db import OD_DB, NodeId, OreSatId
-from oresat_od_db._json_to_od import (
+from oresat_od_db._yaml_to_od import (
     RPDO_COMM_START,
     RPDO_PARA_START,
     TPDO_COMM_START,
@@ -648,9 +648,7 @@ def main():
     parser = ArgumentParser("generate CANopenNode OD.[c/h] files")
     parser.add_argument("oresat", help="oresat mission; oresat0 or oresat0.5")
     parser.add_argument("card", help="card name; c3, battery, solar, imu, or reaction_wheel")
-    parser.add_argument(
-        "-d", "--dir-path", default=".", help='output directory path, default: "."'
-    )
+    parser.add_argument("-d", "--dir-path", default=".", help='output directory path, default: "."')
     args = parser.parse_args()
 
     if (args.oresat.lower(), args.card) not in OD_LIST:

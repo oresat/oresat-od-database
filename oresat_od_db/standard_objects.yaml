@@ -1,0 +1,181 @@
+- name: device_type
+  index: 0x1000
+  object_type: variable
+  description: |
+    - bits 16-31: additional information
+    - bits 0-15: device profile number
+  data_type: uint32
+  access_type: ro
+
+- name: error_register
+  index: 0x1001
+  object_type: variable
+  description: |
+    - bit 7: manufacturer specific
+    - bit 6: reserved (always 0)
+    - bit 5: device profile specific
+    - bit 4: communication error (overrun error state)
+    - bit 3: temperature
+    - bit 2: voltage
+    - bit 1: current
+    - bit 0: generic error
+  data_type: uint8
+  access_type: ro
+
+- name: cob_id_sync
+  index: 0x1005
+  object_type: variable
+  description: COB-ID of the SYNC message
+  data_type: uint32
+  access_type: rw
+  default: 0x80
+
+- name: communication_cycle_period
+  index: 0x1006
+  object_type: variable
+  description: SYNC interval in mircoseconds
+  data_type: uint32
+  access_type: rw
+
+- name: cob_id_emergency_message
+  index: 0x1014
+  object_type: variable
+  description: |
+    - bit 31: not valid
+    - bit 30: reserved
+    - bits 29-11: always 0
+    - bits 10-0: CAN-ID
+  data_type: uint32
+  access_type: rw
+  default: "0x80+$NODE_ID"
+
+- name: consumer_heartbeat_time
+  index: 0x1016
+  object_type: array
+  description: expected heartbeat cycle times in milliseconds for all other nodes
+  length: 127
+  data_type: uint32
+  default: 1000
+
+- name: producer_heartbeat_time
+  index: 0x1017
+  object_type: variable
+  description: heartbeat producer time in ms, 0 = disable
+  data_type: uint16
+  access_type: rw
+  default: 1000
+
+- name: identity
+  index: 0x1018
+  object_type: record
+  subindexes: 
+    - name: vendor_id
+      subindex: 0x1
+      description: manufacturer vendor id set by CiA
+      data_type: uint32
+      access_type: ro
+    
+    - name: product_code
+      subindex: 0x2
+      description: ids a specific type of CANopen devices
+      data_type: uint32
+      access_type: ro
+    
+    - name: revision_number
+      subindex: 0x3
+      description: |
+        - bits 16-31: major version
+        - bits 0-15: minor version
+      data_type: uint32
+      access_type: ro
+    
+    - name: serial_number
+      subindex: 0x4
+      description: unqiue device id for a product group or revision
+      data_type: uint32
+      access_type: ro
+
+- name: sdo_server_parameter
+  index: 0x1200
+  object_type: record
+  subindexes: 
+    - name: cob_id_client_to_server
+      subindex: 0x1
+      data_type: uint32
+      access_type: rw
+      default: 0x80000000
+    
+    - name: cob_id_server_to_client
+      subindex: 0x2
+      data_type: uint32
+      access_type: rw
+      default: 0x80000000
+    
+    - name: node_id_od_sdo_client
+      subindex: 0x3
+      data_type: uint32
+      access_type: rw
+      default: 1
+    
+- name: sdo_client_parameter
+  index: 0x1280
+  object_type: record
+  subindexes: 
+    - name: cob_id_client_to_server
+      subindex: 0x1
+      data_type: uint32
+      access_type: rw
+      default: 0x80000000
+    
+    - name: cob_id_server_to_client
+      subindex: 0x2
+      data_type: uint32
+      access_type: rw
+      default: 0x80000000
+    
+    - name: node_id_od_sdo_client
+      subindex: 0x3
+      data_type: uint32
+      access_type: rw
+      default: 1
+
+- name: os_command
+  index: 0x1023
+  object_type: record
+  subindexes: 
+    - name: command
+      subindex: 0x1
+      description: OS command
+      data_type: domain
+      access_type: rw
+    
+    - name: status
+      subindex: 0x2
+      description: |
+        - 0x00: Command completed no error no reply
+        - 0x01: Command completed no error reply
+        - 0x02: Command completed error no reply
+        - 0x03: Command completed error reply
+        - 0xFF: Command executing
+      data_type: uint32
+      access_type: ro
+    
+    - name: reply
+      subindex: 0x3
+      description: OS command reply
+      data_type: domain
+      access_type: ro
+    
+- name: scet
+  index: 0x2010
+  object_type: variable
+  description: CCSDS Unsegmented Time Code (CUC) object for Spacecraft Elapsed Time (SCET)
+  data_type: uint64
+  access_type: rw
+
+- name: utc
+  index: 0x2011
+  object_type: variable
+  description: CCSDS Day Segmented Time Code (CDS) object for UTC time
+  data_type: uint64
+  access_type: rw
