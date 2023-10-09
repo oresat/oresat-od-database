@@ -78,7 +78,8 @@ objects:
 
       - name: good_test_threshold
         data_type: uint16
-        description: when testing the antenna, any voltage (in millivolts) above this threshold is consisder good
+        description: |
+          when testing the antenna, any voltage (in millivolts) above this threshold is considered good
         access_type: const
         default: 100
 
@@ -200,6 +201,23 @@ objects:
         description: scan for opd nodes
         access_type: wo
 
+      - name: reset
+        data_type: bool
+        description: reset the opd system
+        access_type: wo
+
+      - name: reset_attempts
+        data_type: uint8
+        description: number of reset attempts for the opd system before it is considered dead
+        access_type: rw
+        default: 3
+
+      - name: reset_delay
+        data_type: uint8
+        description: number of seconds between opd system resets
+        access_type: rw
+        default: 10
+
       - name: nodes_status_json
         data_type: str
         description: status of all node as a json string
@@ -208,13 +226,24 @@ objects:
 
       - name: node_select
         data_type: uint8
-        description: select a opd node
+        description: select a opd node via its node id
         access_type: rw
 
       - name: node_enable
         data_type: bool
-        description: enable/disable a node on write or get current state by read
+        description: enable/disable selected node on write or get current state by read
         access_type: rw
+
+      - name: node_reset
+        data_type: bool
+        description: reset the selected node
+        access_type: wo
+
+      - name: node_reset_attempts
+        data_type: uint8
+        description: number of reset attempts for a opd node before it is considered dead
+        access_type: rw
+        default: 3
 
   - name: beacon
     object_type: record
@@ -223,6 +252,7 @@ objects:
         data_type: uint8
         description: the beacon revision number
         access_type: const
+        # default set via beacon.yaml file
 
       - name: src_callsign
         data_type: str
