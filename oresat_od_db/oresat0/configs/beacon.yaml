@@ -1,6 +1,7 @@
 revision: 0
 fields:
   # c3
+  - [beacon, start_chars]
   - [satellite_id]
   - [beacon, revision]
   - [status]

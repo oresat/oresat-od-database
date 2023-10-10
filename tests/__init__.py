@@ -76,17 +76,20 @@ class TestConfig(unittest.TestCase):
                 obj = c3_od[field[0]]
             else:
                 obj = c3_od[field[0]][field[1]]
-            self.assertNotIn(
-                obj.data_type,
-                dynamic_len_data_types,
-                f"{self.id.name} {obj.name} is a dynamic length data type",
-            )
-            length += OD_DATA_TYPE_SIZE[obj.data_type] // 8  # bits to bytes
+
+            if field[0] == "beacon" and field[1] == "start_chars":
+                length += len(obj.default)  # start_chars is required and static
+            else:
+                self.assertNotIn(
+                    obj.data_type,
+                    dynamic_len_data_types,
+                    f"{self.id.name} {obj.name} is a dynamic length data type",
+                )
+                length += OD_DATA_TYPE_SIZE[obj.data_type] // 8  # bits to bytes
 
         # AX.25 payload max length = 255
-        # Start chars = 3
         # CRC32 length = 4
-        self.assertLessEqual(length, 255 - 3 - 4, f"{self.id.name} beacon length too long")
+        self.assertLessEqual(length, 255 - 4, f"{self.id.name} beacon length too long")
 
     def test_record_array_length(self):
         """Test that array/record have is less than 255 objects in it."""
