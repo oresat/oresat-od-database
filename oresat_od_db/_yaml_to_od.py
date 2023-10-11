@@ -261,6 +261,7 @@ def _add_rpdo_data(
         rpdo_mapped_index = 0x7000 + tpdo_node_od.node_id
         if rpdo_mapped_index not in rpdo_node_od:
             rpdo_mapped_rec = canopen.objectdictionary.Record(node_name, rpdo_mapped_index)
+            rpdo_mapped_rec.description = f"{node_name} tpdo mapped data"
             rpdo_node_od.add_object(rpdo_mapped_rec)
 
             # index 0 for node data index
@@ -339,6 +340,7 @@ def _add_rpdo_data(
                 tpdo_mapped_obj = tpdo_node_od[tpdo_mapped_index][tpdo_mapped_subindex]
                 name = tpdo_node_od[tpdo_mapped_index].name + "_" + tpdo_mapped_obj.name
             var = canopen.objectdictionary.Variable(name, rpdo_mapped_index, rpdo_mapped_subindex)
+            var.description = tpdo_mapped_obj.description
             var.access_type = "const"
             var.data_type = tpdo_mapped_obj.data_type
             var.default = tpdo_mapped_obj.default
