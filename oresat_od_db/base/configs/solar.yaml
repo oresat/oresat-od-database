@@ -1,45 +1,56 @@
 objects:
   - name: output
+    description: solar module output
     object_type: record
     subindexes:
       - name: voltage
         data_type: uint16
+        description: voltage in millivolts
         access_type: ro
 
       - name: current
         data_type: int16
+        description: current in milliamps
         access_type: ro
 
       - name: power
         data_type: uint16
+        description: power in milliwatts
         access_type: ro
 
       - name: voltage_avg
         data_type: uint16
+        description: average voltage in millivolts
         access_type: ro
 
       - name: current_avg
         data_type: int16
+        description: average current in milliamps
         access_type: ro
 
       - name: power_avg
         data_type: uint16
+        description: average power in milliwatts
         access_type: ro
 
       - name: voltage_max
         data_type: uint16
+        description: max voltage in millivolts
         access_type: ro
 
       - name: current_max
         data_type: int16
+        description: max current in milliamps
         access_type: ro
 
       - name: power_max
         data_type: uint16
+        description: max power in milliwatts
         access_type: ro
 
       - name: energy
         data_type: uint16
+        description: storing energy in millijoules
         access_type: ro
 
   - name: cell_1
@@ -47,14 +58,17 @@ objects:
     subindexes:
       - name: temperature
         data_type: int8
+        description: cell 1 temperature in celsius
         access_type: ro
 
       - name: temperature_min
         data_type: int8
+        description: min cell 1 temperature in celsius
         access_type: ro
 
       - name: temperature_max
         data_type: int8
+        description: max cell 1 temperature in celsius
         access_type: ro
 
   - name: cell_2
@@ -62,22 +76,29 @@ objects:
     subindexes:
       - name: temperature
         data_type: int8
+        description: cell 2 temperature in celsius
         access_type: ro
 
       - name: temperature_min
         data_type: int8
+        description: min cell 2 temperature in celsius
         access_type: ro
 
       - name: temperature_max
         data_type: int8
+        description: max cell 2 temperature in celsius
         access_type: ro
 
   - name: mppt_alg
     data_type: uint8
-    access_type: rww
+    description: |
+      mppt (maximum power point tracking) algorithm
+      - 0: perturb and observse
+    access_type: rw
 
   - name: lt1618_iadj
     data_type: uint16
+    description: i_adj pin voltage in microvolts
     access_type: ro
 
 tpdos:

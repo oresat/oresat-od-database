@@ -5,90 +5,119 @@ objects:
     subindexes:
       - name: vbatt
         data_type: uint16
+        description: pack voltage in millivolts
         access_type: ro
 
       - name: vcell_max
         data_type: uint16
+        description: max voltage for a cell in millivolts
         access_type: ro
 
       - name: vcell_min
         data_type: uint16
+        description: min voltage for a cell in millivolts
         access_type: ro
 
       - name: vcell
         data_type: uint16
+        description: lowest cell voltage in millivolts
         access_type: ro
 
       - name: vcell_1
         data_type: uint16
+        description: cell 1 voltage in millivolts
         access_type: ro
 
       - name: vcell_2
         data_type: uint16
+        description: cell 2 voltage in millivolts
         access_type: ro
 
       - name: vcell_avg
         data_type: uint16
+        description: average voltage of both cells in millivolts
         access_type: ro
 
       - name: current
         data_type: int16
+        description: pack current in milliamps
         access_type: ro
 
       - name: current_avg
         data_type: int16
+        description: pack average current in milliamps
         access_type: ro
 
       - name: current_max
         data_type: int16
+        description: pack max current in milliamps
         access_type: ro
 
       - name: current_min
         data_type: int16
+        description: pack min current in milliamps
         access_type: ro
 
       - name: full_capacity
         data_type: uint16
+        description: capacity of battery pack in milliamp-hours
         access_type: ro
 
       - name: reported_capacity
         data_type: uint16
+        description: reported capacity of battery pack in milliamp-hours
         access_type: ro
 
       - name: time_to_empty
         data_type: uint16
+        description: estimate of time until battery pack is empty in seconds
         access_type: ro
 
       - name: time_to_full
         data_type: uint16
+        description: estimate of time until battery pack is full in seconds
         access_type: ro
 
       - name: cycles
         data_type: uint16
+        description: charge/discharge cycles
         access_type: ro
+        high_limit: 10485
 
       - name: reported_state_of_charge
         data_type: uint8
+        description: reported charge percent
         access_type: ro
+        high_limit: 100
 
       - name: temperature
         data_type: int8
+        description: temperature of battery pack in celsius
         access_type: ro
 
       - name: temperature_avg
         data_type: int8
+        description: average temperature of battery pack in celsius
         access_type: ro
 
       - name: temperature_max
         data_type: int8
+        description: max temperature of battery pack in celsius
         access_type: ro
 
       - name: temperature_min
         data_type: int8
+        description: min temperature of battery pack in celsius
         access_type: ro
 
       - name: status
         data_type: uint8
+        description: |
+          - bit 0: heater on
+          - bit 1: discharge disable
+          - bit 2: charge disable
+          - bit 3: discharge status
+          - bit 4: charge status
         access_type: ro
 
   - name: pack_2
@@ -97,95 +126,120 @@ objects:
     subindexes:
       - name: vbatt
         data_type: uint16
+        description: pack voltage in millivolts
         access_type: ro
 
       - name: vcell_max
         data_type: uint16
+        description: max voltage for a cell in millivolts
         access_type: ro
 
       - name: vcell_min
         data_type: uint16
+        description: min voltage for a cell in millivolts
         access_type: ro
 
       - name: vcell
         data_type: uint16
+        description: lowest cell voltage in millivolts
         access_type: ro
 
       - name: vcell_1
         data_type: uint16
+        description: cell 1 voltage in millivolts
         access_type: ro
 
       - name: vcell_2
         data_type: uint16
+        description: cell 2 voltage in millivolts
         access_type: ro
 
       - name: vcell_avg
         data_type: uint16
+        description: average voltage of both cells in millivolts
         access_type: ro
 
       - name: current
         data_type: int16
+        description: pack current in milliamps
         access_type: ro
 
       - name: current_avg
         data_type: int16
+        description: average current in milliamps
         access_type: ro
 
       - name: current_max
         data_type: int16
+        description: max current in milliamps
         access_type: ro
 
       - name: current_min
         data_type: int16
+        description: min current in milliamps
         access_type: ro
 
       - name: full_capacity
         data_type: uint16
+        description: capacity of battery pack in milliamp-hours
         access_type: ro
 
       - name: reported_capacity
         data_type: uint16
+        description: reported capacity of battery pack in milliamp-hours
         access_type: ro
 
       - name: time_to_empty
         data_type: uint16
+        description: estimate of time until battery pack is empty in seconds
         access_type: ro
 
       - name: time_to_full
         data_type: uint16
+        description: estimate of time until battery pack is full in seconds
         access_type: ro
 
       - name: cycles
         data_type: uint16
+        description: charge/discharge cycles
         access_type: ro
+        high_limit: 10485
 
       - name: reported_state_of_charge
         data_type: uint8
+        description: reported charge percent
         access_type: ro
+        high_limit: 100
 
       - name: temperature
         data_type: int8
+        description: temperature of battery pack in celsius
         access_type: ro
 
       - name: temperature_avg
         data_type: int8
+        description: average temperature of battery pack in celsius
         access_type: ro
 
       - name: temperature_max
         data_type: int8
+        description: max temperature of battery pack in celsius
         access_type: ro
 
       - name: temperature_min
         data_type: int8
+        description: min temperature of battery pack in celsius
         access_type: ro
 
       - name: status
         data_type: uint8
+        description: |
+          - bit 0: heater on
+          - bit 1: discharge disable
+          - bit 2: charge disable
+          - bit 3: discharge status
+          - bit 4: charge status
         access_type: ro
-
-  - name: model_gauge_alg_status
-    data_type: uint16
-    access_type: rw
 
 tpdos:
   - num: 1

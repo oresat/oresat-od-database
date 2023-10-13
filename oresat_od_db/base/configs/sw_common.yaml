@@ -62,11 +62,13 @@ objects:
         data_type: uint8
         description: the current storage percent used
         access_type: ro
+        high_level: 100
 
       - name: ram_percent
         data_type: uint8
         description: the current ram percent used
         access_type: ro
+        high_level: 100
 
       - name: unix_time
         data_type: uint32
