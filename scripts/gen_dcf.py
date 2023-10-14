@@ -226,7 +226,9 @@ def main():
     """The main"""
 
     parser = ArgumentParser()
-    parser.add_argument("oresat", default="oresat0", help="oresat mission; oresat0 or oresat0.5")
+    parser.add_argument(
+        "oresat", default="oresat0", help="oresat mission; oresat0, oresat0.5, or oresat1"
+    )
     parser.add_argument("card", help="card name; all, c3, gps, star_tracker_1, etc")
     parser.add_argument("-d", "--dir-path", default=".", help='directory path; defautl "."')
     args = parser.parse_args()
@@ -235,6 +237,8 @@ def main():
         od_db = OD_DB[OreSatId.ORESAT0]
     elif args.oresat == "oresat0.5":
         od_db = OD_DB[OreSatId.ORESAT0_5]
+    elif args.oresat == "oresat1":
+        od_db = OD_DB[OreSatId.ORESAT1]
     else:
         print(f"invalid oresat mission {args.oresat}")
         sys.exit()

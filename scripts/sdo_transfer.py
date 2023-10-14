@@ -39,7 +39,7 @@ def main():
         "--oresat",
         metavar="ORESAT",
         default="oresat0.5",
-        help="oresat# (e.g.: oresat0,  oresat0.5)",
+        help="oresat# (e.g.: oresat0, oresat0.5, oresat1)",
     )
     args = parser.parse_args()
 

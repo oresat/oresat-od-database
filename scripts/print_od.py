@@ -36,6 +36,8 @@ def main():
         od_db = OD_DB[OreSatId.ORESAT0]
     elif args.oresat == "oresat0.5":
         od_db = OD_DB[OreSatId.ORESAT0_5]
+    elif args.oresat == "oresat1":
+        od_db = OD_DB[OreSatId.ORESAT1]
     else:
         print(f"invalid oresat mission {args.oresat}")
         sys.exit()

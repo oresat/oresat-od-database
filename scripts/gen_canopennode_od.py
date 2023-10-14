@@ -638,6 +638,11 @@ OD_LIST = {
     ("oresat0.5", "solar"): OD_DB[OreSatId.ORESAT0_5][NodeId.SOLAR_MODULE_1],
     ("oresat0.5", "imu"): OD_DB[OreSatId.ORESAT0_5][NodeId.IMU],
     ("oresat0.5", "reaction_wheel"): OD_DB[OreSatId.ORESAT0_5][NodeId.REACTION_WHEEL_1],
+    # OreSat1
+    ("oresat1", "battery"): OD_DB[OreSatId.ORESAT1][NodeId.BATTERY_1],
+    ("oresat1", "solar"): OD_DB[OreSatId.ORESAT1][NodeId.SOLAR_MODULE_1],
+    ("oresat1", "imu"): OD_DB[OreSatId.ORESAT1][NodeId.IMU],
+    ("oresat1", "reaction_wheel"): OD_DB[OreSatId.ORESAT1][NodeId.REACTION_WHEEL_1],
 }
 
 
