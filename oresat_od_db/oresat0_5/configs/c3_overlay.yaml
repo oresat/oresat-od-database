@@ -1,0 +1,3 @@
+objects:
+  - name: flight_mode
+    access_type: ro

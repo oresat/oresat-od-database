@@ -85,7 +85,9 @@ def _add_objects(
             var.access_type = obj["access_type"]
             var.description = obj["description"]
             var.data_type = OD_DATA_TYPES[obj["data_type"]]
-            if obj["default"] is None:
+            if obj["data_type"] == "octet_str" and "length" in obj:
+                var.default = b"\x00" * obj["length"]
+            elif obj["default"] is None:
                 var.default = OD_DEFAULTS[var.data_type]
             elif var.data_type in int_types and isinstance(obj["default"], str):
                 var.default = int(obj["default"], 16)  # fix hex values data types
@@ -341,9 +343,10 @@ def _add_rpdo_data(
                 name = tpdo_node_od[tpdo_mapped_index].name + "_" + tpdo_mapped_obj.name
             var = canopen.objectdictionary.Variable(name, rpdo_mapped_index, rpdo_mapped_subindex)
             var.description = tpdo_mapped_obj.description
-            var.access_type = "const"
+            var.access_type = "rw"
             var.data_type = tpdo_mapped_obj.data_type
             var.default = tpdo_mapped_obj.default
+            var.pdo_mappable = True
             rpdo_mapped_rec.add_member(var)
 
         # master node mapping obj

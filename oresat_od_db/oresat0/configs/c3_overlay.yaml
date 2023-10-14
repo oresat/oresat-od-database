@@ -1,4 +1,7 @@
 objects:
+  - name: flight_mode
+    access_type: ro
+
   - name: system
     object_type: record
     subindexes:

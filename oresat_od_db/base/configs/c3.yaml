@@ -62,7 +62,13 @@ objects:
 
       - name: attempt_timeout
         data_type: uint8
-        description: number of seconds between deployment attempts
+        description: number of seconds for a deployment attempt
+        access_type: const
+        default: 10
+
+      - name: reattempt_timeout
+        data_type: uint8
+        description: number of seconds between deployment reattempts
         access_type: const
         default: 15
 
@@ -79,7 +85,7 @@ objects:
       - name: good_test_threshold
         data_type: uint16
         description: |
-          when testing the antenna, any voltage (in millivolts) above this threshold is considered good
+          when testing the antennas, any voltage (in millivolts) above this threshold is considered good
         access_type: const
         default: 100
 
@@ -142,6 +148,36 @@ objects:
   - name: edl
     object_type: record
     subindexes:
+      - name: key0
+        data_type: octet_str
+        description: edl crypto key 0
+        access_type: ro
+        length: 32
+
+      - name: key1
+        data_type: octet_str
+        description: edl crypto key 1
+        access_type: ro
+        length: 32
+
+      - name: key2
+        data_type: octet_str
+        description: edl crypto key 2
+        access_type: ro
+        length: 32
+
+      - name: key3
+        data_type: octet_str
+        description: edl crypto key 3
+        access_type: ro
+        length: 32
+
+      - name: active_key
+        data_type: uint8
+        description: selected edl crypto key
+        access_type: ro
+        high_level: 3
+
       - name: sequence_count
         data_type: uint32
         description: edl sequence count
