@@ -652,6 +652,7 @@ def gen_od_db(oresat_id: OreSatId, beacon_def: dict, configs: dict) -> dict:
         od["satellite_id"].default = oresat_id.value
         if node_id == NodeId.C3:
             od["beacon"]["revision"].default = beacon_def["revision"]
+            od["flight_mode"].access_type = "ro"
 
         od_db[node_id] = od
 

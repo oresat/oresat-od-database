@@ -2,22 +2,19 @@ objects:
   - name: camera
     object_type: record
     subindexes:
-      - name: num_of_capture
+      - name: status
+        data_type: uint8
+        description: the camera status
+
+      - name: number_to_capture
         data_type: uint8
         description: number of images to capture or 0 for endless
         default: 1
 
-      - name: delay
+      - name: capture_delay
         data_type: uint32
         description: delay between captures in milliseconds
-
-      - name: integration_time
-        data_type: uint32
-        description: camera integration time in milliseconds
-
-      - name: status
-        data_type: uint8
-        description: the camera status
+        default: 1000
 
       - name: last_capture
         data_type: domain
@@ -39,6 +36,15 @@ objects:
         description: flag to save captured images
         access_type: rw
         default: true
+
+      - name: enabled
+        data_type: bool
+        description: the camera is enabled/disabled
+        access_type: ro
+
+      - name: integration_time
+        data_type: uint32
+        description: camera integration time in milliseconds
 
       - name: temperature
         data_type: int8

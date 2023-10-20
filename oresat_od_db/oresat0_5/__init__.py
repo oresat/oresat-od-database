@@ -21,7 +21,6 @@ from ..base import (
 )
 
 _CONFIGS_DIR = f"{os.path.dirname(os.path.abspath(__file__))}/configs"
-C3_CONFIG_OVERLAY = read_yaml_od_config(f"{_CONFIGS_DIR}/c3_overlay.yaml")
 
 with open(f"{_CONFIGS_DIR}/beacon.yaml", "r") as f:
     ORESAT0_5_BEACON_DEF = yaml.safe_load(f)
@@ -31,7 +30,7 @@ ORESAT0_5_OD_DB = gen_od_db(
     OreSatId.ORESAT0_5,
     ORESAT0_5_BEACON_DEF,
     {
-        NodeId.C3: (C3_CONFIG, SW_COMMON_CONFIG, C3_CONFIG_OVERLAY),
+        NodeId.C3: (C3_CONFIG, SW_COMMON_CONFIG),
         NodeId.BATTERY_1: (BAT_CONFIG, FW_COMMON_CONFIG),
         NodeId.SOLAR_MODULE_1: (SOLAR_CONFIG, FW_COMMON_CONFIG),
         NodeId.SOLAR_MODULE_2: (SOLAR_CONFIG, FW_COMMON_CONFIG),
