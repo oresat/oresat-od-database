@@ -324,7 +324,50 @@ objects:
         description: scet timestamp of last beacon
         access_type: ro
 
+  - name: rtc
+    object_type: record
+    description: rtc info, OreSat0 only as Linux handles the rtc
+    subindexes:
+      - name: timestamp
+        data_type: uint32
+        description: the last saved timestamp in seconds
+
+      - name: alarm_a
+        data_type: uint32
+        description: the last state of alarm a
+
+      - name: alarm_b
+        data_type: uint32
+        description: the last state of alarm b
+
+      - name: wakeup_interval
+        data_type: uint32
+        description: the last state of wakeup interval
+
 tpdos:
   - num: 1 # time sync TPDO
     fields:
       - [scet]
+
+fram:
+  # DO NOT change this order, only append!
+  - [status]
+  - [rtc, timestamp]
+  - [rtc, alarm_a]
+  - [rtc, alarm_b]
+  - [rtc, wakeup_interval]
+  - [tx_control, last_enable_timestamp]
+  - [edl, last_timestamp]
+  - [antenna, deployed]
+  - [system, power_cycles]
+  - [lband, rx_bytes]
+  - [lband, rx_packets]
+  - [edl, vc1_sequence_count]
+  - [edl, vc1_expedite_count]
+  - [edl, sequence_count]
+  - [edl, rejected_count]
+  - [crypto, key0]
+  - [crypto, key1]
+  - [crypto, key2]
+  - [crypto, key3]
+  - [crypto, active_key]

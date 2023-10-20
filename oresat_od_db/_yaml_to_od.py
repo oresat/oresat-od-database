@@ -6,7 +6,7 @@ from copy import deepcopy
 import canopen
 import yaml
 
-from . import NODE_NICE_NAMES, NodeId, OreSatId, __version__
+from .constants import NODE_NICE_NAMES, NodeId, OreSatId, __version__
 
 RPDO_COMM_START = 0x1400
 RPDO_PARA_START = 0x1600

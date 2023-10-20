@@ -1,10 +1,9 @@
-"""OreSat0.5 object dictionary and beacon globals."""
+"""OreSat0.5 object dictionary and beacon constants."""
 
 import os
 
 import yaml
 
-from .. import NodeId, OreSatId
 from .._yaml_to_od import gen_od_db, read_yaml_od_config
 from ..base import (
     BAT_CONFIG,
@@ -19,6 +18,7 @@ from ..base import (
     ST_CONFIG,
     SW_COMMON_CONFIG,
 )
+from ..constants import NodeId, OreSatId
 
 _CONFIGS_DIR = os.path.dirname(os.path.abspath(__file__))
 
