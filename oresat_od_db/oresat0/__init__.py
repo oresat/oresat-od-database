@@ -18,7 +18,7 @@ from ..base import (
     SW_COMMON_CONFIG,
 )
 
-_CONFIGS_DIR = f"{os.path.dirname(os.path.abspath(__file__))}/configs"
+_CONFIGS_DIR = os.path.dirname(os.path.abspath(__file__))
 C3_CONFIG_OVERLAY = read_yaml_od_config(f"{_CONFIGS_DIR}/c3_overlay.yaml")
 BAT_CONFIG_OVERLAY = read_yaml_od_config(f"{_CONFIGS_DIR}/battery_overlay.yaml")
 

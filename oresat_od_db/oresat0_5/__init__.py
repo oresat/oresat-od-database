@@ -20,7 +20,7 @@ from ..base import (
     SW_COMMON_CONFIG,
 )
 
-_CONFIGS_DIR = f"{os.path.dirname(os.path.abspath(__file__))}/configs"
+_CONFIGS_DIR = os.path.dirname(os.path.abspath(__file__))
 
 with open(f"{_CONFIGS_DIR}/beacon.yaml", "r") as f:
     ORESAT0_5_BEACON_DEF = yaml.safe_load(f)
