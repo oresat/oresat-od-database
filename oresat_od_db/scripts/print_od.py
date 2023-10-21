@@ -1,18 +1,17 @@
 #!/usr/bin/env python3
 """Print out a card's objects directory."""
 
-import os
 import sys
 from argparse import ArgumentParser
 from typing import Any
 
-_FILE_PATH = os.path.dirname(os.path.abspath(__file__))
-sys.path.append(f"{_FILE_PATH}/..")
-
 import canopen
 
-from oresat_od_db import OD_DB, NodeId, OreSatId
-from oresat_od_db._yaml_to_od import OD_DATA_TYPES
+from .. import OD_DB, NodeId, OreSatId
+from .._yaml_to_od import OD_DATA_TYPES
+
+PRINT_OD = "print the object dictionary out to stdout"
+PRINT_OD_PROG = "oresat-print-od"
 
 
 def format_default(value: Any) -> str:
@@ -24,13 +23,16 @@ def format_default(value: Any) -> str:
     return value
 
 
-def main():
-    """The main"""
+def print_od(sys_args=None):
+    """The print-od main"""
 
-    parser = ArgumentParser()
+    if sys_args is None:
+        sys_args = sys.argv[1:]
+
+    parser = ArgumentParser(description=PRINT_OD, prog=PRINT_OD_PROG)
     parser.add_argument("oresat", default="oresat0", help="oresat mission; oresat0 or oresat0.5")
     parser.add_argument("card", help="card name; c3, gps, star_tracker_1, etc")
-    args = parser.parse_args()
+    args = parser.parse_args(sys_args)
 
     if args.oresat == "oresat0":
         od_db = OD_DB[OreSatId.ORESAT0]
@@ -62,7 +64,3 @@ def main():
                 data_type = inverted_od_data_types[od[i][j].data_type]
                 value = format_default(od[i][j].default)
                 print(f"  0x{i:04X} 0x{j:02X}: {od[i][j].name} - {data_type} - {value}")
-
-
-if __name__ == "__main__":
-    main()

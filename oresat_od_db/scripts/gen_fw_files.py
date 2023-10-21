@@ -6,18 +6,13 @@ import os
 import sys
 from argparse import ArgumentParser
 
-_FILE_PATH = os.path.dirname(os.path.abspath(__file__))
-sys.path.append(f"{_FILE_PATH}/..")
-
 import canopen
 
-from oresat_od_db import OD_DB, NodeId, OreSatId
-from oresat_od_db._yaml_to_od import (
-    RPDO_COMM_START,
-    RPDO_PARA_START,
-    TPDO_COMM_START,
-    TPDO_PARA_START,
-)
+from .. import OD_DB, NodeId, OreSatId
+from .._yaml_to_od import RPDO_COMM_START, RPDO_PARA_START, TPDO_COMM_START, TPDO_PARA_START
+
+GEN_FW_FILES = "generate CANopenNode OD.[c/h] files for a OreSat firmware card"
+GEN_FW_FILES_PROG = "oresat-gen-fw-files"
 
 INDENT4 = " " * 4
 INDENT8 = " " * 8
@@ -646,14 +641,17 @@ OD_LIST = {
 }
 
 
-def main():
-    """The main"""
+def gen_fw_files(sys_args=None):
+    """generate CANopenNode firmware files main"""
 
-    parser = ArgumentParser("generate CANopenNode OD.[c/h] files")
+    if sys_args is None:
+        sys_args = sys.argv[1:]
+
+    parser = ArgumentParser(description=GEN_FW_FILES, prog=GEN_FW_FILES_PROG)
     parser.add_argument("oresat", help="oresat mission; oresat0 or oresat0.5")
     parser.add_argument("card", help="card name; c3, battery, solar, imu, or reaction_wheel")
     parser.add_argument("-d", "--dir-path", default=".", help='output directory path, default: "."')
-    args = parser.parse_args()
+    args = parser.parse_args(sys_args)
 
     if (args.oresat.lower(), args.card) not in OD_LIST:
         print("invalid oresat and/or card")
@@ -815,7 +813,3 @@ def main():
         od.device_information.nr_of_TXPDO = 16
 
     write_canopennode(od, args.dir_path)
-
-
-if __name__ == "__main__":
-    main()

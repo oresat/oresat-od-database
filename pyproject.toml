@@ -23,10 +23,11 @@ dependencies = [
 dynamic = ["version"]
 
 [project.scripts]
-oresat-gen-canopennode-od = "scripts.gen_canopennode_od:main"
-oresat-gen-dcf = "scripts.gen_dcf:main"
-oresat-print-od = "scripts.print_od:main"
-oresat-sdo-transfer = "scripts.sdo_transfer:main"
+oresat-od-db = "__main__:oresat_od_db"
+oresat-gen-fw-files = "scripts.gen_fw_files:gen_fw_files"
+oresat-gen-dcf = "scripts.gen_dcf:gen_dcf"
+oresat-print-od = "scripts.print_od:print_od"
+oresat-sdo-transfer = "scripts.sdo_transfer:sdo_transfer"
 
 [tool.setuptools.dynamic]
 version = {attr = "oresat_od_db.constants.__version__"}

@@ -1,17 +1,16 @@
 #!/usr/bin/env python3
 """Generate a DCF for from an OreSat card's object directory."""
 
-import os
 import sys
 from argparse import ArgumentParser
 from datetime import datetime
 
-_FILE_PATH = os.path.dirname(os.path.abspath(__file__))
-sys.path.append(f"{_FILE_PATH}/..")
-
 import canopen
 
-from oresat_od_db import OD_DB, NodeId, OreSatId
+from .. import OD_DB, NodeId, OreSatId
+
+GEN_DCF = "generate DCF file for OreSat node(s)"
+GEN_DCF_PROG = "oresat-gen-dcf"
 
 
 def write_od(od: canopen.ObjectDictionary, dir_path: str = "."):
@@ -222,16 +221,19 @@ def _record_lines(record: canopen.objectdictionary.Record, index: int) -> list:
     return lines
 
 
-def main():
-    """The main"""
+def gen_dcf(sys_args=None):
+    """Gen_dcf main."""
 
-    parser = ArgumentParser()
+    if sys_args is None:
+        sys_args = sys.argv[1:]
+
+    parser = ArgumentParser(description=GEN_DCF, prog=GEN_DCF_PROG)
     parser.add_argument(
         "oresat", default="oresat0", help="oresat mission; oresat0, oresat0.5, or oresat1"
     )
     parser.add_argument("card", help="card name; all, c3, gps, star_tracker_1, etc")
     parser.add_argument("-d", "--dir-path", default=".", help='directory path; defautl "."')
-    args = parser.parse_args()
+    args = parser.parse_args(sys_args)
 
     if args.oresat == "oresat0":
         od_db = OD_DB[OreSatId.ORESAT0]
@@ -249,7 +251,3 @@ def main():
     else:
         od = od_db[NodeId[args.card.upper()]]
         write_od(od, args.dir_path)
-
-
-if __name__ == "__main__":
-    main()

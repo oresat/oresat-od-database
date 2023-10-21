@@ -12,15 +12,19 @@ from argparse import ArgumentParser
 
 import canopen
 
-from oresat_od_db import OD_DB, NodeId, OreSatId
+from .. import OD_DB, NodeId, OreSatId
+
+SDO_TRANSFER = "read or write value to a node's object dictionary via SDO transfers"
+SDO_TRANSFER_PROG = "oresat-sdo-transfer"
 
 
-def main():
+def sdo_transfer(sys_args=None):
     """Read or write data to a node using a SDO."""
 
-    parser = ArgumentParser(
-        description="read or write value to a node's object dictionary",
-    )
+    if sys_args is None:
+        sys_args = sys.argv[1:]
+
+    parser = ArgumentParser(description=SDO_TRANSFER, prog=SDO_TRANSFER_PROG)
     parser.add_argument("bus", metavar="BUS", help="CAN bus to use (e.g., can0, vcan0)")
     parser.add_argument("node", metavar="NODE", help="device node name (e.g. gps, solar_module_1)")
     parser.add_argument("mode", metavar="MODE", help="r[ead] or w[rite] (e.g. r, read, w, write)")
@@ -41,7 +45,7 @@ def main():
         default="oresat0.5",
         help="oresat# (e.g.: oresat0, oresat0.5, oresat1)",
     )
-    args = parser.parse_args()
+    args = parser.parse_args(sys_args)
 
     if args.oresat == "oresat0":
         od_db = OD_DB[OreSatId.ORESAT0]
@@ -111,7 +115,3 @@ def main():
         print(e)
 
     network.disconnect()
-
-
-if __name__ == "__main__":
-    main()
