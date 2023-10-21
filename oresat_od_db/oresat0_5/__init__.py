@@ -4,7 +4,7 @@ import os
 
 import yaml
 
-from .._yaml_to_od import gen_od_db, read_yaml_od_config
+from .._yaml_to_od import gen_od_db, get_c3_beacon_defs, get_c3_fram_defs, read_yaml_od_config
 from ..base import (
     BAT_CONFIG,
     C3_CONFIG,
@@ -23,12 +23,12 @@ from ..constants import NodeId, OreSatId
 _CONFIGS_DIR = os.path.dirname(os.path.abspath(__file__))
 
 with open(f"{_CONFIGS_DIR}/beacon.yaml", "r") as f:
-    ORESAT0_5_BEACON_DEF = yaml.safe_load(f)
+    ORESAT0_5_BEACON_CONFIG = yaml.safe_load(f)
 
 
 ORESAT0_5_OD_DB = gen_od_db(
     OreSatId.ORESAT0_5,
-    ORESAT0_5_BEACON_DEF,
+    ORESAT0_5_BEACON_CONFIG,
     {
         NodeId.C3: (C3_CONFIG, SW_COMMON_CONFIG),
         NodeId.BATTERY_1: (BAT_CONFIG, FW_COMMON_CONFIG),
@@ -68,3 +68,6 @@ ORESAT0_5_GPS_OD = ORESAT0_5_OD_DB[NodeId.GPS]
 ORESAT0_5_STAR_TRACKER_1_OD = ORESAT0_5_OD_DB[NodeId.STAR_TRACKER_1]
 ORESAT0_5_DXWIFI_OD = ORESAT0_5_OD_DB[NodeId.DXWIFI]
 ORESAT0_5_CFC_OD = ORESAT0_5_OD_DB[NodeId.CFC]
+
+ORESAT0_5_BEACON_DEF = get_c3_beacon_defs(ORESAT0_5_C3_OD, ORESAT0_5_BEACON_CONFIG)
+ORESAT0_5_FRAM_DEF = get_c3_fram_defs(ORESAT0_5_C3_OD, C3_CONFIG)

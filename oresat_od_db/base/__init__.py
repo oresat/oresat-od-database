@@ -16,5 +16,3 @@ GPS_CONFIG = read_yaml_od_config(f"{_CONFIGS_DIR}/gps.yaml")
 ST_CONFIG = read_yaml_od_config(f"{_CONFIGS_DIR}/star_tracker.yaml")
 DXWIFI_CONFIG = read_yaml_od_config(f"{_CONFIGS_DIR}/dxwifi.yaml")
 CFC_CONFIG = read_yaml_od_config(f"{_CONFIGS_DIR}/cfc.yaml")
-
-C3_FRAM_DEF = C3_CONFIG.get("fram", [])

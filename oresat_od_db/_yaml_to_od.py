@@ -674,3 +674,33 @@ def gen_od_db(oresat_id: OreSatId, beacon_def: dict, configs: dict) -> dict:
                 od[index].value = od[index].default
 
     return od_db
+
+
+def get_c3_fram_defs(c3_od: canopen.ObjectDictionary, config: dict) -> list:
+    """Get the list of objects in saved to fram."""
+
+    fram_objs = []
+
+    for fields in config.get("fram", []):
+        if len(fields) == 1:
+            obj = c3_od[fields[0]]
+        elif len(fields) == 2:
+            obj = c3_od[fields[0]][fields[1]]
+        fram_objs.append(obj)
+
+    return fram_objs
+
+
+def get_c3_beacon_defs(c3_od: canopen.ObjectDictionary, beacon_def: dict) -> list:
+    """Get the list of objects in the beacon from OD."""
+
+    beacon_objs = []
+
+    for fields in beacon_def.get("fields", []):
+        if len(fields) == 1:
+            obj = c3_od[fields[0]]
+        elif len(fields) == 2:
+            obj = c3_od[fields[0]][fields[1]]
+        beacon_objs.append(obj)
+
+    return beacon_objs

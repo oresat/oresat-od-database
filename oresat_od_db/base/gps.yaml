@@ -121,6 +121,7 @@ tpdos:
   - num: 3
     fields:
       -  [skytraq, time_since_midnight]
+
   - num: 4
     fields:
       - [skytraq, ecef_x]

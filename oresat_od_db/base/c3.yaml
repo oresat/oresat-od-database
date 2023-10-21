@@ -148,31 +148,31 @@ objects:
   - name: edl
     object_type: record
     subindexes:
-      - name: key0
+      - name: crypto_key_0
         data_type: octet_str
         description: edl crypto key 0
-        access_type: ro
+        access_type: wo
         length: 32
 
-      - name: key1
+      - name: crypto_key_1
         data_type: octet_str
         description: edl crypto key 1
-        access_type: ro
+        access_type: wo
         length: 32
 
-      - name: key2
+      - name: crypto_key_2
         data_type: octet_str
         description: edl crypto key 2
-        access_type: ro
+        access_type: wo
         length: 32
 
-      - name: key3
+      - name: crypto_key_3
         data_type: octet_str
         description: edl crypto key 3
-        access_type: ro
+        access_type: wo
         length: 32
 
-      - name: active_key
+      - name: active_crypto_key
         data_type: uint8
         description: selected edl crypto key
         access_type: ro
@@ -358,7 +358,7 @@ fram:
   - [rtc, wakeup_interval]
   - [tx_control, last_enable_timestamp]
   - [edl, last_timestamp]
-  - [antenna, deployed]
+  - [antennas, deployed]
   - [system, power_cycles]
   - [lband, rx_bytes]
   - [lband, rx_packets]
@@ -366,8 +366,10 @@ fram:
   - [edl, vc1_expedite_count]
   - [edl, sequence_count]
   - [edl, rejected_count]
-  - [crypto, key0]
-  - [crypto, key1]
-  - [crypto, key2]
-  - [crypto, key3]
-  - [crypto, active_key]
+  - [edl, crypto_key_0]
+  - [edl, crypto_key_1]
+  - [edl, crypto_key_2]
+  - [edl, crypto_key_3]
+  - [edl, active_crypto_key]
+  - [uhf, rx_bytes]
+  - [uhf, rx_packets]

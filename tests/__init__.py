@@ -15,7 +15,7 @@ class TestConfig(unittest.TestCase):
     def setUp(self):
         self.id = OreSatId.ORESAT0
         self.od_db = {NodeId.C3: canopen.ObjectDictionary()}
-        self.beacon_def = {"fields": []}
+        self.beacon_def = []
 
     def test_tpdo_sizes(self):
         """Validate TPDO sizes."""
@@ -69,15 +69,8 @@ class TestConfig(unittest.TestCase):
             canopen.objectdictionary.DOMAIN,
         ]
 
-        c3_od = self.od_db[NodeId.C3]
-
-        for field in self.beacon_def["fields"]:
-            if len(field) == 1:
-                obj = c3_od[field[0]]
-            else:
-                obj = c3_od[field[0]][field[1]]
-
-            if field[0] == "beacon" and field[1] == "start_chars":
+        for obj in self.beacon_def:
+            if obj.name == "start_chars":
                 length += len(obj.default)  # start_chars is required and static
             else:
                 self.assertNotIn(
