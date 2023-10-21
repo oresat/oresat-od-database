@@ -65,6 +65,21 @@ OD_DEFAULTS = {
 }
 
 
+def _set_var_default(obj: dict, var: canopen.objectdictionary.Variable):
+    """Set the variables default value based off of configs."""
+
+    if obj["data_type"] == "octet_str" and "length" in obj:
+        var.default = b"\x00" * obj["length"]
+    elif obj["default"] is None:
+        var.default = OD_DEFAULTS[var.data_type]
+    elif var.data_type in canopen.objectdictionary.INTEGER_TYPES and isinstance(
+        obj["default"], str
+    ):
+        var.default = int(obj["default"], 16)  # fix hex values data types
+    else:
+        var.default = obj["default"]
+
+
 def _add_objects(
     od: canopen.ObjectDictionary, objects: list, base_index: int
 ) -> canopen.objectdictionary.Record:
@@ -75,7 +90,6 @@ def _add_objects(
         canopen.objectdictionary.OCTET_STRING,
         canopen.objectdictionary.DOMAIN,
     ]
-    int_types = canopen.objectdictionary.INTEGER_TYPES
 
     index = base_index
     for obj in objects:
@@ -85,14 +99,7 @@ def _add_objects(
             var.access_type = obj["access_type"]
             var.description = obj["description"]
             var.data_type = OD_DATA_TYPES[obj["data_type"]]
-            if obj["data_type"] == "octet_str" and "length" in obj:
-                var.default = b"\x00" * obj["length"]
-            elif obj["default"] is None:
-                var.default = OD_DEFAULTS[var.data_type]
-            elif var.data_type in int_types and isinstance(obj["default"], str):
-                var.default = int(obj["default"], 16)  # fix hex values data types
-            else:
-                var.default = obj["default"]
+            _set_var_default(obj, var)
             if var.data_type not in dynamic_len_data_types:
                 var.pdo_mappable = True
             od.add_object(var)
@@ -110,12 +117,7 @@ def _add_objects(
                 var.access_type = sub_obj["access_type"]
                 var.description = sub_obj["description"]
                 var.data_type = OD_DATA_TYPES[sub_obj["data_type"]]
-                if sub_obj["default"] is None:
-                    var.default = OD_DEFAULTS[var.data_type]
-                elif var.data_type in int_types and isinstance(sub_obj["default"], str):
-                    var.default = int(sub_obj["default"], 16)  # fix hex values data types
-                else:
-                    var.default = sub_obj["default"]
+                _set_var_default(sub_obj, var)
                 if var.data_type not in dynamic_len_data_types:
                     var.pdo_mappable = True
                 rec.add_member(var)
@@ -136,12 +138,7 @@ def _add_objects(
                 var = canopen.objectdictionary.Variable(sub_name, index, subindex)
                 var.access_type = obj["access_type"]
                 var.data_type = OD_DATA_TYPES[obj["data_type"]]
-                if sub_obj["default"] is None:
-                    var.default = OD_DEFAULTS[var.data_type]
-                elif var.data_type in int_types and isinstance(sub_obj["default"], str):
-                    var.default = int(sub_obj["default"], 16)  # fix hex values data types
-                else:
-                    var.default = sub_obj["default"]
+                _set_var_default(sub_obj, var)
                 if var.data_type not in dynamic_len_data_types:
                     var.pdo_mappable = True
                 arr.add_member(var)

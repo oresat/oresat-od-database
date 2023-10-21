@@ -71,43 +71,43 @@ objects:
         data_type: float32
         description: the PID proportional constant
         access_type: const
-        value: 0.5
+        default: 0.5
 
       - name: pid_ki
         data_type: float32
         description: the PID intergral constant
         access_type: const
-        value: 0.0
+        default: 0.0
 
       - name: pid_kd
         data_type: float32
         description: the PID derivative constant
         access_type: const
-        value: 0.1
+        default: 0.1
 
       - name: pid_delay
         data_type: uint32
         description: the delay between PID loops in milliseconds
         access_type: rw
-        value: 250
+        default: 250
 
       - name: moving_avg_samples
         data_type: uint8
         description: the number of reading used to calcuate the moving average to determine if saturated
         access_type: rw
-        value: 4
+        default: 4
 
       - name: saturation_diff
         data_type: uint8
         description: the difference between the lowest and current temperature (in celsius) to flag as saturated
         access_type: rw
-        value: 3
+        default: 3
 
       - name: cooldown_temperature
         data_type: int8
         description: once saturated the TEC controller cannot be enable until the camera temperature (in celsius) is greater this value
         access_type: rw
-        value: 40
+        default: 40
 
 tpdos:
   - num: 3
