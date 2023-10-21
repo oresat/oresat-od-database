@@ -21,39 +21,10 @@ transfers.
   They contain all card specific objects and PDOs.
   - **NOTE:** The cards YAML are simular to CANopen's `.eds` files; they are for
     a device type, not a unique device on a CAN network.
-- The `beacon.yaml` file defines the beacon definition as all the data is pull
+- The `beacon.yaml` file defines the beacon definition as all the data is pulled
   strait out the the C3 OD, which is mostly build from all other ODs.
 - All the configs are passed to `gen_od_db()` that reads in all configs
   cross reference so all OD definition of PDOs match.
-- All python-based projects can just import their OreSat OD like:
-  ```python
-  from oresat_od_db.oresat0_5 import GPS_OD
-
-  print(GPS_OD["skytraq"]["latitude"].value)
-  ```
-- All ChibiOS-based projects generate their `OD.[c/h]` files by:
-  ```bash
-  $ oresat-gen-canopennode-od oresat0.5 imu -d path/to/output/dir
-  ```
-  And use it like:
-  ```c
-  #include "OD.h"
-  #include "CANopen.h"
-  #include <stdint.h>
-
-  /** Example function that gets a value from the OD. */
-  int main(void) {
-    int16_t gryo_yaw = 0;
-
-    // OD is a global provided by CANopen.h
-    // OD_INDEX_GYROSCOPE and OD_SUBINDEX_GYROSCOPE_YAW are defined in OD.h
-    OD_entry_t *entry = OD_find(OD, OD_INDEX_GYROSCOPE);
-
-    // boolean is a flag to bypass any OD callback functions and read strait
-    // from the OD
-    gryo_yaw = OD_get_u8(entry, OD_SUBINDEX_GYROSCOPE_YAW, true);
-  }
-  ```
 
 ## Updating a Config
 
