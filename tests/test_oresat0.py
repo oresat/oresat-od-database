@@ -1,6 +1,6 @@
 """Unit tests for OreSat0 OD database."""
 
-from oresat_od_db import BEACON_DEF_DB, FRAM_DEF_DB, OD_DB, OreSatId
+from oresat_configs import BEACON_DEF_DB, FRAM_DEF_DB, OD_DB, OreSatId
 
 from . import TestConfig
 

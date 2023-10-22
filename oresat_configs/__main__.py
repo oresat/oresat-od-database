@@ -1,4 +1,4 @@
-"""oresat_od_db main"""
+"""oresat_configs main"""
 
 import sys
 
@@ -16,10 +16,10 @@ SCRIPTS = {
 }
 
 
-def oresat_od_db():
-    """oresat_od_db main."""
+def oresat_configs():
+    """oresat_configs main."""
 
-    print("oresat_od_db v" + __version__)
+    print("oresat_configs v" + __version__)
     print("")
 
     print("command : description")
@@ -30,7 +30,7 @@ def oresat_od_db():
 
 if __name__ == "__main__":
     if len(sys.argv) < 2:
-        oresat_od_db()
+        oresat_configs()
     elif sys.argv[1] == GEN_DCF_PROG:
         gen_dcf(sys.argv[2:])
     elif sys.argv[1] == GEN_FW_FILES_PROG:
@@ -40,4 +40,4 @@ if __name__ == "__main__":
     elif sys.argv[1] == SDO_TRANSFER_PROG:
         sdo_transfer(sys.argv[2:])
     else:
-        oresat_od_db()
+        oresat_configs()

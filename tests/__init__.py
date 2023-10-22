@@ -5,8 +5,8 @@ import unittest
 
 import canopen
 
-from oresat_od_db import NodeId, OreSatId
-from oresat_od_db._yaml_to_od import OD_DATA_TYPE_SIZE, TPDO_COMM_START, TPDO_PARA_START
+from oresat_configs import NodeId, OreSatId
+from oresat_configs._yaml_to_od import OD_DATA_TYPE_SIZE, TPDO_COMM_START, TPDO_PARA_START
 
 
 class TestConfig(unittest.TestCase):

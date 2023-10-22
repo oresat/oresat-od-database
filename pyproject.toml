@@ -3,8 +3,8 @@ requires = ["setuptools"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "oresat-od-database"
-description = "OreSat object dictionary database"
+name = "oresat-configs"
+description = "OreSat mission configurations"
 readme = "README.md"
 requires-python = ">=3.9"
 license = {text = "GPL-3.0"}
@@ -23,14 +23,14 @@ dependencies = [
 dynamic = ["version"]
 
 [project.scripts]
-oresat-od-db = "__main__:oresat_od_db"
+oresat-configs = "__main__:oresat_configs"
 oresat-gen-fw-files = "scripts.gen_fw_files:gen_fw_files"
 oresat-gen-dcf = "scripts.gen_dcf:gen_dcf"
 oresat-print-od = "scripts.print_od:print_od"
 oresat-sdo-transfer = "scripts.sdo_transfer:sdo_transfer"
 
 [tool.setuptools.dynamic]
-version = {attr = "oresat_od_db.constants.__version__"}
+version = {attr = "oresat_configs.constants.__version__"}
 
 [tool.setuptools.packages.find]
 exclude = ["docs*", "tests*"] 
