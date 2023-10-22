@@ -63,6 +63,11 @@ objects:
         description: the tec is saturated
         access_type: ro
 
+      - name: pid_graph
+        data_type: domain
+        description: graph of temperatures and pid outputs
+        access_type: ro
+
       - name: pid_setpoint
         data_type: int8
         description: the tec target temperature in celsius
