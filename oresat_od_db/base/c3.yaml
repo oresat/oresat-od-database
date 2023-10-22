@@ -217,8 +217,8 @@ objects:
   - name: opd
     object_type: record
     subindexes:
-      - name: enable
-        data_type: bool
+      - name: status
+        data_type: uint8
         description: opd system enable status
         access_type: rw
 
@@ -265,8 +265,8 @@ objects:
         description: select a opd node via its node id
         access_type: rw
 
-      - name: node_enable
-        data_type: bool
+      - name: node_status
+        data_type: uint8
         description: enable/disable selected node on write or get current state by read
         access_type: rw
 
