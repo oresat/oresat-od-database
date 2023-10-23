@@ -4,7 +4,13 @@ import os
 
 import yaml
 
-from .._yaml_to_od import gen_od_db, get_c3_beacon_defs, get_c3_fram_defs, read_yaml_od_config
+from .._yaml_to_od import (
+    gen_fw_base_od,
+    gen_od_db,
+    get_c3_beacon_defs,
+    get_c3_fram_defs,
+    read_yaml_od_config,
+)
 from ..base import (
     BAT_CONFIG,
     C3_CONFIG,
@@ -56,3 +62,5 @@ ORESAT0_DXWIFI_OD = ORESAT0_OD_DB[NodeId.DXWIFI]
 
 ORESAT0_BEACON_DEF = get_c3_beacon_defs(ORESAT0_C3_OD, ORESAT0_5_BEACON_CONFIG)
 ORESAT0_FRAM_DEF = get_c3_fram_defs(ORESAT0_C3_OD, C3_CONFIG)
+
+ORESAT0_FW_BASE_OD = gen_fw_base_od(OreSatId.ORESAT0, FW_COMMON_CONFIG)

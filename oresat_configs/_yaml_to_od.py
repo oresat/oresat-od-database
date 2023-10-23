@@ -511,11 +511,63 @@ def _load_std_objs(file_path: str) -> dict:
     return std_objs
 
 
+STD_OBJS_FILE_NAME = f"{os.path.dirname(os.path.abspath(__file__))}/standard_objects.yaml"
+STD_OBJS = _load_std_objs(STD_OBJS_FILE_NAME)
+
+
+def overlay_configs(card_config, overlay_config):
+    """deal with overlays"""
+
+    for obj in overlay_config.get("objects", []):
+        overlayed = False
+        for obj2 in card_config.get("objects", []):
+            if obj["name"] != obj2["name"]:
+                continue
+
+            if obj["object_type"] == "variable":
+                obj2["data_type"] = obj["data_type"]
+                obj2["access_type"] = obj.get("access_type", "rw")
+            else:
+                for sub_obj in obj["subindexes"]:
+                    for sub_obj2 in obj2["subindexes"]:
+                        if sub_obj[""] != sub_obj2["name"]:
+                            sub_obj2["data_type"] = sub_obj["data_type"]
+                            sub_obj2["access_type"] = sub_obj.get("access_type", "rw")
+                            overlayed = True
+                            break  # obj was found, search for next one
+            overlayed = True
+            break  # obj was found, search for next one
+        if not overlayed:  # add it
+            card_config["objects"].append(deepcopy(obj))
+
+    # overlay tpdos
+    for overlay_tpdo in overlay_config.get("tpdos", []):
+        overlayed = False
+        for card_tpdo in card_config.get("tpdos", []):
+            if card_tpdo["num"] == card_tpdo["num"]:
+                card_tpdo["fields"] = overlay_tpdo["fields"]
+                card_tpdo["delay_ms"] = overlay_tpdo.get("delay_ms", 0)
+                card_tpdo["sync"] = overlay_tpdo.get("sync", 0)
+                overlayed = True
+                break
+        if not overlayed:  # add it
+            card_config["tpdos"].append(deepcopy(overlay_tpdo))
+
+    # overlay rpdos
+    for overlay_rpdo in overlay_config.get("rpdos", []):
+        overlayed = False
+        for card_rpdo in card_config.get("rpdos", []):
+            if card_rpdo["num"] == card_rpdo["num"]:
+                card_rpdo["card"] = overlay_rpdo["card"]
+                card_rpdo["tpdo_num"] = overlay_rpdo["tpdo_num"]
+                overlayed = True
+                break
+        if not overlayed:  # add it
+            card_config["rpdos"].append(deepcopy(overlay_rpdo))
+
+
 def gen_od_db(oresat_id: OreSatId, beacon_def: dict, configs: dict) -> dict:
     """Generate all ODs for a OreSat mission."""
-
-    std_objs_file_name = f"{os.path.dirname(os.path.abspath(__file__))}/standard_objects.yaml"
-    std_objs = _load_std_objs(std_objs_file_name)
 
     od_db = {}
 
@@ -527,57 +579,9 @@ def gen_od_db(oresat_id: OreSatId, beacon_def: dict, configs: dict) -> dict:
         card_config = configs[node_id][0]
         common_config = configs[node_id][1]
 
-        # deal with overlays
         if len(configs[node_id]) > 2:
             overlay_config = configs[node_id][2]
-
-            # overlay objects
-            for obj in overlay_config.get("objects", []):
-                overlayed = False
-                for obj2 in card_config.get("objects", []):
-                    if obj["name"] != obj2["name"]:
-                        continue
-
-                    if obj["object_type"] == "variable":
-                        obj2["data_type"] = obj["data_type"]
-                        obj2["access_type"] = obj.get("access_type", "rw")
-                    else:
-                        for sub_obj in obj["subindexes"]:
-                            for sub_obj2 in obj2["subindexes"]:
-                                if sub_obj[""] != sub_obj2["name"]:
-                                    sub_obj2["data_type"] = sub_obj["data_type"]
-                                    sub_obj2["access_type"] = sub_obj.get("access_type", "rw")
-                                    overlayed = True
-                                    break  # obj was found, search for next one
-                    overlayed = True
-                    break  # obj was found, search for next one
-                if not overlayed:  # add it
-                    card_config["objects"].append(deepcopy(obj))
-
-            # overlay tpdos
-            for overlay_tpdo in overlay_config.get("tpdos", []):
-                overlayed = False
-                for card_tpdo in card_config.get("tpdos", []):
-                    if card_tpdo["num"] == card_tpdo["num"]:
-                        card_tpdo["fields"] = overlay_tpdo["fields"]
-                        card_tpdo["delay_ms"] = overlay_tpdo.get("delay_ms", 0)
-                        card_tpdo["sync"] = overlay_tpdo.get("sync", 0)
-                        overlayed = True
-                        break
-                if not overlayed:  # add it
-                    card_config["tpdos"].append(deepcopy(overlay_tpdo))
-
-            # overlay rpdos
-            for overlay_rpdo in overlay_config.get("rpdos", []):
-                overlayed = False
-                for card_rpdo in card_config.get("rpdos", []):
-                    if card_rpdo["num"] == card_rpdo["num"]:
-                        card_rpdo["card"] = overlay_rpdo["card"]
-                        card_rpdo["tpdo_num"] = overlay_rpdo["tpdo_num"]
-                        overlayed = True
-                        break
-                if not overlayed:  # add it
-                    card_config["rpdos"].append(deepcopy(overlay_rpdo))
+            overlay_configs(card_config, overlay_config)
 
         od = canopen.ObjectDictionary()
         od.bitrate = 1_000_000  # bps
@@ -609,7 +613,7 @@ def gen_od_db(oresat_id: OreSatId, beacon_def: dict, configs: dict) -> dict:
         # without this firmware binary size for STM32M0-base cards becomes too large
         std_objects = set(card_config.get("std_objects", []) + common_config.get("std_objects", []))
         if "consumer_heartbeat_time" in std_objects:
-            obj = std_objs["consumer_heartbeat_time"]
+            obj = STD_OBJS["consumer_heartbeat_time"]
 
             arr = canopen.objectdictionary.Array(obj.name, obj.index)
             od[obj.index] = arr
@@ -621,21 +625,21 @@ def gen_od_db(oresat_id: OreSatId, beacon_def: dict, configs: dict) -> dict:
 
             if node_id != NodeId.C3:
                 # add only the subindex for the c3 for non-c3 nodes
-                arr.add_member(deepcopy(std_objs[obj.name][1]))
+                arr.add_member(deepcopy(STD_OBJS[obj.name][1]))
                 var.default = 1
             else:
                 # add all node_ids to c3
                 for key in configs.keys():
                     if key == NodeId.C3:
                         continue  # skip itself
-                    arr.add_member(deepcopy(std_objs[obj.name][key.value]))
+                    arr.add_member(deepcopy(STD_OBJS[obj.name][key.value]))
                     var.default = key.value
 
         # add any standard objects
         for key in std_objects:
             if key == "consumer_heartbeat_time":
                 continue  # added above, skip this
-            od[std_objs[key].index] = deepcopy(std_objs[key])
+            od[STD_OBJS[key].index] = deepcopy(STD_OBJS[key])
             if key == "cob_id_emergency_message":
                 od["cob_id_emergency_message"].default = 0x80 + node_id
 
@@ -701,3 +705,63 @@ def get_c3_beacon_defs(c3_od: canopen.ObjectDictionary, beacon_def: dict) -> lis
         beacon_objs.append(obj)
 
     return beacon_objs
+
+
+def gen_fw_base_od(oresat_id: OreSatId, config: dict) -> canopen.ObjectDictionary:
+    """Generate all ODs for a OreSat mission."""
+
+    od = canopen.ObjectDictionary()
+    od.bitrate = 1_000_000  # bps
+    od.node_id = 0x7C
+    od.device_information.allowed_baudrates = set([1000])
+    od.device_information.vendor_name = "PSAS"
+    od.device_information.vendor_number = 0
+    od.device_information.product_name = "Firmware Base"
+    od.device_information.product_number = 0
+    od.device_information.revision_number = 0
+    od.device_information.order_code = 0
+    od.device_information.simple_boot_up_master = False
+    od.device_information.simple_boot_up_slave = False
+    od.device_information.granularity = 8
+    od.device_information.dynamic_channels_supported = False
+    od.device_information.group_messaging = False
+    od.device_information.nr_of_RXPDO = 0
+    od.device_information.nr_of_TXPDO = 0
+    od.device_information.LSS_supported = False
+
+    # add common and card records
+    _add_objects(od, config.get("objects", []), 0x3000)
+
+    std_objects = config.get("std_objects", [])
+
+    if "consumer_heartbeat_time" in std_objects:
+        obj = STD_OBJS["consumer_heartbeat_time"]
+
+        arr = canopen.objectdictionary.Array(obj.name, obj.index)
+        od[obj.index] = arr
+
+        var = canopen.objectdictionary.Variable("highest_index_supported", obj.index, 0x0)
+        var.data_type = canopen.objectdictionary.UNSIGNED8
+        var.access_type = "const"
+        arr.add_member(var)
+
+        # add only the subindex for the c3 for non-c3 nodes
+        arr.add_member(deepcopy(STD_OBJS[obj.name][1]))
+        var.default = 1
+
+    # add any standard objects
+    for key in std_objects:
+        if key == "consumer_heartbeat_time":
+            continue  # added above, skip this
+        od[STD_OBJS[key].index] = deepcopy(STD_OBJS[key])
+        if key == "cob_id_emergency_message":
+            od["cob_id_emergency_message"].default = 0x80 + od.node_id
+
+    # add TPDSs
+    _add_tpdo_data(od, config)
+
+    # set specific obj defaults
+    od["versions"]["db_version"].default = __version__
+    od["satellite_id"].default = oresat_id.value
+
+    return od

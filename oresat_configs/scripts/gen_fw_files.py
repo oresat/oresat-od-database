@@ -8,7 +8,7 @@ from argparse import ArgumentParser
 
 import canopen
 
-from .. import OD_DB, NodeId, OreSatId
+from .. import OD_DB, OD_FW_BASE_DB, NodeId, OreSatId
 from .._yaml_to_od import RPDO_COMM_START, RPDO_PARA_START, TPDO_COMM_START, TPDO_PARA_START
 
 GEN_FW_FILES = "generate CANopenNode OD.[c/h] files for a OreSat firmware card"
@@ -624,16 +624,19 @@ def write_canopennode_h(od: canopen.ObjectDictionary, dir_path: str = "."):
 
 OD_LIST = {
     # OreSat0
+    ("oresat0", "base"): OD_FW_BASE_DB[OreSatId.ORESAT0],
     ("oresat0", "c3"): OD_DB[OreSatId.ORESAT0][NodeId.C3],
     ("oresat0", "battery"): OD_DB[OreSatId.ORESAT0][NodeId.BATTERY_1],
     ("oresat0", "solar"): OD_DB[OreSatId.ORESAT0][NodeId.SOLAR_MODULE_1],
     ("oresat0", "imu"): OD_DB[OreSatId.ORESAT0][NodeId.IMU],
     # OreSat0.5
+    ("oresat0_5", "base"): OD_FW_BASE_DB[OreSatId.ORESAT0_5],
     ("oresat0.5", "battery"): OD_DB[OreSatId.ORESAT0_5][NodeId.BATTERY_1],
     ("oresat0.5", "solar"): OD_DB[OreSatId.ORESAT0_5][NodeId.SOLAR_MODULE_1],
     ("oresat0.5", "imu"): OD_DB[OreSatId.ORESAT0_5][NodeId.IMU],
     ("oresat0.5", "reaction_wheel"): OD_DB[OreSatId.ORESAT0_5][NodeId.REACTION_WHEEL_1],
     # OreSat1
+    ("oresat1", "base"): OD_FW_BASE_DB[OreSatId.ORESAT1],
     ("oresat1", "battery"): OD_DB[OreSatId.ORESAT1][NodeId.BATTERY_1],
     ("oresat1", "solar"): OD_DB[OreSatId.ORESAT1][NodeId.SOLAR_MODULE_1],
     ("oresat1", "imu"): OD_DB[OreSatId.ORESAT1][NodeId.IMU],
