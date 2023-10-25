@@ -1,18 +1,22 @@
 objects:
-  - name: status
+  - index: 0x4000
+    name: status
     data_type: uint8
     description: the gps status
     access_type: ro
 
-  - name: time_syncd
+  - index: 0x4001
+    name: time_syncd
     data_type: bool
     description: system time has syncd to gps time
     access_type: ro
 
-  - name: skytraq
+  - index: 0x4002
+    name: skytraq
     object_type: record
     subindexes:
-      - name: fix_mode
+      - subindex: 0x1
+        name: fix_mode
         data_type: uint8
         description: |
           quality of fix:
@@ -22,97 +26,116 @@ objects:
             - 3: 3d+dgps
         access_type: ro
 
-      - name: number_of_sv
+      - subindex: 0x2
+        name: number_of_sv
         data_type: uint8
         description: number of gps satellites locked onto. max 12
         access_type: ro
 
-      - name: gps_week
+      - subindex: 0x3
+        name: gps_week
         data_type: uint16
         description: gps week number
         access_type: ro
 
-      - name: tow
+      - subindex: 0x4
+        name: tow
         data_type: uint32
         description: time of the week in 0.01 seconds scaling
         access_type: ro
 
-      - name: latitude
+      - subindex: 0x5
+        name: latitude
         data_type: int32
         description: latitude in 1e-7 degrees
         access_type: ro
 
-      - name: longitude
+      - subindex: 0x6
+        name: longitude
         data_type: int32
         description: longitude in 1e-7 degrees
         access_type: ro
 
-      - name: ellipsoid_alt
+      - subindex: 0x7
+        name: ellipsoid_alt
         data_type: uint32
         description: height above ellipsoid in cm
         access_type: ro
 
-      - name: mean_sea_lvl_alt
+      - subindex: 0x8
+        name: mean_sea_lvl_alt
         data_type: uint32
         description: mean sea level in cm
         access_type: ro
 
-      - name: gdop
+      - subindex: 0x9
+        name: gdop
         data_type: uint16
         description: geometric diluttion of precision in 0.01 scaling
         access_type: ro
 
-      - name: pdop
+      - subindex: 0xa
+        name: pdop
         data_type: uint16
         description: position diluttion of precision in 0.01 scaling
         access_type: ro
 
-      - name: hdop
+      - subindex: 0xb
+        name: hdop
         data_type: uint16
         description: height diluttion of precision in 0.01 scaling
         access_type: ro
 
-      - name: vdop
+      - subindex: 0xc
+        name: vdop
         data_type: uint16
         description: vertical diluttion of precision in 0.01 scaling
         access_type: ro
 
-      - name: tdop
+      - subindex: 0xd
+        name: tdop
         data_type: uint16
         description: time diluttion of precision in 0.01 scaling
         access_type: ro
 
-      - name: ecef_x
+      - subindex: 0xe
+        name: ecef_x
         data_type: int32
         description: ecef x coordinate in cm
         access_type: ro
 
-      - name: ecef_y
+      - subindex: 0xf
+        name: ecef_y
         data_type: int32
         description: ecef y coordinate in cm
         access_type: ro
 
-      - name: ecef_z
+      - subindex: 0x10
+        name: ecef_z
         data_type: int32
         description: ecef z coordinate in cm
         access_type: ro
 
-      - name: ecef_vx
+      - subindex: 0x11
+        name: ecef_vx
+        data_type: int32
+        description: ecef x velocity in cm/s
+        access_type: ro
+
+      - subindex: 0x12
+        name: ecef_vy
         data_type: int32
         description: ecef y velocity in cm/s
         access_type: ro
 
-      - name: ecef_vy
-        data_type: int32
-        description: ecef y velocity in cm/s
-        access_type: ro
-
-      - name: ecef_vz
+      - subindex: 0x13
+        name: ecef_vz
         data_type: int32
         description: ecef z velocity in cm/s
         access_type: ro
 
-      - name: time_since_midnight
+      - subindex: 0x14
+        name: time_since_midnight
         data_type: uint32
         description: the number of milliseconds since midnight when the gps data was received
         access_type: ro

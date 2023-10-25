@@ -15,7 +15,7 @@ fields:
   - [uhf, rx_bytes]
   - [uhf, rx_packets]
   - [uhf, rssi]
-  - [system, bank_status]
+  - [system, boot_select]
   - [edl, sequence_count]
   - [edl, rejected_count]
   # battery_1

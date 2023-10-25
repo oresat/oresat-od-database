@@ -5,342 +5,417 @@ std_objects:
   - sdo_client_parameter
 
 objects:
-  - name: status
+  - index: 0x4000
+    name: status
     data_type: uint8
     description: the c3 state
     access_type: ro
 
-  - name: reset_timeout
+  - index: 0x4001
+    name: reset_timeout
     data_type: uint32
     description: the reset system timeout in seconds
     access_type: const
     default: 86400 # 24 hours
 
-  - name: mode
+  - index: 0x4002
+    name: mode
     data_type: uint8
     description: the oresat system mode
     access_type: ro
 
-  - name: tx_control
+  - index: 0x4003
+    name: hw_id
+    data_type: uint8
+    description: the hardware id
+    access_type: ro
+
+  # index 0x4004 is reserverd
+
+  - index: 0x4005
+    name: tx_control
     object_type: record
     subindexes:
-      - name: enable
+      - subindex: 0x1
+        name: enable
         data_type: bool
         description: tx status
         access_type: ro
 
-      - name: timeout
+      - subindex: 0x2
+        name: timeout
         data_type: uint32
         description: tx enable timeout in seconds
         access_type: const
         default: 1209600 # 2 weeks
 
-      - name: last_enable_timestamp
+      - subindex: 0x3
+        name: last_enable_timestamp
         data_type: uint32
         description: last tx enable timestamp in seconds
         access_type: ro
 
-  - name: antennas
+  - index: 0x4006
+    name: antennas
     object_type: record
     subindexes:
-      - name: deployed
+      - subindex: 0x1
+        name: deployed
         data_type: bool
         description: antennas are deployed
         access_type: ro
 
-      - name: attempts
+      - subindex: 0x2
+        name: attempts
         data_type: uint8
         description: number of deployment attempts before continuing
         access_type: const
         default: 3
 
-      - name: pre_attempt_timeout
+      - subindex: 0x3
+        name: pre_attempt_timeout
         data_type: uint8
         description: number of seconds before trying to deploy the antennas
         access_type: const
         default: 2700 # 45 minutes
 
-      - name: attempt_timeout
+      - subindex: 0x4
+        name: attempt_timeout
         data_type: uint8
         description: number of seconds for a deployment attempt
         access_type: const
         default: 10
 
-      - name: reattempt_timeout
+      - subindex: 0x5
+        name: reattempt_timeout
         data_type: uint8
         description: number of seconds between deployment reattempts
         access_type: const
         default: 15
 
-      - name: deploy_monopole_now
+      - subindex: 0x6
+        name: deploy_monopole_now
         data_type: bool
         description: deploy the monopole antennas now
         access_type: wo
 
-      - name: deploy_helical_now
+      - subindex: 0x7
+        name: deploy_helical_now
         data_type: bool
         description: deploy the helical antenna now
         access_type: wo
 
-      - name: good_test_threshold
+      - subindex: 0x8
+        name: good_test_threshold
         data_type: uint16
         description: |
           when testing the antennas, any voltage (in millivolts) above this threshold is considered good
         access_type: const
         default: 100
 
-      - name: test_monopole_is_good
+      - subindex: 0x9
+        name: test_monopole_is_good
         data_type: bool
         description: test the monopole antennas
         access_type: ro
 
-      - name: test_helical_is_good
+      - subindex: 0xa
+        name: test_helical_is_good
         data_type: bool
         description: test the helical antenna
         access_type: ro
 
-      - name: monopole_voltage
+      - subindex: 0xb
+        name: monopole_voltage
         data_type: uint16
         description: monopole voltage in millivolts
         access_type: ro
 
-      - name: helical_voltage
+      - subindex: 0xc
+        name: helical_voltage
         data_type: uint16
         description: helical voltage in millivolts
         access_type: ro
 
-  - name: lband
+  - index: 0x4007
+    name: lband
     object_type: record
     subindexes:
-      - name: rx_bytes
+      - subindex: 0x1
+        name: rx_bytes
         data_type: uint32
         description: lband received byte count
         access_type: ro
 
-      - name: rx_packets
+      - subindex: 0x2
+        name: rx_packets
         data_type: uint32
         description: lband received packet count
         access_type: ro
 
-      - name: rssi
+      - subindex: 0x3
+        name: rssi
         data_type: int8
         description: lband rssi of last packet received after lna, filters, and digital channel filter in dB
         access_type: ro
 
-  - name: uhf
+  - index: 0x4008
+    name: uhf
     object_type: record
     subindexes :
-      - name: rx_bytes
+      - subindex: 0x1
+        name: rx_bytes
         data_type: uint32
         description: uhf received byte count
         access_type: ro
 
-      - name: rx_packets
+      - subindex: 0x2
+        name: rx_packets
         data_type: uint32
         description: uhf received packet count
         access_type: ro
 
-      - name: rssi
+      - subindex: 0x3
+        name: rssi
         data_type: int8
         description: uhf rssi of last packet received after lna, filters, and digital channel filter in dB
         access_type: ro
 
-  - name: edl
+  - index: 0x4009
+    name: edl
     object_type: record
     subindexes:
-      - name: crypto_key_0
+      - subindex: 0x1
+        name: crypto_key_0
         data_type: octet_str
         description: edl crypto key 0
         access_type: wo
         length: 32
 
-      - name: crypto_key_1
+      - subindex: 0x2
+        name: crypto_key_1
         data_type: octet_str
         description: edl crypto key 1
         access_type: wo
         length: 32
 
-      - name: crypto_key_2
+      - subindex: 0x3
+        name: crypto_key_2
         data_type: octet_str
         description: edl crypto key 2
         access_type: wo
         length: 32
 
-      - name: crypto_key_3
+      - subindex: 0x4
+        name: crypto_key_3
         data_type: octet_str
         description: edl crypto key 3
         access_type: wo
         length: 32
 
-      - name: active_crypto_key
+      - subindex: 0x5
+        name: active_crypto_key
         data_type: uint8
         description: selected edl crypto key
         access_type: ro
         high_level: 3
 
-      - name: sequence_count
+      - subindex: 0x6
+        name: sequence_count
         data_type: uint32
         description: edl sequence count
         access_type: ro
 
-      - name: rejected_count
+      - subindex: 0x7
+        name: rejected_count
         data_type: uint32
         description: edl sequence count
         access_type: ro
 
-      - name: vc1_sequence_count
+      - subindex: 0x8
+        name: vc1_sequence_count
         data_type: uint32
         description: edl virtual channel 1 sequence count
         access_type: ro
 
-      - name: vc1_rejected_count
+      - subindex: 0x9
+        name: vc1_rejected_count
         data_type: uint32
         description: edl virtual channel 1 reject count
         access_type: ro
 
-      - name: vc1_expedite_count
+      - subindex: 0xa
+        name: vc1_expedite_count
         data_type: uint32
         description: edl virtual channel 1 expedite count
         access_type: ro
 
-      - name: last_timestamp
+      - subindex: 0xb
+        name: last_timestamp
         data_type: uint64
         description: scet timestamp of last valid edl command
         access_type: ro
 
-      - name: timeout
+      - subindex: 0xc
+        name: timeout
         data_type: uint32
         description: edl timeout in seconds
         access_type: const
         default: 60
 
-  - name: opd
+  - index: 0x400a
+    name: opd
     object_type: record
     subindexes:
-      - name: status
+      - subindex: 0x1
+        name: status
         data_type: uint8
         description: opd system enable status
         access_type: rw
 
-      - name: has_fault
+      - subindex: 0x2
+        name: has_fault
         data_type: uint8
         description: opd system circuit has a fault
         access_type: ro
 
-      - name: current
+      - subindex: 0x3
+        name: current
         data_type: uint8
         description: opd system current draw in mA
         access_type: ro
 
-      - name: scan
+      - subindex: 0x4
+        name: scan
         data_type: bool
         description: scan for opd nodes
         access_type: wo
 
-      - name: reset
+      - subindex: 0x5
+        name: reset
         data_type: bool
         description: reset the opd system
         access_type: wo
 
-      - name: reset_attempts
+      - subindex: 0x6
+        name: reset_attempts
         data_type: uint8
         description: number of reset attempts for the opd system before it is considered dead
         access_type: rw
         default: 3
 
-      - name: reset_delay
+      - subindex: 0x7
+        name: reset_delay
         data_type: uint8
         description: number of seconds between opd system resets
         access_type: rw
         default: 10
 
-      - name: nodes_status_json
+      - subindex: 0x8
+        name: nodes_status_json
         data_type: str
         description: status of all node as a json string
         access_type: ro
         default: "{}"
 
-      - name: node_select
+      - subindex: 0x9
+        name: node_select
         data_type: uint8
         description: select a opd node via its node id
         access_type: rw
 
-      - name: node_status
+      - subindex: 0xa
+        name: node_status
         data_type: uint8
         description: enable/disable selected node on write or get current state by read
         access_type: rw
 
-      - name: node_reset
+      - subindex: 0xb
+        name: node_reset
         data_type: bool
         description: reset the selected node
         access_type: wo
 
-      - name: node_reset_attempts
+      - subindex: 0xc
+        name: node_reset_attempts
         data_type: uint8
         description: number of reset attempts for a opd node before it is considered dead
         access_type: rw
         default: 3
 
-  - name: beacon
+  - index: 0x400b
+    name: beacon
     object_type: record
     subindexes:
-      - name: revision
+      - subindex: 0x1
+        name: revision
         data_type: uint8
         description: the beacon revision number
         access_type: const
         # default set via beacon.yaml file
 
-      - name: src_callsign
+      - subindex: 0x2
+        name: src_callsign
         data_type: str
         description: the beacon source callsign
         access_type: const
         default: "KJ7SAT"
 
-      - name: dest_callsign
+      - subindex: 0x3
+        name: dest_callsign
         data_type: str
         description: the beacon destination callsign
         access_type: const
         default: "SPACE"
 
-      - name: start_chars
+      - subindex: 0x4
+        name: start_chars
         data_type: str
         description: the beacon start characters
         access_type: const
         default: "{{z"
 
-      - name: delay
+      - subindex: 0x5
+        name: delay
         data_type: uint32
         description: delay between beacons in seconds or 0 to disable
         access_type: const
         default: 30
 
-      - name: send_now
+      - subindex: 0x6
+        name: send_now
         data_type: bool
         description: send a beacon now
         access_type: wo
 
-      - name: last_timestamp
+      - subindex: 0x7
+        name: last_timestamp
         data_type: uint64
         description: scet timestamp of last beacon
         access_type: ro
 
-  - name: rtc
+  - index: 0x400c
+    name: rtc
     object_type: record
     description: rtc info, OreSat0 only as Linux handles the rtc
     subindexes:
-      - name: timestamp
+      - subindex: 0x1
+        name: timestamp
         data_type: uint32
         description: the last saved timestamp in seconds
 
-      - name: alarm_a
+      - subindex: 0x2
+        name: alarm_a
         data_type: uint32
         description: the last state of alarm a
 
-      - name: alarm_b
+      - subindex: 0x3
+        name: alarm_b
         data_type: uint32
         description: the last state of alarm b
 
-      - name: wakeup_interval
+      - subindex: 0x4
+        name: wakeup_interval
         data_type: uint32
         description: the last state of wakeup interval
 

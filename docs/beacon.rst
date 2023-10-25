@@ -1,9 +1,7 @@
 Beacon
 ======
 
-.. note:: Octets are used instead of bytes as octets are guaranteed to be 8 bits and bytes are not.
-
-OreSat use AX.25 V2 frame for it's beacon format.
+All OreSats use a AX.25 V2 frame for their beacon format.
 
 A great reference for AX.25 is at https://notblackmagic.com/bitsnpieces/ax.25/
 
@@ -21,7 +19,7 @@ Beacon AX.25 Header Definition
 +------------------+-----+-----+-----+-----+-----+-----+----------+-----+-----+-----+-----+-----+-----+-----------+---------+-----+
 | Hex (bitshifted) | 9E  | 68  | 5A  | 6A  | 52  | 6C  | 00       | 6A  | 64  | 52  | 56  | 5A  | 28  | 00        | 00      | 00  |
 +------------------+-----+-----+-----+-----+-----+-----+----------+-----+-----+-----+-----+-----+-----+-----------+---------+-----+
-| Octet Offset     | 0   | 1   | 2   | 3   | 4   | 5   | 6        | 7   | 8   | 9   | 10  | 11  | 12  | 13        | 14      | 15  |
+| Offset           | 0   | 1   | 2   | 3   | 4   | 5   | 6        | 7   | 8   | 9   | 10  | 11  | 12  | 13        | 14      | 15  |
 +------------------+-----+-----+-----+-----+-----+-----+----------+-----+-----+-----+-----+-----+-----+-----------+---------+-----+
 
 

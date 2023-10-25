@@ -1,28 +1,40 @@
 objects:
-  - name: pack_1
+  - index: 0x4000
+    name: pack_1
+    object_type: record
     subindexes:
-      - name: temperature
+      - subindex: 0x12
+        name: temperature
         data_type: int16
 
-      - name: temperature_avg
+      - subindex: 0x13
+        name: temperature_avg
         data_type: int16
 
-      - name: temperature_max
+      - subindex: 0x14
+        name: temperature_max
         data_type: int16
 
-      - name: temperature_min
+      - subindex: 0x15
+        name: temperature_min
         data_type: int16
 
-  - name: pack_2
+  - index: 0x4001
+    name: pack_2
+    object_type: record
     subindexes:
-      - name: temperature
+      - subindex: 0x12
+        name: temperature
         data_type: int16
 
-      - name: temperature_avg
+      - subindex: 0x13
+        name: temperature_avg
         data_type: int16
 
-      - name: temperature_max
+      - subindex: 0x14
+        name: temperature_max
         data_type: int16
 
-      - name: temperature_min
+      - subindex: 0x15
+        name: temperature_min
         data_type: int16

@@ -1,175 +1,205 @@
 objects:
-  - name: gyroscope
+  - index: 0x4000
+    name: gyroscope
     object_type: record
     subindexes:
-      - name: pitch_rate
+      - subindex: 0x1
+        name: pitch_rate
         data_type: int16
         description: x axis rate deg/s
         access_type: ro
 
-      - name: yaw_rate
+      - subindex: 0x2
+        name: yaw_rate
         data_type: int16
         description: y axis rate deg/s
         access_type: ro
 
-      - name: roll_rate
+      - subindex: 0x3
+        name: roll_rate
         data_type: int16
         description: z axis rate deg/s
         access_type: ro
 
-      - name: pitch_rate_raw
+      - subindex: 0x4
+        name: pitch_rate_raw
         data_type: uint16
         description: raw x axis rate
         access_type: ro
 
-      - name: yaw_rate_raw
+      - subindex: 0x5
+        name: yaw_rate_raw
         data_type: uint16
         description: raw y axis rate
         access_type: ro
 
-      - name: roll_rate_raw
+      - subindex: 0x6
+        name: roll_rate_raw
         data_type: uint16
         description: raw z axis rate
         access_type: ro
 
-  - name: accelerometer
+  - index: 0x4001
+    name: accelerometer
     object_type: record
     subindexes:
-      - name: x
+      - subindex: 0x1
+        name: x
         data_type: int16
         description: x acceleration in milli-g's
         access_type: ro
 
-      - name: y
+      - subindex: 0x2
+        name: y
         data_type: int16
         description: y acceleration in milli-g's
         access_type: ro
 
-      - name: z
+      - subindex: 0x3
+        name: z
         data_type: int16
         description: z acceleration in milli-g's
         access_type: ro
 
-      - name: x_raw
+      - subindex: 0x4
+        name: x_raw
         data_type: uint16
         description: raw x acceleration value
         access_type: ro
 
-      - name: y_raw
+      - subindex: 0x5
+        name: y_raw
         data_type: uint16
         description: raw y acceleration value
         access_type: ro
 
-      - name: z_raw
+      - subindex: 0x6
+        name: z_raw
         data_type: uint16
         description: raw z acceleration value
         access_type: ro
 
-  - name: temperature
+  - index: 0x4002
+    name: temperature
     data_type: int8
     description: temperature in celsius
     access_type: ro
 
-  - name: pos_z_magnetometer_1
+  - index: 0x4003
+    name: pos_z_magnetometer_1
     object_type: record
     description: +z endcard magnetometer 1 data
     subindexes:
-      - name: x
+      - subindex: 0x1
+        name: x
         data_type: int16
         description: +z mag 1 x axis magnetic field in milligauss
         access_type: ro
         low_limit: -8192
         high_limit: 8192
 
-      - name: y
+      - subindex: 0x2
+        name: y
         data_type: int16
         description: +z mag 1 y axis magnetic field in milligauss
         access_type: ro
         low_limit: -8192
         high_limit: 8192
 
-      - name: z
+      - subindex: 0x3
+        name: z
         data_type: int16
         description: +z mag 1 z axis magnetic field in milligauss
         access_type: ro
         low_limit: -8192
         high_limit: 8192
 
-  - name: pos_z_magnetometer_2
+  - index: 0x4004
+    name: pos_z_magnetometer_2
     object_type: record
     description: +z endcard magnetometer 2 data
     subindexes:
-      - name: x
+      - subindex: 0x1
+        name: x
         data_type: int16
         description: +z mag 1 x axis magnetic field in milligauss
         access_type: ro
         low_limit: -8192
         high_limit: 8192
 
-      - name: y
+      - subindex: 0x2
+        name: y
         data_type: int16
         description: +z mag 2 y axis magnetic field in milligauss
         access_type: ro
         low_limit: -8192
         high_limit: 8192
 
-      - name: z
+      - subindex: 0x3
+        name: z
         data_type: int16
         description: +z mag 2 z axis magnetic field in milligauss
         access_type: ro
         low_limit: -8192
         high_limit: 8192
 
-  - name: min_z_magnetometer_1
+  - index: 0x4005
+    name: min_z_magnetometer_1
     object_type: record
     description: -z endcard magnetometer 1 data
     subindexes:
-      - name: x
+      - subindex: 0x1
+        name: x
         data_type: int16
         description: -z mag 1 x axis magnetic field in milligauss
         access_type: ro
         low_limit: -8192
         high_limit: 8192
 
-      - name: y
+      - subindex: 0x2
+        name: y
         data_type: int16
         description: -z mag 1 y axis magnetic field in milligauss
         access_type: ro
         low_limit: -8192
         high_limit: 8192
 
-      - name: z
+      - subindex: 0x3
+        name: z
         data_type: int16
         description: -z mag 1 z axis magnetic field in milligauss
         access_type: ro
         low_limit: -8192
         high_limit: 8192
 
-  - name: min_z_magnetometer_2
+  - index: 0x4006
+    name: min_z_magnetometer_2
     object_type: record
     description: -z endcard magnetometer 2 data
     subindexes:
-      - name: x
+      - subindex: 0x1
+        name: x
         data_type: int16
         description: -z mag 2 x axis magnetic field in milligauss
         access_type: ro
         low_limit: -8192
         high_limit: 8192
 
-      - name: y
+      - subindex: 0x2
+        name: y
         data_type: int16
         description: -z mag 2 y axis magnetic field in milligauss
         access_type: ro
         low_limit: -8192
         high_limit: 8192
 
-      - name: z
+      - subindex: 0x3
+        name: z
         data_type: int16
         description: -z mag 2 z axis magnetic field in milligauss
         access_type: ro
         low_limit: -8192
         high_limit: 8192
-
 
 tpdos:
   - num: 1

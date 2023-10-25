@@ -1,5 +1,6 @@
 objects:
-  - name: status
+  - index: 0x4000
+    name: status
     data_type: uint8
     description: |
       the star tracker status
@@ -11,100 +12,120 @@ objects:
       - 0x05: capture_only
       - 0xFF: hardware error
 
-  - name: capture
+  - index: 0x4001
+    name: capture
     object_type: record
     subindexes:
-      - name: num_of_images
+      - subindex: 0x1
+        name: num_of_images
         data_type: uint8
         description: number of images to capture in camera mode or 0 for endless
         default: 1
 
-      - name: delay
+      - subindex: 0x2
+        name: delay
         data_type: uint32
         description: delay between captures in ms
         default: 1000
 
-      - name: duration
+      - subindex: 0x3
+        name: duration
         data_type: uint32
         description: how long to try to capture for in seconds
         default: 1
 
-      - name: last_capture
+      - subindex: 0x4
+        name: last_capture
         data_type: domain
         description: the last raw capture
         access_type: ro
 
-      - name: last_display_image
+      - subindex: 0x5
+        name: last_display_image
         data_type: domain
         description: the last capture convert to a nice display image
         access_type: ro
 
-      - name: last_capture_time
+      - subindex: 0x6
+        name: last_capture_time
         data_type: uint64
         description: timestamp of last raw capture
         access_type: ro
 
-      - name: images_captured
+      - subindex: 0x7
+        name: images_captured
         data_type: uint32
         description: number of images capture during capture mode
         access_type: ro
 
-      - name: save_captures
+      - subindex: 0x8
+        name: save_captures
         data_type: bool
         description: save the captures
         default: true
 
-  - name: orientation
+  - index: 0x4002
+    name: orientation
     object_type: record
     description: last solve calculations
     subindexes:
-      - name: right_ascension
+      - subindex: 0x1
+        name: right_ascension
         data_type: int16
         description: the right ascension of the satellite in degrees
         access_type: ro
 
-      - name: declination
+      - subindex: 0x2
+        name: declination
         data_type: int16
         description: the delination of the satellite in degrees
         access_type: ro
 
-      - name: roll
+      - subindex: 0x3
+        name: roll
         data_type: int16
         description: the roll of the satellite in degrees
         access_type: ro
 
-      - name: time_since_midnight
+      - subindex: 0x4
+        name: time_since_midnight
         data_type: uint32
         description: the number of milliseconds since midnight when the image was captured
         access_type: ro
 
-  - name: capture_filter
+  - index: 0x4003
+    name: capture_filter
     object_type: record
     description: settings use to accept or reject the capture
     subindexes:
-      - name: enable
+      - subindex: 0x1
+        name: enable
         data_type: bool
-        description: enable/disable the capture filters
+        description: enable/disable all capture filters
         access_type: rw
         default: true
 
-      - name: lower_bound
+      - subindex: 0x2
+        name: lower_bound
         data_type: uint8
         description: intensity threshold for a pixel to be considered bright enough
         access_type: rw
 
-      - name: lower_percentage
+      - subindex: 0x3
+        name: lower_percentage
         data_type: uint8
         description: percentage of pixels must be above lower bound
         access_type: rw
         upper_limit: 100
 
-      - name: upper_bound
+      - subindex: 0x4
+        name: upper_bound
         data_type: uint8
         description: intensity threshold for a pixel to be considered too bright
         access_type: rw
 
-      - name: upper_percentage
+      - subindex: 0x5
+        name: upper_percentage
         data_type: uint8
         description: percentage of pixels must be above upper bound
         access_type: rw

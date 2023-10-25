@@ -1,10 +1,12 @@
 objects:
-  - name: status
+  - index: 0x4000
+    name: status
     data_type: uint8
     description: the dxwifi status
     access_type: rw
 
-  - name: radio_temperature
+  - index: 0x4001
+    name: radio_temperature
     data_type: uint8
     description: the temperature of the ar9271 chip in celsius
     access_type: ro

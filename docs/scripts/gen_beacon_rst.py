@@ -57,7 +57,7 @@ def gen_beacon_rst(beacon_def: list, oresat: str, file_path: str):
             index_name = obj.parent.name
             subindex_name = obj.name
 
-        if obj.index < 0x7000:
+        if obj.index < 0x5000:
             card = "c3"
             name = index_name
             name += "_" + subindex_name if subindex_name else ""
