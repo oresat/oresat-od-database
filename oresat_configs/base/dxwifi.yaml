@@ -6,14 +6,18 @@ objects:
     access_type: rw
 
   - index: 0x4001
-    name: radio_temperature
-    data_type: uint8
-    description: the temperature of the ar9271 chip in celsius
-    access_type: ro
+    name: radio
+    object_type: record
+    subindexes:
+    - subindex: 0x1
+      name: temperature
+      data_type: int8
+      description: the temperature of the radio in celsius
+      access_type: ro
 
 tpdos:
   - num: 3
     fields:
       - [status]
-      - [radio_temperature]
+      - [radio, temperature]
     delay_ms: 1000

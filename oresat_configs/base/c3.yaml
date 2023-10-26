@@ -30,9 +30,7 @@ objects:
     description: the hardware id
     access_type: ro
 
-  # index 0x4004 is reserverd
-
-  - index: 0x4005
+  - index: 0x4004
     name: tx_control
     object_type: record
     subindexes:
@@ -55,7 +53,7 @@ objects:
         description: last tx enable timestamp in seconds
         access_type: ro
 
-  - index: 0x4006
+  - index: 0x4005
     name: antennas
     object_type: record
     subindexes:
@@ -137,7 +135,7 @@ objects:
         description: helical voltage in millivolts
         access_type: ro
 
-  - index: 0x4007
+  - index: 0x4006
     name: lband
     object_type: record
     subindexes:
@@ -159,7 +157,7 @@ objects:
         description: lband rssi of last packet received after lna, filters, and digital channel filter in dB
         access_type: ro
 
-  - index: 0x4008
+  - index: 0x4007
     name: uhf
     object_type: record
     subindexes :
@@ -181,7 +179,7 @@ objects:
         description: uhf rssi of last packet received after lna, filters, and digital channel filter in dB
         access_type: ro
 
-  - index: 0x4009
+  - index: 0x4008
     name: edl
     object_type: record
     subindexes:
@@ -263,7 +261,7 @@ objects:
         access_type: const
         default: 60
 
-  - index: 0x400a
+  - index: 0x4009
     name: opd
     object_type: record
     subindexes:
@@ -343,7 +341,7 @@ objects:
         access_type: rw
         default: 3
 
-  - index: 0x400b
+  - index: 0x400a
     name: beacon
     object_type: record
     subindexes:
@@ -394,7 +392,7 @@ objects:
         description: scet timestamp of last beacon
         access_type: ro
 
-  - index: 0x400c
+  - index: 0x400b
     name: rtc
     object_type: record
     description: rtc info, OreSat0 only as Linux handles the rtc
@@ -448,3 +446,4 @@ fram:
   - [edl, active_crypto_key]
   - [uhf, rx_bytes]
   - [uhf, rx_packets]
+  - [tx_control, enable]
