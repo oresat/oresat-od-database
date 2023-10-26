@@ -1,11 +1,11 @@
 #!/usr/bin/env python3
+"""Generate beacon rst files."""
 
 import os
 import sys
 
 _FILE_PATH = os.path.dirname(os.path.abspath(__file__ + "/../.."))
 sys.path.insert(0, _FILE_PATH)
-_FILE_PATH = os.path.dirname(os.path.abspath(__file__ + "/.."))
 
 import canopen
 
@@ -27,6 +27,7 @@ OD_DATA_TYPES = {
     canopen.objectdictionary.OCTET_STRING: "octect_str",
     canopen.objectdictionary.DOMAIN: "domain",
 }
+"""Nice names for CANopen data types."""
 
 
 def gen_beacon_rst(beacon_def: list, oresat: str, file_path: str):
@@ -94,8 +95,10 @@ def gen_beacon_rst(beacon_def: list, oresat: str, file_path: str):
         f.writelines(lines)
 
 
-def gen_all():
-    file_path = _FILE_PATH + "/" + "gen"
+def gen_beacon_rst_files():
+    """Generate all beacon rst files."""
+
+    file_path = os.path.dirname(os.path.abspath(__file__ + "/..")) + "/gen"
     gen_beacon_rst(BEACON_DEF_DB[OreSatId.ORESAT0], "OreSat0", f"{file_path}/oresat0_beacon.rst")
     gen_beacon_rst(
         BEACON_DEF_DB[OreSatId.ORESAT0_5], "OreSat0.5", f"{file_path}/oresat0_5_beacon.rst"
