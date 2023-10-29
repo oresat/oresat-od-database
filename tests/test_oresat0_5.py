@@ -1,6 +1,6 @@
 """Unit tests for OreSat0.5 OD database."""
 
-from oresat_configs import OreSatId, OreSatConfig
+from oresat_configs import OreSatConfig, OreSatId
 
 from . import TestConfig
 

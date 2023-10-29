@@ -8,7 +8,7 @@ sys.path.insert(0, _FILE_PATH)
 
 import canopen
 
-from oresat_configs import OreSatId, OreSatConfig, ORESAT_NICE_NAMES
+from oresat_configs import ORESAT_NICE_NAMES, OreSatConfig, OreSatId
 
 OD_DATA_TYPES = {
     canopen.objectdictionary.BOOLEAN: "bool",

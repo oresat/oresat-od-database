@@ -11,7 +11,7 @@ from argparse import ArgumentParser
 
 import canopen
 
-from .. import NodeId, OreSatId, OreSatConfig
+from .. import NodeId, OreSatConfig, OreSatId
 
 SDO_TRANSFER = "read or write value to a node's object dictionary via SDO transfers"
 SDO_TRANSFER_PROG = "oresat-sdo-transfer"

@@ -1,14 +1,14 @@
 """OreSat OD database"""
 
-import yaml
 import canopen
+import yaml
 
+from ._yaml_to_od import _gen_c3_beacon_defs, _gen_c3_fram_defs, _gen_fw_base_od, _gen_od_db
+from .base import C3_CONFIG, FW_COMMON_CONFIG
 from .constants import NODE_NICE_NAMES, ORESAT_NICE_NAMES, NodeId, OreSatId, __version__
-from .oresat0 import ORESAT0_CARD_CONFIGS, ORESAT0_BEACON_CONFIG
-from .oresat0_5 import ORESAT0_5_CARD_CONFIGS, ORESAT0_5_BEACON_CONFIG
-from .oresat1 import ORESAT1_CARD_CONFIGS, ORESAT1_BEACON_CONFIG
-from ._yaml_to_od import _gen_od_db, _gen_c3_fram_defs, _gen_c3_beacon_defs, _gen_fw_base_od
-from .base import FW_COMMON_CONFIG, C3_CONFIG
+from .oresat0 import ORESAT0_BEACON_CONFIG, ORESAT0_CARD_CONFIGS
+from .oresat0_5 import ORESAT0_5_BEACON_CONFIG, ORESAT0_5_CARD_CONFIGS
+from .oresat1 import ORESAT1_BEACON_CONFIG, ORESAT1_CARD_CONFIGS
 
 
 class OreSatConfig:
@@ -27,7 +27,6 @@ class OreSatConfig:
     }
 
     def __init__(self, oresat_id: OreSatId):
-
         self.oresat_id = oresat_id
         beacon_config = self.BEACON_CONFIGS[oresat_id]
         self.od_db = _gen_od_db(oresat_id, beacon_config, self.CARD_CONFIGS[oresat_id])

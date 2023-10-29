@@ -6,7 +6,7 @@ from datetime import datetime
 
 import canopen
 
-from .. import NodeId, OreSatId, OreSatConfig
+from .. import NodeId, OreSatConfig, OreSatId
 
 GEN_DCF = "generate DCF file for OreSat node(s)"
 GEN_DCF_PROG = "oresat-gen-dcf"

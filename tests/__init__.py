@@ -5,7 +5,7 @@ import unittest
 
 import canopen
 
-from oresat_configs import NodeId, OreSatId, OreSatConfig
+from oresat_configs import NodeId, OreSatConfig, OreSatId
 from oresat_configs._yaml_to_od import OD_DATA_TYPE_SIZE, TPDO_COMM_START, TPDO_PARA_START
 
 

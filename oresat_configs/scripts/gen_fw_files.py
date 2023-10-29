@@ -7,7 +7,7 @@ from argparse import ArgumentParser
 
 import canopen
 
-from .. import NodeId, OreSatId, OreSatConfig
+from .. import NodeId, OreSatConfig, OreSatId
 from .._yaml_to_od import RPDO_COMM_START, RPDO_PARA_START, TPDO_COMM_START, TPDO_PARA_START
 
 GEN_FW_FILES = "generate CANopenNode OD.[c/h] files for a OreSat firmware card"
