@@ -1,4 +1,3 @@
-#!/usr/bin/env python3
 """Generate beacon rst files."""
 
 import os
@@ -9,7 +8,7 @@ sys.path.insert(0, _FILE_PATH)
 
 import canopen
 
-from oresat_configs import BEACON_DEF_DB, OreSatId
+from oresat_configs import OreSatId, OreSatConfig, ORESAT_NICE_NAMES
 
 OD_DATA_TYPES = {
     canopen.objectdictionary.BOOLEAN: "bool",
@@ -30,10 +29,10 @@ OD_DATA_TYPES = {
 """Nice names for CANopen data types."""
 
 
-def gen_beacon_rst(beacon_def: list, oresat: str, file_path: str):
+def gen_beacon_rst(config: OreSatConfig, file_path: str):
     """Genetate a rst file for a beacon definition."""
 
-    title = f"{oresat} Beacon Definition"
+    title = f"{ORESAT_NICE_NAMES[config.oresat_id]} Beacon Definition"
     lines = [
         f"{title}\n",
         f'{"=" * len(title)}\n',
@@ -50,7 +49,7 @@ def gen_beacon_rst(beacon_def: list, oresat: str, file_path: str):
     lines.append(f'   "{offset}", "c3", "ax25_header", "octect_str", "{size}", "{desc}"\n')
     offset += size
 
-    for obj in beacon_def:
+    for obj in config.beacon_def:
         if isinstance(obj.parent, canopen.ObjectDictionary):
             index_name = obj.name
             subindex_name = ""
@@ -99,8 +98,6 @@ def gen_beacon_rst_files():
     """Generate all beacon rst files."""
 
     file_path = os.path.dirname(os.path.abspath(__file__ + "/..")) + "/gen"
-    gen_beacon_rst(BEACON_DEF_DB[OreSatId.ORESAT0], "OreSat0", f"{file_path}/oresat0_beacon.rst")
-    gen_beacon_rst(
-        BEACON_DEF_DB[OreSatId.ORESAT0_5], "OreSat0.5", f"{file_path}/oresat0_5_beacon.rst"
-    )
-    gen_beacon_rst(BEACON_DEF_DB[OreSatId.ORESAT1], "OreSat1", f"{file_path}/oresat1_beacon.rst")
+    gen_beacon_rst(OreSatConfig(OreSatId.ORESAT0), f"{file_path}/oresat0_beacon.rst")
+    gen_beacon_rst(OreSatConfig(OreSatId.ORESAT0_5), f"{file_path}/oresat0_5_beacon.rst")
+    gen_beacon_rst(OreSatConfig(OreSatId.ORESAT1), f"{file_path}/oresat1_beacon.rst")

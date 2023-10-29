@@ -1,4 +1,3 @@
-#!/usr/bin/env python3
 """Print out a card's objects directory."""
 
 import sys
@@ -7,7 +6,7 @@ from typing import Any
 
 import canopen
 
-from .. import OD_DB, NodeId, OreSatId
+from .. import NodeId, OreSatId, OreSatConfig
 from .._yaml_to_od import OD_DATA_TYPES
 
 PRINT_OD = "print the object dictionary out to stdout"
@@ -34,25 +33,27 @@ def print_od(sys_args=None):
     parser.add_argument("card", help="card name; c3, gps, star_tracker_1, etc")
     args = parser.parse_args(sys_args)
 
-    if args.oresat == "oresat0":
-        od_db = OD_DB[OreSatId.ORESAT0]
-    elif args.oresat == "oresat0.5":
-        od_db = OD_DB[OreSatId.ORESAT0_5]
-    elif args.oresat == "oresat1":
-        od_db = OD_DB[OreSatId.ORESAT1]
+    arg_oresat = args.oresat.lower()
+    if arg_oresat in ["0", "oresat0"]:
+        oresat_id = OreSatId.ORESAT0
+    elif arg_oresat in ["0.5", "oresat0.5"]:
+        oresat_id = OreSatId.ORESAT0_5
+    elif arg_oresat in ["1", "oresat1"]:
+        oresat_id = OreSatId.ORESAT1
     else:
-        print(f"invalid oresat mission {args.oresat}")
+        print(f"invalid oresat mission: {args.oresat}")
         sys.exit()
 
-    if args.card is None:
-        print("card not set")
-        sys.exit()
+    config = OreSatConfig(oresat_id)
 
     inverted_od_data_types = {}
     for key in OD_DATA_TYPES:
         inverted_od_data_types[OD_DATA_TYPES[key]] = key
 
-    od = od_db[NodeId[args.card.upper()]]
+    arg_card = args.card.upper().replace("-", "_")
+
+    node_id = NodeId[arg_card]
+    od = config.od_db[node_id]
     for i in od:
         if isinstance(od[i], canopen.objectdictionary.Variable):
             data_type = inverted_od_data_types[od[i].data_type]

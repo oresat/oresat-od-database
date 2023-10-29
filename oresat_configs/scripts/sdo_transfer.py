@@ -1,4 +1,3 @@
-#!/usr/bin/env python3
 """
 SDO transfer script
 
@@ -12,7 +11,7 @@ from argparse import ArgumentParser
 
 import canopen
 
-from .. import OD_DB, NodeId, OreSatId
+from .. import NodeId, OreSatId, OreSatConfig
 
 SDO_TRANSFER = "read or write value to a node's object dictionary via SDO transfers"
 SDO_TRANSFER_PROG = "oresat-sdo-transfer"
@@ -47,13 +46,18 @@ def sdo_transfer(sys_args=None):
     )
     args = parser.parse_args(sys_args)
 
-    if args.oresat == "oresat0":
-        od_db = OD_DB[OreSatId.ORESAT0]
-    elif args.oresat == "oresat0.5":
-        od_db = OD_DB[OreSatId.ORESAT0_5]
+    arg_oresat = args.oresat.lower()
+    if arg_oresat in ["0", "oresat0"]:
+        oresat_id = OreSatId.ORESAT0
+    elif arg_oresat in ["0.5", "oresat0.5"]:
+        oresat_id = OreSatId.ORESAT0_5
+    elif arg_oresat in ["1", "oresat1"]:
+        oresat_id = OreSatId.ORESAT1
     else:
-        print(f"invalid oresat mission {args.oresat}")
+        print(f"invalid oresat mission: {args.oresat}")
         sys.exit()
+
+    config = OreSatConfig(oresat_id)
 
     if args.value.startswith("file:"):
         if not os.path.isfile(args.value[5:]):
@@ -61,7 +65,7 @@ def sdo_transfer(sys_args=None):
             sys.exit()
 
     node_id = NodeId[args.node.upper()]
-    od = od_db[node_id]
+    od = config.od_db[node_id]
 
     # connect to CAN network
     network = canopen.Network()

@@ -9,11 +9,11 @@ objects:
     name: radio
     object_type: record
     subindexes:
-    - subindex: 0x1
-      name: temperature
-      data_type: int8
-      description: the temperature of the radio in celsius
-      access_type: ro
+      - subindex: 0x1
+        name: temperature
+        data_type: int8
+        description: the temperature of the radio in celsius
+        access_type: ro
 
 tpdos:
   - num: 3

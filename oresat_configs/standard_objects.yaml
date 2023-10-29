@@ -1,5 +1,5 @@
-- name: device_type
-  index: 0x1000
+- index: 0x1000
+  name: device_type
   object_type: variable
   description: |
     - bits 16-31: additional information
@@ -7,8 +7,8 @@
   data_type: uint32
   access_type: ro
 
-- name: error_register
-  index: 0x1001
+- index: 0x1001
+  name: error_register
   object_type: variable
   description: |
     - bit 7: manufacturer specific
@@ -22,23 +22,23 @@
   data_type: uint8
   access_type: ro
 
-- name: cob_id_sync
-  index: 0x1005
+- index: 0x1005
+  name: cob_id_sync
   object_type: variable
   description: COB-ID of the SYNC message
   data_type: uint32
   access_type: rw
   default: 0x80
 
-- name: communication_cycle_period
-  index: 0x1006
+- index: 0x1006
+  name: communication_cycle_period
   object_type: variable
   description: SYNC interval in mircoseconds
   data_type: uint32
   access_type: rw
 
-- name: cob_id_emergency_message
-  index: 0x1014
+- index: 0x1014
+  name: cob_id_emergency_message
   object_type: variable
   description: |
     - bit 31: not valid
@@ -49,108 +49,108 @@
   access_type: rw
   default: "0x80+$NODE_ID"
 
-- name: consumer_heartbeat_time
-  index: 0x1016
+- index: 0x1016
+  name: consumer_heartbeat_time
   object_type: array
   description: expected heartbeat cycle times in milliseconds for all other nodes
   length: 127
   data_type: uint32
   default: 1000
 
-- name: producer_heartbeat_time
-  index: 0x1017
+- index: 0x1017
+  name: producer_heartbeat_time
   object_type: variable
   description: heartbeat producer time in ms, 0 = disable
   data_type: uint16
   access_type: rw
   default: 1000
 
-- name: identity
-  index: 0x1018
+- index: 0x1018
+  name: identity
   object_type: record
   subindexes: 
-    - name: vendor_id
-      subindex: 0x1
+    - subindex: 0x1
+      name: vendor_id
       description: manufacturer vendor id set by CiA
       data_type: uint32
       access_type: ro
     
-    - name: product_code
-      subindex: 0x2
+    - subindex: 0x2
+      name: product_code
       description: ids a specific type of CANopen devices
       data_type: uint32
       access_type: ro
     
-    - name: revision_number
-      subindex: 0x3
+    - subindex: 0x3
+      name: revision_number
       description: |
         - bits 16-31: major version
         - bits 0-15: minor version
       data_type: uint32
       access_type: ro
     
-    - name: serial_number
-      subindex: 0x4
+    - subindex: 0x4
+      name: serial_number
       description: unqiue device id for a product group or revision
       data_type: uint32
       access_type: ro
 
-- name: sdo_server_parameter
-  index: 0x1200
+- index: 0x1200
+  name: sdo_server_parameter
   object_type: record
   subindexes: 
-    - name: cob_id_client_to_server
-      subindex: 0x1
+    - subindex: 0x1
+      name: cob_id_client_to_server
       data_type: uint32
       access_type: rw
       default: 0x80000000
     
-    - name: cob_id_server_to_client
-      subindex: 0x2
+    - subindex: 0x2
+      name: cob_id_server_to_client
       data_type: uint32
       access_type: rw
       default: 0x80000000
     
-    - name: node_id_od_sdo_client
-      subindex: 0x3
+    - subindex: 0x3
+      name: node_id_od_sdo_client
       data_type: uint32
       access_type: rw
       default: 1
     
-- name: sdo_client_parameter
-  index: 0x1280
+- index: 0x1280
+  name: sdo_client_parameter
   object_type: record
   subindexes: 
-    - name: cob_id_client_to_server
-      subindex: 0x1
+    - subindex: 0x1
+      name: cob_id_client_to_server
       data_type: uint32
       access_type: rw
       default: 0x80000000
     
-    - name: cob_id_server_to_client
-      subindex: 0x2
+    - subindex: 0x2
+      name: cob_id_server_to_client
       data_type: uint32
       access_type: rw
       default: 0x80000000
     
-    - name: node_id_od_sdo_client
-      subindex: 0x3
+    - subindex: 0x3
+      name: node_id_od_sdo_client
       data_type: uint32
       access_type: rw
       default: 1
 
-- name: os_command
-  index: 0x1023
+- index: 0x1023
+  name: os_command
   object_type: record
   subindexes: 
-    - name: command
-      subindex: 0x1
+    - subindex: 0x1
+      name: command
       description: OS command
       data_type: domain
       access_type: rw
     
-    - name: status
-      subindex: 0x2
+    - subindex: 0x2
+      name: status
       description: |
         - 0x00: Command completed no error no reply
         - 0x01: Command completed no error reply
@@ -160,21 +160,21 @@
       data_type: uint32
       access_type: ro
     
-    - name: reply
-      subindex: 0x3
+    - subindex: 0x3
+      name: reply
       description: OS command reply
       data_type: domain
       access_type: ro
     
-- name: scet
-  index: 0x2010
+- index: 0x2010
+  name: scet
   object_type: variable
   description: CCSDS Unsegmented Time Code (CUC) object for Spacecraft Elapsed Time (SCET)
   data_type: uint64
   access_type: rw
 
-- name: utc
-  index: 0x2011
+- index: 0x2011
+  name: utc
   object_type: variable
   description: CCSDS Day Segmented Time Code (CDS) object for UTC time
   data_type: uint64

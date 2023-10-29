@@ -5,7 +5,7 @@ import unittest
 
 import canopen
 
-from oresat_configs import NodeId, OreSatId
+from oresat_configs import NodeId, OreSatId, OreSatConfig
 from oresat_configs._yaml_to_od import OD_DATA_TYPE_SIZE, TPDO_COMM_START, TPDO_PARA_START
 
 
@@ -14,15 +14,14 @@ class TestConfig(unittest.TestCase):
 
     def setUp(self):
         self.id = OreSatId.ORESAT0
-        self.od_db = {NodeId.C3: canopen.ObjectDictionary()}
-        self.beacon_def = []
+        self.config = OreSatConfig(self.id)
 
     def test_tpdo_sizes(self):
         """Validate TPDO sizes."""
 
-        for node in self.od_db:
+        for node in self.config.od_db:
             tpdos = 0
-            od = self.od_db[node]
+            od = self.config.od_db[node]
             for i in range(16):
                 tpdo_comm_index = TPDO_COMM_START + i
                 tpdo_para_index = TPDO_PARA_START + i
@@ -69,7 +68,7 @@ class TestConfig(unittest.TestCase):
             canopen.objectdictionary.DOMAIN,
         ]
 
-        for obj in self.beacon_def:
+        for obj in self.config.beacon_def:
             if obj.name == "start_chars":
                 length += len(obj.default)  # start_chars is required and static
             else:
@@ -87,7 +86,7 @@ class TestConfig(unittest.TestCase):
     def test_record_array_length(self):
         """Test that array/record have is less than 255 objects in it."""
 
-        for od in self.od_db.values():
+        for od in self.config.od_db.values():
             for index in od:
                 if not isinstance(od[index], canopen.objectdictionary.Variable):
                     self.assertLessEqual(len(od[index].subindices), 255)
@@ -155,7 +154,7 @@ class TestConfig(unittest.TestCase):
     def test_objects(self):
         """Test that all objects are valid."""
 
-        for od in self.od_db.values():
+        for od in self.config.od_db.values():
             for index in od:
                 if isinstance(od[index], canopen.objectdictionary.Variable):
                     self._test_variable(od[index])

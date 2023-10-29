@@ -1,4 +1,3 @@
-#!/usr/bin/env python3
 """Generate a DCF for from an OreSat card's object directory."""
 
 import sys
@@ -7,7 +6,7 @@ from datetime import datetime
 
 import canopen
 
-from .. import OD_DB, NodeId, OreSatId
+from .. import NodeId, OreSatId, OreSatConfig
 
 GEN_DCF = "generate DCF file for OreSat node(s)"
 GEN_DCF_PROG = "oresat-gen-dcf"
@@ -235,19 +234,22 @@ def gen_dcf(sys_args=None):
     parser.add_argument("-d", "--dir-path", default=".", help='directory path; defautl "."')
     args = parser.parse_args(sys_args)
 
-    if args.oresat == "oresat0":
-        od_db = OD_DB[OreSatId.ORESAT0]
-    elif args.oresat == "oresat0.5":
-        od_db = OD_DB[OreSatId.ORESAT0_5]
-    elif args.oresat == "oresat1":
-        od_db = OD_DB[OreSatId.ORESAT1]
+    arg_oresat = args.oresat.lower()
+    if arg_oresat in ["0", "oresat0"]:
+        oresat_id = OreSatId.ORESAT0
+    elif arg_oresat in ["0.5", "oresat0.5"]:
+        oresat_id = OreSatId.ORESAT0_5
+    elif arg_oresat in ["1", "oresat1"]:
+        oresat_id = OreSatId.ORESAT1
     else:
-        print(f"invalid oresat mission {args.oresat}")
+        print(f"invalid oresat mission: {args.oresat}")
         sys.exit()
 
+    config = OreSatConfig(oresat_id)
+
     if args.card.lower() == "all":
-        for od in od_db.values():
+        for od in config.od_db.values():
             write_od(od, args.dir_path)
     else:
-        od = od_db[NodeId[args.card.upper()]]
+        od = config.od_db[NodeId[args.card.upper()]]
         write_od(od, args.dir_path)

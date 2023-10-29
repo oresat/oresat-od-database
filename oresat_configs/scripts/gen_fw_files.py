@@ -1,4 +1,3 @@
-#!/usr/bin/env python3
 """Generate a OreSat card's CANopenNode OD.[c/h] files"""
 
 import math as m
@@ -8,7 +7,7 @@ from argparse import ArgumentParser
 
 import canopen
 
-from .. import OD_DB, OD_FW_BASE_DB, NodeId, OreSatId
+from .. import NodeId, OreSatId, OreSatConfig
 from .._yaml_to_od import RPDO_COMM_START, RPDO_PARA_START, TPDO_COMM_START, TPDO_PARA_START
 
 GEN_FW_FILES = "generate CANopenNode OD.[c/h] files for a OreSat firmware card"
@@ -622,28 +621,6 @@ def write_canopennode_h(od: canopen.ObjectDictionary, dir_path: str = "."):
             f.write(i + "\n")
 
 
-OD_LIST = {
-    # OreSat0
-    ("oresat0", "base"): OD_FW_BASE_DB[OreSatId.ORESAT0],
-    ("oresat0", "c3"): OD_DB[OreSatId.ORESAT0][NodeId.C3],
-    ("oresat0", "battery"): OD_DB[OreSatId.ORESAT0][NodeId.BATTERY_1],
-    ("oresat0", "solar"): OD_DB[OreSatId.ORESAT0][NodeId.SOLAR_MODULE_1],
-    ("oresat0", "imu"): OD_DB[OreSatId.ORESAT0][NodeId.IMU],
-    # OreSat0.5
-    ("oresat0_5", "base"): OD_FW_BASE_DB[OreSatId.ORESAT0_5],
-    ("oresat0.5", "battery"): OD_DB[OreSatId.ORESAT0_5][NodeId.BATTERY_1],
-    ("oresat0.5", "solar"): OD_DB[OreSatId.ORESAT0_5][NodeId.SOLAR_MODULE_1],
-    ("oresat0.5", "imu"): OD_DB[OreSatId.ORESAT0_5][NodeId.IMU],
-    ("oresat0.5", "reaction_wheel"): OD_DB[OreSatId.ORESAT0_5][NodeId.REACTION_WHEEL_1],
-    # OreSat1
-    ("oresat1", "base"): OD_FW_BASE_DB[OreSatId.ORESAT1],
-    ("oresat1", "battery"): OD_DB[OreSatId.ORESAT1][NodeId.BATTERY_1],
-    ("oresat1", "solar"): OD_DB[OreSatId.ORESAT1][NodeId.SOLAR_MODULE_1],
-    ("oresat1", "imu"): OD_DB[OreSatId.ORESAT1][NodeId.IMU],
-    ("oresat1", "reaction_wheel"): OD_DB[OreSatId.ORESAT1][NodeId.REACTION_WHEEL_1],
-}
-
-
 def gen_fw_files(sys_args=None):
     """generate CANopenNode firmware files main"""
 
@@ -656,11 +633,35 @@ def gen_fw_files(sys_args=None):
     parser.add_argument("-d", "--dir-path", default=".", help='output directory path, default: "."')
     args = parser.parse_args(sys_args)
 
-    if (args.oresat.lower(), args.card) not in OD_LIST:
-        print("invalid oresat and/or card")
+    arg_oresat = args.oresat.lower()
+    if arg_oresat in ["0", "oresat0"]:
+        oresat_id = OreSatId.ORESAT0
+    elif arg_oresat in ["0.5", "oresat0.5"]:
+        oresat_id = OreSatId.ORESAT0_5
+    elif arg_oresat in ["1", "oresat1"]:
+        oresat_id = OreSatId.ORESAT1
+    else:
+        print(f"invalid oresat mission: {args.oresat}")
         sys.exit()
 
-    od = OD_LIST[(args.oresat.lower(), args.card)]
+    config = OreSatConfig(oresat_id)
+
+    arg_card = args.card.lower()
+    if arg_card == "c3":
+        od = config.od_db[NodeId.C3]
+    elif arg_card in ["solar", "solar-module", "solar_module"]:
+        od = config.od_db[NodeId.SOLAR_MODULE_1]
+    elif arg_card in ["battery", "bat"]:
+        od = config.od_db[NodeId.BATTERY_1]
+    elif arg_card == "imu":
+        od = config.od_db[NodeId.IMU]
+    elif arg_card in ["rw", "reaction-wheel", "reaction_wheel"]:
+        od = config.od_db[NodeId.REACTION_WHEEL_1]
+    elif arg_card == "base":
+        od = config.fw_base_od
+    else:
+        print(f"invalid oresat card: {args.card}")
+        sys.exit()
 
     # need to add empty pdo indexes and subindexes
     for i in range(16):

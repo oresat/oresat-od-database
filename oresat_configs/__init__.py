@@ -1,35 +1,37 @@
 """OreSat OD database"""
 
+import yaml
+import canopen
+
 from .constants import NODE_NICE_NAMES, ORESAT_NICE_NAMES, NodeId, OreSatId, __version__
-from .oresat0 import ORESAT0_BEACON_DEF, ORESAT0_FRAM_DEF, ORESAT0_FW_BASE_OD, ORESAT0_OD_DB
-from .oresat0_5 import (
-    ORESAT0_5_BEACON_DEF,
-    ORESAT0_5_FRAM_DEF,
-    ORESAT0_5_FW_BASE_OD,
-    ORESAT0_5_OD_DB,
-)
-from .oresat1 import ORESAT1_BEACON_DEF, ORESAT1_FRAM_DEF, ORESAT1_FW_BASE_OD, ORESAT1_OD_DB
+from .oresat0 import ORESAT0_CARD_CONFIGS, ORESAT0_BEACON_CONFIG
+from .oresat0_5 import ORESAT0_5_CARD_CONFIGS, ORESAT0_5_BEACON_CONFIG
+from .oresat1 import ORESAT1_CARD_CONFIGS, ORESAT1_BEACON_CONFIG
+from ._yaml_to_od import _gen_od_db, _gen_c3_fram_defs, _gen_c3_beacon_defs, _gen_fw_base_od
+from .base import FW_COMMON_CONFIG, C3_CONFIG
 
-OD_DB = {
-    OreSatId.ORESAT0: ORESAT0_OD_DB,
-    OreSatId.ORESAT0_5: ORESAT0_5_OD_DB,
-    OreSatId.ORESAT1: ORESAT1_OD_DB,
-}
 
-BEACON_DEF_DB = {
-    OreSatId.ORESAT0: ORESAT0_BEACON_DEF,
-    OreSatId.ORESAT0_5: ORESAT0_5_BEACON_DEF,
-    OreSatId.ORESAT1: ORESAT1_BEACON_DEF,
-}
+class OreSatConfig:
+    """All the configs for an OreSat mission."""
 
-FRAM_DEF_DB = {
-    OreSatId.ORESAT0: ORESAT0_FRAM_DEF,
-    OreSatId.ORESAT0_5: ORESAT0_5_FRAM_DEF,
-    OreSatId.ORESAT1: ORESAT1_FRAM_DEF,
-}
+    CARD_CONFIGS = {
+        OreSatId.ORESAT0: ORESAT0_CARD_CONFIGS,
+        OreSatId.ORESAT0_5: ORESAT0_5_CARD_CONFIGS,
+        OreSatId.ORESAT1: ORESAT1_CARD_CONFIGS,
+    }
 
-OD_FW_BASE_DB = {
-    OreSatId.ORESAT0: ORESAT0_FW_BASE_OD,
-    OreSatId.ORESAT0_5: ORESAT0_5_FW_BASE_OD,
-    OreSatId.ORESAT1: ORESAT1_FW_BASE_OD,
-}
+    BEACON_CONFIGS = {
+        OreSatId.ORESAT0: ORESAT0_BEACON_CONFIG,
+        OreSatId.ORESAT0_5: ORESAT0_5_BEACON_CONFIG,
+        OreSatId.ORESAT1: ORESAT1_BEACON_CONFIG,
+    }
+
+    def __init__(self, oresat_id: OreSatId):
+
+        self.oresat_id = oresat_id
+        beacon_config = self.BEACON_CONFIGS[oresat_id]
+        self.od_db = _gen_od_db(oresat_id, beacon_config, self.CARD_CONFIGS[oresat_id])
+        c3_od = self.od_db[NodeId.C3]
+        self.beacon_def = _gen_c3_beacon_defs(c3_od, beacon_config)
+        self.fram_def = _gen_c3_fram_defs(c3_od, C3_CONFIG)
+        self.fw_base_od = _gen_fw_base_od(oresat_id, FW_COMMON_CONFIG)

@@ -80,7 +80,7 @@ def _set_var_default(obj: dict, var: canopen.objectdictionary.Variable):
         var.default = obj["default"]
 
 
-def _add_objects(od: canopen.ObjectDictionary, objects: list) -> canopen.objectdictionary.Record:
+def _add_objects(od: canopen.ObjectDictionary, objects: list):
     """Add a Record tothe OD based off the config objects."""
 
     dynamic_len_data_types = [
@@ -573,7 +573,7 @@ def overlay_configs(card_config, overlay_config):
             card_config["rpdos"].append(deepcopy(overlay_rpdo))
 
 
-def gen_od_db(oresat_id: OreSatId, beacon_def: dict, configs: dict) -> dict:
+def _gen_od_db(oresat_id: OreSatId, beacon_def: dict, configs: dict) -> dict:
     """Generate all ODs for a OreSat mission."""
 
     od_db = {}
@@ -697,7 +697,7 @@ def gen_od_db(oresat_id: OreSatId, beacon_def: dict, configs: dict) -> dict:
     return od_db
 
 
-def get_c3_fram_defs(c3_od: canopen.ObjectDictionary, config: dict) -> list:
+def _gen_c3_fram_defs(c3_od: canopen.ObjectDictionary, config: dict) -> list:
     """Get the list of objects in saved to fram."""
 
     fram_objs = []
@@ -712,7 +712,7 @@ def get_c3_fram_defs(c3_od: canopen.ObjectDictionary, config: dict) -> list:
     return fram_objs
 
 
-def get_c3_beacon_defs(c3_od: canopen.ObjectDictionary, beacon_def: dict) -> list:
+def _gen_c3_beacon_defs(c3_od: canopen.ObjectDictionary, beacon_def: dict) -> list:
     """Get the list of objects in the beacon from OD."""
 
     beacon_objs = []
@@ -727,7 +727,7 @@ def get_c3_beacon_defs(c3_od: canopen.ObjectDictionary, beacon_def: dict) -> lis
     return beacon_objs
 
 
-def gen_fw_base_od(oresat_id: OreSatId, config: dict) -> canopen.ObjectDictionary:
+def _gen_fw_base_od(oresat_id: OreSatId, config: dict) -> canopen.ObjectDictionary:
     """Generate all ODs for a OreSat mission."""
 
     od = canopen.ObjectDictionary()

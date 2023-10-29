@@ -1,6 +1,6 @@
 """Unit tests for OreSat0 OD database."""
 
-from oresat_configs import BEACON_DEF_DB, FRAM_DEF_DB, OD_DB, OreSatId
+from oresat_configs import OreSatId, OreSatConfig
 
 from . import TestConfig
 
@@ -10,6 +10,4 @@ class TestOreSat0(TestConfig):
 
     def setUp(self):
         self.id = OreSatId.ORESAT0_5
-        self.od_db = OD_DB[self.id]
-        self.beacon_def = BEACON_DEF_DB[self.id]
-        self.fram_def = FRAM_DEF_DB[self.id]
+        self.config = OreSatConfig(self.id)
