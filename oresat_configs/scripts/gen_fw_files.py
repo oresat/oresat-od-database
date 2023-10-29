@@ -117,13 +117,16 @@ def write_canopennode(od: canopen.ObjectDictionary, dir_path: str = "."):
 def remove_node_id(default: str):
     """Remove "+$NODEID" or "$NODEID+" from the default value"""
 
+    if isinstance(default, bool):
+        default = int(default)
     if not isinstance(default, str):
         return default
 
-    temp = default.split("+")
-
     if default == "":
         return "0"
+
+    temp = default.split("+")
+
     if len(temp) == 1:
         return default  # does not include $NODEID
     if temp[0] == "$NODEID":
