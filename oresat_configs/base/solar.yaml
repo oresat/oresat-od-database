@@ -129,7 +129,7 @@ tpdos:
       - [output, current]
       - [output, power]
       - [output, voltage_avg]
-    delay_ms: 10000
+    event_timer_ms: 10000
 
   - num: 2
     fields:
@@ -137,13 +137,13 @@ tpdos:
       - [output, power_avg]
       - [output, voltage_max]
       - [output, current_max]
-    delay_ms: 10000
+    event_timer_ms: 10000
 
   - num: 3
     fields:
       - [output, power_max]
       - [output, energy]
-    delay_ms: 10000
+    event_timer_ms: 10000
 
   - num: 4
     fields:
@@ -153,4 +153,4 @@ tpdos:
       - [cell_2, temperature_min]
       - [cell_1, temperature_max]
       - [cell_2, temperature_max]
-    delay_ms: 10000
+    event_timer_ms: 10000

@@ -685,7 +685,7 @@ def gen_fw_files(sys_args=None):
             var = canopen.objectdictionary.Variable("cob_id", index, 0x1)
             var.access_type = "const"
             var.data_type = canopen.objectdictionary.UNSIGNED32
-            var.default = ((i % 4) * 0x100) + 0x80000200  # disabled
+            var.default = ((i % 4) * 0x100) + 0xC0000200  # disabled and no rtr
             rec.add_member(var)
 
             var = canopen.objectdictionary.Variable("transmission_type", index, 0x2)
@@ -749,7 +749,7 @@ def gen_fw_files(sys_args=None):
             var = canopen.objectdictionary.Variable("cob_id", index, 0x1)
             var.access_type = "const"
             var.data_type = canopen.objectdictionary.UNSIGNED32
-            var.default = ((i % 4) * 0x100) + 0x80000180  # disabled
+            var.default = ((i % 4) * 0x100) + 0xC0000180  # disabled and no rtr
             rec.add_member(var)
 
             var = canopen.objectdictionary.Variable("transmission_type", index, 0x2)

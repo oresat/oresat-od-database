@@ -262,13 +262,13 @@ tpdos:
       - [fwrite_cache, length]
       - [daemons, active]
       - [daemons, failed]
-    delay_ms: 30000
+    event_timer_ms: 30000
 
   - num: 2
     fields:
       - [updater, status]
       - [updater, cache_length]
-    delay_ms: 5000
+    event_timer_ms: 5000
 
 rpdos:
   - num: 1

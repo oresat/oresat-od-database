@@ -122,7 +122,7 @@ objects:
       - subindex: 0x1
         name: x
         data_type: int16
-        description: +z mag 1 x axis magnetic field in milligauss
+        description: +z mag 2 x axis magnetic field in milligauss
         access_type: ro
         low_limit: -8192
         high_limit: 8192
@@ -207,19 +207,19 @@ tpdos:
       - [gyroscope, pitch_rate]
       - [gyroscope, yaw_rate]
       - [gyroscope, roll_rate]
-    delay_ms: 1000
+    event_timer_ms: 1000
 
   - num: 2
     fields:
       - [accelerometer, x]
       - [accelerometer, y]
       - [accelerometer, z]
-    delay_ms: 1000
+    event_timer_ms: 1000
 
   - num: 3
     fields:
       - [temperature]
-    delay_ms: 1000
+    event_timer_ms: 1000
 
   - num: 4
     fields:

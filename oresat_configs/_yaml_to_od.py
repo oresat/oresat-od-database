@@ -207,30 +207,26 @@ def _add_tpdo_data(od: canopen.ObjectDictionary, config: dict):
             node_id = NodeId.C3.value
             num = 1
         var.default = node_id + (((num - 1) % 4) * 0x100) + ((num - 1) // 4) + 0x180
+        if tpdo.get("rtr", False):
+            var.default |= (1 << 30)  # rtr bit, 1 for no RTR allowed
         comm_rec.add_member(var)
 
         var = canopen.objectdictionary.Variable("transmission_type", comm_index, 0x2)
         var.access_type = "const"
         var.data_type = canopen.objectdictionary.UNSIGNED8
-        var.default = tpdo.get("sync", 255)
+        var.default = tpdo.get("sync", 254)
         comm_rec.add_member(var)
 
         var = canopen.objectdictionary.Variable("inhibit_time", comm_index, 0x3)
         var.access_type = "const"
         var.data_type = canopen.objectdictionary.UNSIGNED16
-        var.default = 0
-        comm_rec.add_member(var)
-
-        var = canopen.objectdictionary.Variable("compatibility_entry", comm_index, 0x4)
-        var.access_type = "const"
-        var.data_type = canopen.objectdictionary.UNSIGNED8
-        var.default = 0
+        var.default = tpdo.get("inhibit_time_ms", 0)
         comm_rec.add_member(var)
 
         var = canopen.objectdictionary.Variable("event_timer", comm_index, 0x5)
         var.access_type = "const"
         var.data_type = canopen.objectdictionary.UNSIGNED16
-        var.default = tpdo.get("delay_ms", 0)
+        var.default = tpdo.get("event_timer_ms", 0)
         comm_rec.add_member(var)
 
         var = canopen.objectdictionary.Variable("sync_start_value", comm_index, 0x6)
@@ -290,7 +286,7 @@ def _add_rpdo_data(
     var = canopen.objectdictionary.Variable("transmission_type", rpdo_comm_index, 0x2)
     var.access_type = "const"
     var.data_type = canopen.objectdictionary.UNSIGNED8
-    var.default = 255
+    var.default = 254
     rpdo_comm_rec.add_member(var)
 
     var = canopen.objectdictionary.Variable("event_timer", rpdo_comm_index, 0x5)
@@ -553,7 +549,8 @@ def overlay_configs(card_config, overlay_config):
         for card_tpdo in card_config.get("tpdos", []):
             if card_tpdo["num"] == card_tpdo["num"]:
                 card_tpdo["fields"] = overlay_tpdo["fields"]
-                card_tpdo["delay_ms"] = overlay_tpdo.get("delay_ms", 0)
+                card_tpdo["event_timer_ms"] = overlay_tpdo.get("event_timer_ms", 0)
+                card_tpdo["inhibit_time_ms"] = overlay_tpdo.get("inhibit_time_ms", 0)
                 card_tpdo["sync"] = overlay_tpdo.get("sync", 0)
                 overlayed = True
                 break

@@ -294,14 +294,14 @@ tpdos:
       - [pack_1, vcell_max]
       - [pack_1, vcell_min]
       - [pack_1, vcell]
-    delay_ms: 10000
+    event_timer_ms: 10000
 
   - num: 2
     fields:
       - [pack_1, vcell_1]
       - [pack_1, vcell_2]
       - [pack_1, vcell_avg]
-    delay_ms: 10000
+    event_timer_ms: 10000
 
   - num: 3
     fields:
@@ -309,7 +309,7 @@ tpdos:
       - [pack_1, current_avg]
       - [pack_1, current_max]
       - [pack_1, current_min]
-    delay_ms: 10000
+    event_timer_ms: 10000
 
   - num: 4
     fields:
@@ -317,7 +317,7 @@ tpdos:
       - [pack_1, temperature_avg]
       - [pack_1, temperature_max]
       - [pack_1, temperature_min]
-    delay_ms: 10000
+    event_timer_ms: 10000
 
   - num: 5
     fields:
@@ -326,7 +326,7 @@ tpdos:
       - [pack_1, reported_capacity]
       - [pack_1, reported_state_of_charge]
       - [pack_1, status]
-    delay_ms: 10000
+    event_timer_ms: 10000
 
   - num: 6
     fields:
@@ -334,14 +334,14 @@ tpdos:
       - [pack_2, vcell_max]
       - [pack_2, vcell_min]
       - [pack_2, vcell]
-    delay_ms: 10000
+    event_timer_ms: 10000
 
   - num: 7
     fields:
       - [pack_2, vcell_1]
       - [pack_2, vcell_2]
       - [pack_2, vcell_avg]
-    delay_ms: 10000
+    event_timer_ms: 10000
 
   - num: 8
     fields:
@@ -349,7 +349,7 @@ tpdos:
       - [pack_2, current_avg]
       - [pack_2, current_max]
       - [pack_2, current_min]
-    delay_ms: 10000
+    event_timer_ms: 10000
 
   - num: 9
     fields:
@@ -357,7 +357,7 @@ tpdos:
       - [pack_2, temperature_avg]
       - [pack_2, temperature_max]
       - [pack_2, temperature_min]
-    delay_ms: 10000
+    event_timer_ms: 10000
 
   - num: 10
     fields:
@@ -365,4 +365,4 @@ tpdos:
       - [pack_2, reported_capacity]
       - [pack_2, reported_state_of_charge]
       - [pack_2, status]
-    delay_ms: 10000
+    event_timer_ms: 10000
