@@ -196,6 +196,7 @@ def _add_tpdo_data(od: canopen.ObjectDictionary, config: dict):
         var0 = canopen.objectdictionary.Variable("highest_index_supported", comm_index, 0x0)
         var0.access_type = "const"
         var0.data_type = canopen.objectdictionary.UNSIGNED8
+        var0.default = 0x6
         comm_rec.add_member(var0)
 
         var = canopen.objectdictionary.Variable("cob_id", comm_index, 0x1)
@@ -208,7 +209,7 @@ def _add_tpdo_data(od: canopen.ObjectDictionary, config: dict):
             num = 1
         var.default = node_id + (((num - 1) % 4) * 0x100) + ((num - 1) // 4) + 0x180
         if tpdo.get("rtr", False):
-            var.default |= (1 << 30)  # rtr bit, 1 for no RTR allowed
+            var.default |= 1 << 30  # rtr bit, 1 for no RTR allowed
         comm_rec.add_member(var)
 
         var = canopen.objectdictionary.Variable("transmission_type", comm_index, 0x2)
@@ -234,8 +235,6 @@ def _add_tpdo_data(od: canopen.ObjectDictionary, config: dict):
         var.data_type = canopen.objectdictionary.UNSIGNED8
         var.default = 0
         comm_rec.add_member(var)
-
-        var0.default = len(comm_rec) - 1
 
 
 def _add_rpdo_data(

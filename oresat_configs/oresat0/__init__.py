@@ -19,14 +19,13 @@ from ..base import (
 from ..constants import NodeId
 
 _CONFIGS_DIR = os.path.dirname(os.path.abspath(__file__))
-C3_CONFIG_OVERLAY = read_yaml_od_config(f"{_CONFIGS_DIR}/c3_overlay.yaml")
 BAT_CONFIG_OVERLAY = read_yaml_od_config(f"{_CONFIGS_DIR}/battery_overlay.yaml")
 
 with open(f"{_CONFIGS_DIR}/beacon.yaml", "r") as f:
     ORESAT0_BEACON_CONFIG = yaml.safe_load(f)
 
 ORESAT0_CARD_CONFIGS = {
-    NodeId.C3: (C3_CONFIG, FW_COMMON_CONFIG, C3_CONFIG_OVERLAY),
+    NodeId.C3: (C3_CONFIG, SW_COMMON_CONFIG),
     NodeId.BATTERY_1: (BAT_CONFIG, FW_COMMON_CONFIG, BAT_CONFIG_OVERLAY),
     NodeId.SOLAR_MODULE_1: (SOLAR_CONFIG, FW_COMMON_CONFIG),
     NodeId.SOLAR_MODULE_2: (SOLAR_CONFIG, FW_COMMON_CONFIG),
