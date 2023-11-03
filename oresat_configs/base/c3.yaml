@@ -75,7 +75,7 @@ objects:
         data_type: uint8
         description: number of seconds before trying to deploy the antennas
         access_type: const
-        default: 2700 # 45 minutes
+        default: 300 # 5 minutes
 
       - subindex: 0x4
         name: attempt_timeout
@@ -134,6 +134,13 @@ objects:
         data_type: uint16
         description: helical voltage in millivolts
         access_type: ro
+
+      - subindex: 0xd
+        name: attempt_between_timeout
+        data_type: uint32
+        description: number of seconds beteeen monopole and helical deployments for an attempt
+        access_type: const
+        default: 5
 
   - index: 0x4006
     name: lband
@@ -355,21 +362,21 @@ objects:
       - subindex: 0x2
         name: src_callsign
         data_type: str
-        description: the beacon source callsign
+        description: the ax.25 header source callsign
         access_type: const
         default: "KJ7SAT"
 
       - subindex: 0x3
         name: dest_callsign
         data_type: str
-        description: the beacon destination callsign
+        description: the ax.25 header destination callsign
         access_type: const
         default: "SPACE"
 
       - subindex: 0x4
         name: start_chars
         data_type: str
-        description: the beacon start characters
+        description: the aprs start characters
         access_type: const
         default: "{{z"
 
@@ -391,6 +398,34 @@ objects:
         data_type: uint64
         description: scet timestamp of last beacon
         access_type: ro
+
+      - subindex: 0x8
+        name: src_ssid
+        data_type: uint8
+        description: the ax.25 header source ssid
+        access_type: const
+        default: 11 # balloons, aircraft, spacecraft, etc
+
+      - subindex: 0x9
+        name: dest_ssid
+        data_type: uint8
+        description: the ax.25 header destination ssid
+        access_type: const
+        default: 0 # primary station
+
+      - subindex: 0xa
+        name: control
+        data_type: uint8
+        description: the ax.25 header control field
+        access_type: const
+        default: 0x3 # ui-frame
+
+      - subindex: 0xb
+        name: pid
+        data_type: uint8
+        description: the ax.25 header pid (protocol identifier) field
+        access_type: const
+        default: 0xf0 # no L3 protocol
 
   - index: 0x400b
     name: rtc
