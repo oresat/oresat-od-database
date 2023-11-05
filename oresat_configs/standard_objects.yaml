@@ -49,6 +49,13 @@
   access_type: rw
   default: "0x80+$NODE_ID"
 
+- index: 0x1015
+  name: inhibit_time_emcy
+  object_type: variable
+  description: inhibit time (in 100 us) for emcy messages
+  data_type: uint16
+  access_type: rw
+
 - index: 0x1016
   name: consumer_heartbeat_time
   object_type: array

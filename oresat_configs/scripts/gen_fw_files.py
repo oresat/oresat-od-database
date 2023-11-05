@@ -592,13 +592,17 @@ def write_canopennode_h(od: canopen.ObjectDictionary, dir_path: str = "."):
     lines.append("extern OD_ATTR_OD OD_t *OD;")
     lines.append("")
 
+    num = 0
     for i in od:
-        lines.append(f"#define OD_ENTRY_H{i:X} &OD->list[0x{i:X}]")
+        lines.append(f"#define OD_ENTRY_H{i:X} &OD->list[{num}]")
+        num += 1
     lines.append("")
 
+    num = 0
     for i in od:
         name = format_name(od[i].name)
-        lines.append(f"#define OD_ENTRY_H{i:X}_{name.upper()} &OD->list[0x{i:X}]")
+        lines.append(f"#define OD_ENTRY_H{i:X}_{name.upper()} &OD->list[{num}]")
+        num += 1
     lines.append("")
 
     # add nice #defines for indexes and subindex values
@@ -685,7 +689,7 @@ def gen_fw_files(sys_args=None):
             var = canopen.objectdictionary.Variable("cob_id", index, 0x1)
             var.access_type = "const"
             var.data_type = canopen.objectdictionary.UNSIGNED32
-            var.default = ((i % 4) * 0x100) + 0xC0000200  # disabled and no rtr
+            var.default = ((i % 4) * 0x100) + 0x80000200  # disabled and no rtr
             rec.add_member(var)
 
             var = canopen.objectdictionary.Variable("transmission_type", index, 0x2)
@@ -798,19 +802,19 @@ def gen_fw_files(sys_args=None):
                 var = canopen.objectdictionary.Variable(
                     f"mapping_object_{subindex}", index, subindex
                 )
-                var.access_type = "const"
+                var.access_type = "rw"
                 var.data_type = canopen.objectdictionary.UNSIGNED32
                 var.default = 0
                 rec.add_member(var)
         else:
-            for subindex in range(8):
+            for subindex in range(1, 9):
                 if subindex in od[index]:
                     continue
 
                 var = canopen.objectdictionary.Variable(
                     f"mapping_object_{subindex}", index, subindex
                 )
-                var.access_type = "const"
+                var.access_type = "rw"
                 var.data_type = canopen.objectdictionary.UNSIGNED32
                 var.default = 0
                 od[index].add_member(var)

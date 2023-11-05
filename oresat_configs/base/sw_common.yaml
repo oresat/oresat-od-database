@@ -4,6 +4,7 @@ std_objects:
   - cob_id_sync
   - identity
   - cob_id_emergency_message
+  - inhibit_time_emcy
   - consumer_heartbeat_time
   - producer_heartbeat_time
   - sdo_server_parameter
