@@ -491,7 +491,7 @@ def _load_std_objs(file_path: str) -> dict:
             var = canopen.objectdictionary.Variable("highest_index_supported", index, 0x0)
             var.data_type = canopen.objectdictionary.UNSIGNED8
             var.access_type = "const"
-            var.default = length + 1
+            var.default = length
             arr.add_member(var)
 
             for subindex in range(1, length + 1):
