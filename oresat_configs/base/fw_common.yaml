@@ -1,6 +1,7 @@
 std_objects:
   - device_type
   - error_register
+  - predefined_error_field
   - cob_id_sync
   - communication_cycle_period
   - identity

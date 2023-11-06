@@ -22,6 +22,13 @@
   data_type: uint8
   access_type: ro
 
+- index: 0x1003
+  name: predefined_error_field
+  object_type: array
+  description: emcy history for device
+  length: 8  # can be up to 127
+  data_type: uint32
+
 - index: 0x1005
   name: cob_id_sync
   object_type: variable
