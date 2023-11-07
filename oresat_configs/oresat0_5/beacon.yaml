@@ -107,6 +107,7 @@ fields:
   - [solar_module_6, output_energy]
   # star_tracker_1
   - [star_tracker_1, system_storage_percent]
+  - [star_tracker_1, status]
   - [star_tracker_1, orientation_right_ascension]
   - [star_tracker_1, orientation_declination]
   - [star_tracker_1, orientation_roll]
