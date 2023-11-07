@@ -8,7 +8,6 @@ from argparse import ArgumentParser
 import canopen
 
 from .. import NodeId, OreSatConfig, OreSatId
-from .._yaml_to_od import RPDO_COMM_START, RPDO_PARA_START, TPDO_COMM_START, TPDO_PARA_START
 
 GEN_FW_FILES = "generate CANopenNode OD.[c/h] files for a OreSat firmware card"
 GEN_FW_FILES_PROG = "oresat-gen-fw-files"
@@ -565,8 +564,10 @@ def write_canopennode_h(od: canopen.ObjectDictionary, dir_path: str = "."):
     lines.append("#define OD_CNT_SDO_SRV 1")
     if 0x1280 in od:
         lines.append("#define OD_CNT_SDO_CLI 1")
-    lines.append(f"#define OD_CNT_RPDO {od.device_information.nr_of_RXPDO}")
-    lines.append(f"#define OD_CNT_TPDO {od.device_information.nr_of_TXPDO}")
+    if od.device_information.nr_of_RXPDO > 0:
+        lines.append(f"#define OD_CNT_RPDO {od.device_information.nr_of_RXPDO}")
+    if od.device_information.nr_of_TXPDO > 0:
+        lines.append(f"#define OD_CNT_TPDO {od.device_information.nr_of_TXPDO}")
     lines.append("")
 
     for i in od:
@@ -669,158 +670,5 @@ def gen_fw_files(sys_args=None):
     else:
         print(f"invalid oresat card: {args.card}")
         sys.exit()
-
-    # need to add empty pdo indexes and subindexes
-    for i in range(16):
-        num = i + 1
-
-        index = i + RPDO_COMM_START
-        if index not in od:
-            rec = canopen.objectdictionary.Record(f"rpdo_{num}_communication_parameters", index)
-            od.add_object(rec)
-
-            # index 0 for mapping index
-            var = canopen.objectdictionary.Variable("highest_index_supported", index, 0x0)
-            var.access_type = "const"
-            var.data_type = canopen.objectdictionary.UNSIGNED8
-            var.default = 5
-            rec.add_member(var)
-
-            var = canopen.objectdictionary.Variable("cob_id", index, 0x1)
-            var.access_type = "const"
-            var.data_type = canopen.objectdictionary.UNSIGNED32
-            var.default = ((i % 4) * 0x100) + 0x80000200  # disabled and no rtr
-            rec.add_member(var)
-
-            var = canopen.objectdictionary.Variable("transmission_type", index, 0x2)
-            var.access_type = "const"
-            var.data_type = canopen.objectdictionary.UNSIGNED8
-            var.default = 254  # event driven (delay-based or app specific)
-            rec.add_member(var)
-
-            var = canopen.objectdictionary.Variable("event_timer", index, 0x5)
-            var.access_type = "const"
-            var.data_type = canopen.objectdictionary.UNSIGNED16
-            var.default = 0
-            rec.add_member(var)
-
-        index = i + RPDO_PARA_START
-        if index not in od:
-            rec = canopen.objectdictionary.Record(f"rpdo_{num}_mapping_parameters", index)
-            od.add_object(rec)
-
-            # index 0 for mapping index
-            var = canopen.objectdictionary.Variable("highest_index_supported", index, 0x0)
-            var.access_type = "const"
-            var.data_type = canopen.objectdictionary.UNSIGNED8
-            var.default = 8
-            rec.add_member(var)
-
-            for subindex in range(1, 9):
-                var = canopen.objectdictionary.Variable(
-                    f"mapping_object_{subindex}", index, subindex
-                )
-                var.access_type = "const"
-                var.data_type = canopen.objectdictionary.UNSIGNED32
-                var.default = 0
-                rec.add_member(var)
-        else:
-            for subindex in range(8):
-                if subindex in od[index]:
-                    continue
-
-                var = canopen.objectdictionary.Variable(
-                    f"mapping_object_{subindex}", index, subindex
-                )
-                var.access_type = "const"
-                var.data_type = canopen.objectdictionary.UNSIGNED32
-                var.default = 0
-                od[index].add_member(var)
-            od[index][0].default = 8
-
-        index = i + TPDO_COMM_START
-        if index not in od:
-            rec = canopen.objectdictionary.Record(f"tpdo_{num}_communication_parameters", index)
-            od.add_object(rec)
-
-            # index 0 for mapping index
-            var = canopen.objectdictionary.Variable("highest_index_supported", index, 0x0)
-            var.access_type = "const"
-            var.data_type = canopen.objectdictionary.UNSIGNED8
-            var.default = 6
-            rec.add_member(var)
-
-            var = canopen.objectdictionary.Variable("cob_id", index, 0x1)
-            var.access_type = "const"
-            var.data_type = canopen.objectdictionary.UNSIGNED32
-            var.default = ((i % 4) * 0x100) + 0xC0000180  # disabled and no rtr
-            rec.add_member(var)
-
-            var = canopen.objectdictionary.Variable("transmission_type", index, 0x2)
-            var.access_type = "const"
-            var.data_type = canopen.objectdictionary.UNSIGNED8
-            var.default = 254  # event driven (delay-based or app specific)
-            rec.add_member(var)
-
-            var = canopen.objectdictionary.Variable("inhibit_time", index, 0x3)
-            var.access_type = "const"
-            var.data_type = canopen.objectdictionary.UNSIGNED16
-            var.default = 0
-            rec.add_member(var)
-
-            var = canopen.objectdictionary.Variable("compatibility_entry", index, 0x4)
-            var.access_type = "const"
-            var.data_type = canopen.objectdictionary.UNSIGNED8
-            var.default = 0
-            rec.add_member(var)
-
-            var = canopen.objectdictionary.Variable("event_timer", index, 0x5)
-            var.access_type = "const"
-            var.data_type = canopen.objectdictionary.UNSIGNED16
-            var.default = 0
-            rec.add_member(var)
-
-            var = canopen.objectdictionary.Variable("sync_start_value", index, 0x6)
-            var.access_type = "const"
-            var.data_type = canopen.objectdictionary.UNSIGNED8
-            var.default = 0
-            rec.add_member(var)
-
-        index = i + TPDO_PARA_START
-        if index not in od:
-            rec = canopen.objectdictionary.Record(f"tpdo_{num}_mapping_parameters", index)
-            od.add_object(rec)
-
-            # index 0 for mapping index
-            var = canopen.objectdictionary.Variable("highest_index_supported", index, 0x0)
-            var.access_type = "const"
-            var.data_type = canopen.objectdictionary.UNSIGNED8
-            var.default = 8
-            rec.add_member(var)
-
-            for subindex in range(1, 9):
-                var = canopen.objectdictionary.Variable(
-                    f"mapping_object_{subindex}", index, subindex
-                )
-                var.access_type = "rw"
-                var.data_type = canopen.objectdictionary.UNSIGNED32
-                var.default = 0
-                rec.add_member(var)
-        else:
-            for subindex in range(1, 9):
-                if subindex in od[index]:
-                    continue
-
-                var = canopen.objectdictionary.Variable(
-                    f"mapping_object_{subindex}", index, subindex
-                )
-                var.access_type = "rw"
-                var.data_type = canopen.objectdictionary.UNSIGNED32
-                var.default = 0
-                od[index].add_member(var)
-            od[index][0].default = 8
-
-        od.device_information.nr_of_RXPDO = 16
-        od.device_information.nr_of_TXPDO = 16
 
     write_canopennode(od, args.dir_path)
