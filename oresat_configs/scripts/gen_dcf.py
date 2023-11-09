@@ -154,10 +154,6 @@ def _objects_lines(od: canopen.ObjectDictionary, indexes: list) -> list:
 def _variable_lines(variable: canopen.objectdictionary.Variable, index: int, subindex=None) -> list:
     lines = []
 
-    if variable.description:
-        for i in variable.description.split("\n"):
-            lines.append(f";{i}")
-
     if subindex is None:
         lines.append(f"[{index:X}]")
     else:
@@ -183,10 +179,6 @@ def _variable_lines(variable: canopen.objectdictionary.Variable, index: int, sub
 def _array_lines(array: canopen.objectdictionary.Array, index: int) -> list:
     lines = []
 
-    if array.description:
-        for i in array.description.split("\n"):
-            lines.append(f";{i}")
-
     lines.append(f"[{index:X}]")
 
     lines.append(f"ParameterName={array.name}")
@@ -202,10 +194,6 @@ def _array_lines(array: canopen.objectdictionary.Array, index: int) -> list:
 
 def _record_lines(record: canopen.objectdictionary.Record, index: int) -> list:
     lines = []
-
-    if record.description:
-        for i in record.description.split("\n"):
-            lines.append(f";{i}")
 
     lines.append(f"[{index:X}]")
 
