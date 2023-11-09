@@ -202,60 +202,64 @@ objects:
         high_limit: 8192
 
   - index: 0x4007
-    name: magnetorquer_current
+    name: magnetorquer_current_x
     object_type: record
     description: Magnetorquer Current Feedback in uA
     subindexes:
       - subindex: 0x1
-        name: x
+        name: current_feedback
         data_type: int32
-        description: X current
+        description: current feedback
         access_type: ro
 
       - subindex: 0x2
-        name: y
+        name: current_set
         data_type: int32
-        description: Y current
-        access_type: ro
-
-      - subindex: 0x3
-        name: z
-        data_type: int16
-        description: Z current
-        access_type: ro
+        description: Set current
+        access_type: rw
 
   - index: 0x4008
-    name: magnetorquer_current_set
+    name: magnetorquer_current_y
     object_type: record
-    description: Set Magnetorquer Current in uA
+    description: Magnetorquer Current Feedback in uA
     subindexes:
       - subindex: 0x1
-        name: x
+        name: current_feedback
         data_type: int32
-        description: X current
-        access_type: rw
+        description: current feedback
+        access_type: ro
 
       - subindex: 0x2
-        name: y
+        name: current_set
         data_type: int32
-        description: Y current
+        description: Set current
         access_type: rw
-
-      - subindex: 0x3
-        name: z
-        data_type: int16
-        description: Z current
-        access_type: rw
-
 
   - index: 0x4009
+    name: magnetorquer_current_z
+    object_type: record
+    description: Magnetorquer Current Feedback in uA
+    subindexes:
+      - subindex: 0x1
+        name: current_feedback
+        data_type: int32
+        description: current feedback
+        access_type: ro
+
+      - subindex: 0x2
+        name: current_set
+        data_type: int32
+        description: Set current
+        access_type: rw
+
+  - index: 0x4010
     name: magnetorquer_pwm_percent
     object_type: record
     description: Magnetorquer PWM Percent
     subindexes:
       - subindex: 0x1
         name: x
-        data_type: int32
+        data_type: int16
         description: X axis
         access_type: ro
         low_limit: 0
@@ -263,7 +267,7 @@ objects:
 
       - subindex: 0x2
         name: y
-        data_type: int32
+        data_type: int16
         description: Y axis
         access_type: ro
         low_limit: 0
@@ -328,18 +332,23 @@ tpdos:
 
   - num: 8
     fields:
-      - [magnetorquer_current, x]
-      - [magnetorquer_current, y]
-      - [magnetorquer_current, z]
+      - [magnetorquer_current_x, current_feedback]
+      - [magnetorquer_current_x, current_set]
     event_timer_ms: 1000
 
   - num: 9
     fields:
-      - [magnetorquer_current_set, x]
-      - [magnetorquer_current_set, y]
-      - [magnetorquer_current_set, z]
+      - [magnetorquer_current_y, current_feedback]
+      - [magnetorquer_current_y, current_set]
+    event_timer_ms: 1000
 
-  - num: 10 
+  - num: 10
+    fields:
+      - [magnetorquer_current_z, current_feedback]
+      - [magnetorquer_current_z, current_set]
+    event_timer_ms: 1000
+
+  - num: 11 
     fields:
       - [magnetorquer_pwm_percent, x]
       - [magnetorquer_pwm_percent, y]
