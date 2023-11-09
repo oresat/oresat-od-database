@@ -201,6 +201,83 @@ objects:
         low_limit: -8192
         high_limit: 8192
 
+  - index: 0x4007
+    name: magnetorquer_current
+    object_type: record
+    description: Magnetorquer Current Feedback in uA
+    subindexes:
+      - subindex: 0x1
+        name: x
+        data_type: int32
+        description: X current
+        access_type: ro
+
+      - subindex: 0x2
+        name: y
+        data_type: int32
+        description: Y current
+        access_type: ro
+
+      - subindex: 0x3
+        name: z
+        data_type: int16
+        description: Z current
+        access_type: ro
+
+  - index: 0x4008
+    name: magnetorquer_current_set
+    object_type: record
+    description: Set Magnetorquer Current in uA
+    subindexes:
+      - subindex: 0x1
+        name: x
+        data_type: int32
+        description: X current
+        access_type: rw
+
+      - subindex: 0x2
+        name: y
+        data_type: int32
+        description: Y current
+        access_type: rw
+
+      - subindex: 0x3
+        name: z
+        data_type: int16
+        description: Z current
+        access_type: rw
+
+
+  - index: 0x4009
+    name: magnetorquer_pwm_percent
+    object_type: record
+    description: Magnetorquer PWM Percent
+    subindexes:
+      - subindex: 0x1
+        name: x
+        data_type: int32
+        description: X axis
+        access_type: ro
+        low_limit: 0
+        high_limit: 10000
+
+      - subindex: 0x2
+        name: y
+        data_type: int32
+        description: Y axis
+        access_type: ro
+        low_limit: 0
+        high_limit: 10000
+
+      - subindex: 0x3
+        name: z
+        data_type: int16
+        description: Z axis
+        access_type: ro
+        low_limit: 0
+        high_limit: 10000
+
+
 tpdos:
   - num: 1
     fields:
@@ -226,21 +303,48 @@ tpdos:
       - [pos_z_magnetometer_1, x]
       - [pos_z_magnetometer_1, y]
       - [pos_z_magnetometer_1, z]
+    event_timer_ms: 1000
 
   - num: 5
     fields:
       - [pos_z_magnetometer_2, x]
       - [pos_z_magnetometer_2, y]
       - [pos_z_magnetometer_2, z]
+    event_timer_ms: 1000
 
   - num: 6
     fields:
       - [min_z_magnetometer_1, x]
       - [min_z_magnetometer_1, y]
       - [min_z_magnetometer_1, z]
+    event_timer_ms: 1000
 
   - num: 7
     fields:
       - [min_z_magnetometer_2, x]
       - [min_z_magnetometer_2, y]
       - [min_z_magnetometer_2, z]
+    event_timer_ms: 1000
+
+  - num: 8
+    fields:
+      - [magnetorquer_current, x]
+      - [magnetorquer_current, y]
+      - [magnetorquer_current, z]
+    event_timer_ms: 1000
+
+  - num: 9
+    fields:
+      - [magnetorquer_current_set, x]
+      - [magnetorquer_current_set, y]
+      - [magnetorquer_current_set, z]
+
+  - num: 10 
+    fields:
+      - [magnetorquer_pwm_percent, x]
+      - [magnetorquer_pwm_percent, y]
+      - [magnetorquer_pwm_percent, z]
+    event_timer_ms: 1000
+
+
+
