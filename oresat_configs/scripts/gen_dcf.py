@@ -19,14 +19,15 @@ def write_od(od: canopen.ObjectDictionary, dir_path: str = "."):
     ----------
     od: canopen.ObjectDictionary
         od data structure to save as file
-    file_path: str
-        File path of dcf to save.
+    dir_path: str
+        Directory path of dcf to save.
     """
 
     lines = []
 
     dev_info = od.device_information
     file_name = dev_info.product_name + ".dcf"
+    file_name = file_name.lower().replace(" ", "_")
     file_path = f"{dir_path}/{file_name}"
     now = datetime.now()
 
@@ -168,8 +169,7 @@ def _variable_lines(variable: canopen.objectdictionary.Variable, index: int, sub
     lines.append(f"AccessType={variable.access_type}")
     if variable.default:  # optional
         if variable.data_type == canopen.objectdictionary.OCTET_STRING:
-            value_ns = variable.default.replace(" ", "")
-            tmp = " ".join([value_ns[i : i + 2] for i in range(0, len(value_ns), 2)])
+            tmp = variable.default.hex(sep=" ")
             lines.append(f"DefaultValue={tmp}")
         else:
             lines.append(f"DefaultValue={variable.default}")
