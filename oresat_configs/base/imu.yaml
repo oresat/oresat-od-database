@@ -202,100 +202,69 @@ objects:
         high_limit: 8192
 
   - index: 0x4007
-    name: magnetorquer_feedback_x
+    name: magnetorquer
     object_type: record
     description: Magnetorquer Current Feedback in uA
     subindexes:
       - subindex: 0x1
-        name: current
+        name: current_x
+        data_type: int32
+        description: current feedback
+        access_type: ro
+        
+      - subindex: 0x2
+        name: current_y
+        data_type: int32
+        description: current feedback
+        access_type: ro
+        
+      - subindex: 0x3
+        name: current_z
         data_type: int32
         description: current feedback
         access_type: ro
 
-      - subindex: 0x2
-        name: pwm
+      - subindex: 0x4
+        name: current_x_setpoint
+        data_type: int32
+        description: Set current
+        access_type: rw
+        
+      - subindex: 0x5
+        name: current_y_setpoint
+        data_type: int32
+        description: Set current
+        access_type: rw
+        
+      - subindex: 0x6
+        name: current_z_setpoint
+        data_type: int32
+        description: Set current
+        access_type: rw
+
+      - subindex: 0x7
+        name: pwm_x
         data_type: int16
         description: X axis
         access_type: ro
         low_limit: 0
         high_limit: 10000
 
-
-
-  - index: 0x4008
-    name: magnetorquer_feedback_y
-    object_type: record
-    description: Magnetorquer Current Feedback in uA
-    subindexes:
-      - subindex: 0x1
-        name: current
-        data_type: int32
-        description: current feedback
-        access_type: ro
-
-      - subindex: 0x2
-        name: pwm
+      - subindex: 0x8
+        name: pwm_y
         data_type: int16
-        description: Y axis
+        description: X axis
         access_type: ro
         low_limit: 0
         high_limit: 10000
-        
 
-
-  - index: 0x4009
-    name: magnetorquer_feedback_z
-    object_type: record
-    description: Magnetorquer Current Feedback in uA
-    subindexes:
-      - subindex: 0x1
-        name: current
-        data_type: int32
-        description: current feedback
-        access_type: ro
-
-      - subindex: 0x2
-        name: pwm
+      - subindex: 0x9
+        name: pwm_z
         data_type: int16
-        description: Z axis
+        description: X axis
         access_type: ro
         low_limit: 0
         high_limit: 10000
-        
-      
-
-  - index: 0x4010
-    name: magnetorquer_x
-    object_type: record
-    description: Magnetorquer Set Current
-    subindexes:
-      - subindex: 0x1
-        name: current_set
-        data_type: int32
-        description: Set current
-        access_type: rw
-
-  - index: 0x4011
-    name: magnetorquer_y
-    object_type: record
-    description: Magnetorquer Set Current
-    subindexes:
-      - subindex: 0x1
-        name: current_set
-        data_type: int32
-        description: Set current
-        access_type: rw
-        
-  - index: 0x4012
-    name: magnetorquer_z
-    object_type: record
-    description: Magnetorquer Set Current
-    subindexes:
-      - subindex: 0x1
-        name: current_set
-        data_type: int32
-        description: Set current
-        access_type: rw
 
 
 tpdos:
@@ -348,34 +317,21 @@ tpdos:
 
   - num: 8
     fields:
-      - [magnetorquer_feedback_x, current]
-      - [magnetorquer_feedback_x, pwm]
+      - [magnetorquer, current_x]
+      - [magnetorquer, pwm_x]
     event_timer_ms: 1000
     
   - num: 9
     fields:
-      - [magnetorquer_feedback_y, current]
-      - [magnetorquer_feedback_y, pwm]
+      - [magnetorquer, current_y]
+      - [magnetorquer, pwm_z]
     event_timer_ms: 1000
 
   - num: 10
     fields:
-      - [magnetorquer_feedback_z, current]
-      - [magnetorquer_feedback_z, pwm]
+      - [magnetorquer, current_z]
+      - [magnetorquer, pwm_z]
     event_timer_ms: 1000
-
-  - num: 11 
-    fields:
-      - [magnetorquer_x, current_set]
-      
-  - num: 12
-    fields:
-      - [magnetorquer_y, current_set]
-      
-  - num: 13
-    fields:
-      - [magnetorquer_z, current_set]
-
 
 
 
