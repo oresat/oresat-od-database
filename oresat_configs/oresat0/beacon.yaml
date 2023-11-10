@@ -1,4 +1,12 @@
 revision: 0
+ax25:
+  dest_callsign: SPACE
+  dest_ssid: 0
+  src_callsign: KJ7SAT
+  src_ssid: 0
+  control: 0x3 # ui-frame
+  pid: 0xf0 # no L3 protocol
+  command: false
 fields:
   # c3
   - [beacon, start_chars]
