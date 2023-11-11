@@ -6,7 +6,7 @@ ax25:
   src_ssid: 0
   control: 0x3 # ui-frame
   pid: 0xf0 # no L3 protocol
-  command: false
+  command: true
 fields:
   # c3
   - [beacon, start_chars]
