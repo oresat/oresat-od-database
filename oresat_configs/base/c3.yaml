@@ -430,7 +430,14 @@ objects:
       - subindex: 0xc
         name: command
         data_type: bool
-        description: defines the ax.25 header source and destination command bit values
+        description: the ax.25 header destination c-bit value
+        access_type: const
+        # default set via beacon.yaml file
+
+      - subindex: 0xd
+        name: response
+        data_type: bool
+        description: the ax.25 header source c-bit value
         access_type: const
         # default set via beacon.yaml file
 

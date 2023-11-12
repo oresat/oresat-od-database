@@ -674,9 +674,9 @@ def _gen_od_db(oresat_id: OreSatId, beacon_def: dict, configs: dict) -> dict:
             od["beacon"]["dest_ssid"].default = beacon_def["ax25"]["dest_ssid"]
             od["beacon"]["src_callsign"].default = beacon_def["ax25"]["src_callsign"]
             od["beacon"]["src_ssid"].default = beacon_def["ax25"]["src_ssid"]
-            od["beacon"]["src_ssid"].default = beacon_def["ax25"]["src_ssid"]
             od["beacon"]["control"].default = beacon_def["ax25"]["control"]
             od["beacon"]["command"].default = beacon_def["ax25"]["command"]
+            od["beacon"]["response"].default = beacon_def["ax25"]["response"]
             od["beacon"]["pid"].default = beacon_def["ax25"]["pid"]
             od["flight_mode"].access_type = "ro"
 

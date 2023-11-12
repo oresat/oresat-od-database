@@ -55,12 +55,15 @@ def gen_beacon_rst(config: OreSatConfig, file_path: str, url: str):
     dest_callsign = dest_callsign + " " * (6 - len(dest_callsign))
     dest_ssid = c3_od["beacon"]["dest_ssid"].value
     command = c3_od["beacon"]["command"].value
-    reversed_bits = 0b0110_0000
+    response = c3_od["beacon"]["response"].value
     control = c3_od["beacon"]["control"].value
     pid = c3_od["beacon"]["pid"].value
 
-    dest_ssid = (dest_ssid << 1) | (int(not command) << 7) | reversed_bits
-    src_ssid = (src_ssid << 1) | (int(command) << 7) | reversed_bits | 1
+    reserved_bits = 0b0110_0000
+    end_of_addresses = 0b1
+
+    dest_ssid = (dest_ssid << 1) | (int(command) << 7) | reserved_bits
+    src_ssid = (src_ssid << 1) | (int(response) << 7) | reserved_bits | end_of_addresses
 
     header_line = (
         "+------------------+-----------------------------------+-----------+---------------------"
