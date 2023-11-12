@@ -36,6 +36,14 @@ transfers.
 - The `c3.yaml` file also defines what objects have their values periodically
   saved to the C3's F-RAM chip.
 
+## Setup
+
+Install project dev dependencies.
+
+```bash
+$ pip install -r requirements.txt
+```
+
 ## Updating a Config
 
 After updating configs for card(s), run the unit tests to validate all the

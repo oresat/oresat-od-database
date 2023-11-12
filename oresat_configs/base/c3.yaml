@@ -364,14 +364,14 @@ objects:
         data_type: str
         description: the ax.25 header source callsign
         access_type: const
-        default: "KJ7SAT"
+        # default set via beacon.yaml file
 
       - subindex: 0x3
         name: dest_callsign
         data_type: str
         description: the ax.25 header destination callsign
         access_type: const
-        default: "SPACE"
+        # default set via beacon.yaml file
 
       - subindex: 0x4
         name: start_chars
@@ -404,28 +404,42 @@ objects:
         data_type: uint8
         description: the ax.25 header source ssid
         access_type: const
-        default: 11 # balloons, aircraft, spacecraft, etc
+        # default set via beacon.yaml file
 
       - subindex: 0x9
         name: dest_ssid
         data_type: uint8
         description: the ax.25 header destination ssid
         access_type: const
-        default: 0 # primary station
+        # default set via beacon.yaml file
 
       - subindex: 0xa
         name: control
         data_type: uint8
         description: the ax.25 header control field
         access_type: const
-        default: 0x3 # ui-frame
+        # default set via beacon.yaml file
 
       - subindex: 0xb
         name: pid
         data_type: uint8
         description: the ax.25 header pid (protocol identifier) field
         access_type: const
-        default: 0xf0 # no L3 protocol
+        # default set via beacon.yaml file
+
+      - subindex: 0xc
+        name: command
+        data_type: bool
+        description: the ax.25 header destination c-bit value
+        access_type: const
+        # default set via beacon.yaml file
+
+      - subindex: 0xd
+        name: response
+        data_type: bool
+        description: the ax.25 header source c-bit value
+        access_type: const
+        # default set via beacon.yaml file
 
   - index: 0x400b
     name: rtc

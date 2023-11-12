@@ -1,3 +1,4 @@
+bitstring
 black
 build
 canopen
