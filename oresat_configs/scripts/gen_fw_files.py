@@ -166,6 +166,8 @@ def attr_lines(od: canopen.ObjectDictionary, index: int) -> list:
             line += "},"
         elif obj.data_type in canopen.objectdictionary.datatypes.INTEGER_TYPES:
             line += f"0x{default:X},"
+        elif obj.data_type == canopen.objectdictionary.datatypes.BOOLEAN:
+            line += f"{int(default)},"
         else:
             line += f"{default},"
 
@@ -176,7 +178,7 @@ def attr_lines(od: canopen.ObjectDictionary, index: int) -> list:
         lines.append(f"{INDENT4}.x{index:X}_{name}_sub0 = {obj[0].default},")
         line = f"{INDENT4}.x{index:X}_{name} = " + "{"
 
-        if obj[1].data_type == canopen.objectdictionary.datatypes.DOMAIN:
+        if obj[list(obj.subindices)[1]].data_type == canopen.objectdictionary.datatypes.DOMAIN:
             return lines  # skip domains
 
         for i in list(obj.subindices)[1:]:
@@ -202,6 +204,8 @@ def attr_lines(od: canopen.ObjectDictionary, index: int) -> list:
                 line += "}, "
             elif obj[i].data_type in canopen.objectdictionary.datatypes.INTEGER_TYPES:
                 line += f"0x{default:X}, "
+            elif obj[i].data_type == canopen.objectdictionary.datatypes.BOOLEAN:
+                line += f"{int(default)}, "
             else:
                 line += f"{default}, "
 
@@ -239,7 +243,7 @@ def attr_lines(od: canopen.ObjectDictionary, index: int) -> list:
                 line += "0}, "
                 lines.append(line)
             elif obj[i].data_type == canopen.objectdictionary.datatypes.OCTET_STRING:
-                value = obj[i].default.replace("  ", " ")
+                value = obj[i].default.hex(sep=" ")
                 line = f"{INDENT8}.{name} = " + "{"
                 for i in value.split(" "):
                     line += f"0x{i}, "
@@ -255,6 +259,8 @@ def attr_lines(od: canopen.ObjectDictionary, index: int) -> list:
                 lines.append(line)
             elif obj[i].data_type in canopen.objectdictionary.datatypes.INTEGER_TYPES:
                 lines.append(f"{INDENT8}.{name} = 0x{default:X},")
+            elif obj[i].data_type == canopen.objectdictionary.datatypes.BOOLEAN:
+                lines.append(f"{INDENT8}.{name} = {int(default)},")
             else:
                 lines.append(f"{INDENT8}.{name} = {default},")
 
@@ -266,12 +272,15 @@ def attr_lines(od: canopen.ObjectDictionary, index: int) -> list:
 def _var_data_type_len(var: canopen.objectdictionary.Variable) -> int:
     """Get the length of the variable's data in bytes"""
 
-    if var.data_type == canopen.objectdictionary.datatypes.VISIBLE_STRING:
+    if var.data_type in [
+        canopen.objectdictionary.datatypes.VISIBLE_STRING,
+        canopen.objectdictionary.datatypes.OCTET_STRING,
+    ]:
         length = len(var.default)  # char
-    elif var.data_type == canopen.objectdictionary.datatypes.OCTET_STRING:
-        length = len(var.default.replace(" ", "")) // 2
     elif var.data_type == canopen.objectdictionary.datatypes.UNICODE_STRING:
         length = len(var.default) * 2  # uint16_t
+    elif var.data_type == canopen.objectdictionary.datatypes.DOMAIN:
+        length = 0
     else:
         length = DATA_TYPE_C_SIZE[var.data_type] // 8
 
@@ -296,9 +305,13 @@ def _var_attr_flags(var: canopen.objectdictionary.Variable) -> str:
         if var.pdo_mappable:
             attr_str += " | ODA_TRPDO"
 
+    bytes_types = [
+        canopen.objectdictionary.DOMAIN,
+        canopen.objectdictionary.OCTET_STRING,
+    ]
     if var.data_type in DATA_TYPE_STR:
         attr_str += " | ODA_STR"
-    elif (DATA_TYPE_C_SIZE[var.data_type] // 8) > 1:
+    elif var.data_type in bytes_types or (DATA_TYPE_C_SIZE[var.data_type] // 8) > 1:
         attr_str += " | ODA_MB"
 
     return attr_str
@@ -329,9 +342,13 @@ def obj_lines(od: canopen.ObjectDictionary, index) -> list:
     elif isinstance(obj, canopen.objectdictionary.Array):
         lines.append(f"{INDENT8}.dataOrig0 = &OD_RAM.x{index:X}_{name}_sub0,")
 
-        if index in _SKIP_INDEXES or obj[1].data_type == canopen.objectdictionary.datatypes.DOMAIN:
+        first_obj = obj[list(obj.subindices)[1]]
+        if (
+            index in _SKIP_INDEXES
+            or first_obj.data_type == canopen.objectdictionary.datatypes.DOMAIN
+        ):
             lines.append(f"{INDENT8}.dataOrig = NULL,")
-        elif obj[1].data_type in [
+        elif first_obj.data_type in [
             canopen.objectdictionary.datatypes.VISIBLE_STRING,
             canopen.objectdictionary.datatypes.OCTET_STRING,
             canopen.objectdictionary.datatypes.UNICODE_STRING,
@@ -341,18 +358,18 @@ def obj_lines(od: canopen.ObjectDictionary, index) -> list:
             lines.append(f"{INDENT8}.dataOrig = &OD_RAM.x{index:X}_{name}[0],")
 
         lines.append(f"{INDENT8}.attribute0 = ODA_SDO_R,")
-        lines.append(f"{INDENT8}.attribute = {_var_attr_flags(obj[1])},")
-        length = _var_data_type_len(obj[1])
+        lines.append(f"{INDENT8}.attribute = {_var_attr_flags(first_obj)},")
+        length = _var_data_type_len(first_obj)
         lines.append(f"{INDENT8}.dataElementLength = {length},")
 
-        c_name = DATA_TYPE_C_TYPES[obj[1].data_type]
-        if obj[1].data_type == canopen.objectdictionary.datatypes.DOMAIN:
+        c_name = DATA_TYPE_C_TYPES[first_obj.data_type]
+        if first_obj.data_type == canopen.objectdictionary.datatypes.DOMAIN:
             lines.append(f"{INDENT8}.dataElementSizeof = 0,")
-        elif obj[1].data_type in DATA_TYPE_STR:
-            sub_length = len(obj[1].default) + 1  # add 1 for '\0'
+        elif first_obj.data_type in DATA_TYPE_STR:
+            sub_length = len(first_obj.default) + 1  # add 1 for '\0'
             lines.append(f"{INDENT8}.dataElementSizeof = sizeof({c_name}[{sub_length}]),")
-        elif obj[1].data_type == canopen.objectdictionary.datatypes.OCTET_STRING:
-            sub_length = m.ceil(len(obj[1].default.replace(" ", "")) / 2)
+        elif first_obj.data_type == canopen.objectdictionary.datatypes.OCTET_STRING:
+            sub_length = m.ceil(len(first_obj.default.replace(" ", "")) / 2)
             lines.append(f"{INDENT8}.dataElementSizeof = sizeof({c_name}[{sub_length}]),")
         else:
             lines.append(f"{INDENT8}.dataElementSizeof = sizeof({c_name}),")
@@ -490,19 +507,20 @@ def _canopennode_h_lines(od: canopen.ObjectDictionary, index: int) -> list:
         else:
             lines.append(f"{INDENT4}{c_name} x{index:X}_{name};")
     elif isinstance(obj, canopen.objectdictionary.Array):
-        c_name = DATA_TYPE_C_TYPES[obj[1].data_type]
+        first_obj = obj[list(obj.subindices)[1]]
+        c_name = DATA_TYPE_C_TYPES[first_obj.data_type]
         length_str = f"OD_CNT_ARR_{index:X}"
         lines.append(f"{INDENT4}uint8_t x{index:X}_{name}_sub0;")
 
-        if obj[1].data_type == canopen.objectdictionary.datatypes.DOMAIN:
+        if first_obj.data_type == canopen.objectdictionary.datatypes.DOMAIN:
             pass  # skip domains
         elif index in _SKIP_INDEXES:
             pass
-        elif obj[1].data_type in DATA_TYPE_STR:
-            sub_length = len(obj[1].default) + 1  # add 1 for '\0'
+        elif first_obj.data_type in DATA_TYPE_STR:
+            sub_length = len(first_obj.default) + 1  # add 1 for '\0'
             lines.append(f"{INDENT4}{c_name} x{index:X}_{name}[{length_str}][{sub_length}];")
-        elif obj[1].data_type == canopen.objectdictionary.datatypes.OCTET_STRING:
-            sub_length = m.ceil(len(obj[1].default.replace(" ", "")) / 2)
+        elif first_obj.data_type == canopen.objectdictionary.datatypes.OCTET_STRING:
+            sub_length = m.ceil(len(first_obj.default.replace(" ", "")) / 2)
             lines.append(f"{INDENT4}{c_name} x{index:X}_{name}[{length_str}][{sub_length}];")
         else:
             lines.append(f"{INDENT4}{c_name} x{index:X}_{name}[{length_str}];")
@@ -520,7 +538,7 @@ def _canopennode_h_lines(od: canopen.ObjectDictionary, index: int) -> list:
                 length = len(obj[i].default) + 1  # add 1 for '\0'
                 lines.append(f"{INDENT8}{c_name} {sub_name}[{length}];")
             elif data_type == canopen.objectdictionary.datatypes.OCTET_STRING:
-                sub_length = m.ceil(len(obj[1].default.replace(" ", "")) / 2)
+                sub_length = len(obj[list(obj.subindices)[1]].default)
                 lines.append(f"{INDENT8}{c_name} {sub_name}[{sub_length}];")
             else:
                 lines.append(f"{INDENT8}{c_name} {sub_name};")
