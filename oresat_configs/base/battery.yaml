@@ -7,92 +7,107 @@ objects:
       - subindex: 0x1
         name: vbatt
         data_type: uint16
-        description: pack voltage in millivolts
+        description: pack voltage
         access_type: ro
+        unit: mV
 
       - subindex: 0x2
         name: vcell_max
         data_type: uint16
-        description: max voltage for a cell in millivolts
+        description: max voltage for a cell
         access_type: ro
+        unit: mV
 
       - subindex: 0x3
         name: vcell_min
         data_type: uint16
-        description: min voltage for a cell in millivolts
+        description: min voltage for a cell
         access_type: ro
+        unit: mV
 
       - subindex: 0x4
         name: vcell
         data_type: uint16
-        description: lowest cell voltage in millivolts
+        description: lowest cell voltage
         access_type: ro
+        unit: mV
 
       - subindex: 0x5
         name: vcell_1
         data_type: uint16
-        description: cell 1 voltage in millivolts
+        description: cell 1 voltage
         access_type: ro
+        unit: mV
 
       - subindex: 0x6
         name: vcell_2
         data_type: uint16
-        description: cell 2 voltage in millivolts
+        description: cell 2 voltage
         access_type: ro
+        unit: mV
 
       - subindex: 0x7
         name: vcell_avg
         data_type: uint16
-        description: average voltage of both cells in millivolts
+        description: average voltage of both cells
         access_type: ro
+        unit: mV
 
       - subindex: 0x8
         name: current
         data_type: int16
-        description: pack current in milliamps
+        description: pack current
         access_type: ro
+        unit: mA
 
       - subindex: 0x9
         name: current_avg
         data_type: int16
-        description: pack average current in milliamps
+        description: pack average current
         access_type: ro
+        unit: mA
 
       - subindex: 0xa
         name: current_max
         data_type: int16
-        description: pack max current in milliamps
+        description: pack max current
         access_type: ro
+        unit: mA
 
       - subindex: 0xb
         name: current_min
         data_type: int16
-        description: pack min current in milliamps
+        description: pack min current
         access_type: ro
+        unit: mA
 
       - subindex: 0xc
         name: full_capacity
         data_type: uint16
-        description: capacity of battery pack in milliamp-hours
+        description: capacity of battery pack
         access_type: ro
+        unit: mAh
 
       - subindex: 0xd
         name: reported_capacity
         data_type: uint16
-        description: reported capacity of battery pack in milliamp-hours
+        description: reported capacity of battery pack
         access_type: ro
+        unit: mAh
 
       - subindex: 0xe
         name: time_to_empty
         data_type: uint16
-        description: estimate of time until battery pack is empty in seconds
+        description: estimate of time until battery pack is empty
         access_type: ro
+        unit: s
 
       - subindex: 0xf
         name: time_to_full
         data_type: uint16
-        description: estimate of time until battery pack is full in seconds
+        description: estimate of time until battery pack is full
         access_type: ro
+        unit: s
 
       - subindex: 0x10
         name: cycles
@@ -107,30 +122,35 @@ objects:
         description: reported charge percent
         access_type: ro
         high_limit: 100
+        unit: "%"
 
       - subindex: 0x12
         name: temperature
         data_type: int8
-        description: temperature of battery pack in celsius
+        description: temperature of battery pack
         access_type: ro
+        unit: C
 
       - subindex: 0x13
         name: temperature_avg
         data_type: int8
-        description: average temperature of battery pack in celsius
+        description: average temperature of battery pack
         access_type: ro
+        unit: C
 
       - subindex: 0x14
         name: temperature_max
         data_type: int8
-        description: max temperature of battery pack in celsius
+        description: max temperature of battery pack
         access_type: ro
+        unit: C
 
       - subindex: 0x15
         name: temperature_min
         data_type: int8
-        description: min temperature of battery pack in celsius
+        description: min temperature of battery pack
         access_type: ro
+        unit: C
 
       - subindex: 0x16
         name: status
@@ -151,92 +171,107 @@ objects:
       - subindex: 0x1
         name: vbatt
         data_type: uint16
-        description: pack voltage in millivolts
+        description: pack voltage
         access_type: ro
+        unit: mV
 
       - subindex: 0x2
         name: vcell_max
         data_type: uint16
-        description: max voltage for a cell in millivolts
+        description: max voltage for a cell
         access_type: ro
+        unit: mV
 
       - subindex: 0x3
         name: vcell_min
         data_type: uint16
-        description: min voltage for a cell in millivolts
+        description: min voltage for a cell
         access_type: ro
+        unit: mV
 
       - subindex: 0x4
         name: vcell
         data_type: uint16
-        description: lowest cell voltage in millivolts
+        description: lowest cell voltage
         access_type: ro
+        unit: mV
 
       - subindex: 0x5
         name: vcell_1
         data_type: uint16
-        description: cell 1 voltage in millivolts
+        description: cell 1 voltage
         access_type: ro
+        unit: mV
 
       - subindex: 0x6
         name: vcell_2
         data_type: uint16
-        description: cell 2 voltage in millivolts
+        description: cell 2 voltage
         access_type: ro
+        unit: mV
 
       - subindex: 0x7
         name: vcell_avg
         data_type: uint16
-        description: average voltage of both cells in millivolts
+        description: average voltage of both cells
         access_type: ro
+        unit: mV
 
       - subindex: 0x8
         name: current
         data_type: int16
-        description: pack current in milliamps
+        description: pack current
         access_type: ro
+        unit: mA
 
       - subindex: 0x9
         name: current_avg
         data_type: int16
-        description: average current in milliamps
+        description: pack average current
         access_type: ro
+        unit: mA
 
       - subindex: 0xa
         name: current_max
         data_type: int16
-        description: max current in milliamps
+        description: pack max current
         access_type: ro
+        unit: mA
 
       - subindex: 0xb
         name: current_min
         data_type: int16
-        description: min current in milliamps
+        description: pack min current
         access_type: ro
+        unit: mA
 
       - subindex: 0xc
         name: full_capacity
         data_type: uint16
-        description: capacity of battery pack in milliamp-hours
+        description: capacity of battery pack
         access_type: ro
+        unit: mAh
 
       - subindex: 0xd
         name: reported_capacity
         data_type: uint16
-        description: reported capacity of battery pack in milliamp-hours
+        description: reported capacity of battery pack
         access_type: ro
+        unit: mAh
 
       - subindex: 0xe
         name: time_to_empty
         data_type: uint16
-        description: estimate of time until battery pack is empty in seconds
+        description: estimate of time until battery pack is empty
         access_type: ro
+        unit: s
 
       - subindex: 0xf
         name: time_to_full
         data_type: uint16
-        description: estimate of time until battery pack is full in seconds
+        description: estimate of time until battery pack is full
         access_type: ro
+        unit: s
 
       - subindex: 0x10
         name: cycles
@@ -251,30 +286,35 @@ objects:
         description: reported charge percent
         access_type: ro
         high_limit: 100
+        unit: "%"
 
       - subindex: 0x12
         name: temperature
         data_type: int8
-        description: temperature of battery pack in celsius
+        description: temperature of battery pack
         access_type: ro
+        unit: C
 
       - subindex: 0x13
         name: temperature_avg
         data_type: int8
-        description: average temperature of battery pack in celsius
+        description: average temperature of battery pack
         access_type: ro
+        unit: C
 
       - subindex: 0x14
         name: temperature_max
         data_type: int8
-        description: max temperature of battery pack in celsius
+        description: max temperature of battery pack
         access_type: ro
+        unit: C
 
       - subindex: 0x15
         name: temperature_min
         data_type: int8
-        description: min temperature of battery pack in celsius
+        description: min temperature of battery pack
         access_type: ro
+        unit: C
 
       - subindex: 0x16
         name: status

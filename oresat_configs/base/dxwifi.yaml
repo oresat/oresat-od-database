@@ -12,8 +12,9 @@ objects:
       - subindex: 0x1
         name: temperature
         data_type: int8
-        description: the temperature of the radio in celsius
+        description: the temperature of the radio
         access_type: ro
+        unit: C
 
 tpdos:
   - num: 3

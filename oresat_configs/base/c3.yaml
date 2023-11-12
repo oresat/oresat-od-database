@@ -21,9 +21,10 @@ objects:
   - index: 0x4001
     name: reset_timeout
     data_type: uint32
-    description: the reset system timeout in seconds
+    description: the reset system timeout
     access_type: const
     default: 86400 # 24 hours
+    unit: s
 
   - index: 0x4002
     name: mode
@@ -50,15 +51,17 @@ objects:
       - subindex: 0x2
         name: timeout
         data_type: uint32
-        description: tx enable timeout in seconds
+        description: tx enable timeout
         access_type: const
         default: 1209600 # 2 weeks
+        unit: s
 
       - subindex: 0x3
         name: last_enable_timestamp
         data_type: uint32
-        description: last tx enable timestamp in seconds
+        description: last tx enable timestamp
         access_type: ro
+        unit: s
 
   - index: 0x4005
     name: antennas
@@ -80,23 +83,26 @@ objects:
       - subindex: 0x3
         name: pre_attempt_timeout
         data_type: uint8
-        description: number of seconds before trying to deploy the antennas
+        description: timeout before trying to deploy the antennas
         access_type: const
         default: 300 # 5 minutes
+        unit: s
 
       - subindex: 0x4
         name: attempt_timeout
         data_type: uint8
-        description: number of seconds for a deployment attempt
+        description: duration of a deployment attempt
         access_type: const
         default: 10
+        unit: s
 
       - subindex: 0x5
         name: reattempt_timeout
         data_type: uint8
-        description: number of seconds between deployment reattempts
+        description: timeout between deployment reattempts
         access_type: const
         default: 15
+        unit: s
 
       - subindex: 0x6
         name: deploy_monopole_now
@@ -114,9 +120,10 @@ objects:
         name: good_test_threshold
         data_type: uint16
         description: |
-          when testing the antennas, any voltage (in millivolts) above this threshold is considered good
+          when testing the antennas, any voltage above this threshold is considered good
         access_type: const
         default: 100
+        unit: mV
 
       - subindex: 0x9
         name: test_monopole_is_good
@@ -133,21 +140,24 @@ objects:
       - subindex: 0xb
         name: monopole_voltage
         data_type: uint16
-        description: monopole voltage in millivolts
+        description: monopole voltage
         access_type: ro
+        unit: mV
 
       - subindex: 0xc
         name: helical_voltage
         data_type: uint16
-        description: helical voltage in millivolts
+        description: helical voltage
         access_type: ro
+        unit: mV
 
       - subindex: 0xd
         name: attempt_between_timeout
         data_type: uint32
-        description: number of seconds beteeen monopole and helical deployments for an attempt
+        description: timeout between monopole and helical deployments for an attempt
         access_type: const
         default: 5
+        unit: s
 
   - index: 0x4006
     name: lband
@@ -158,6 +168,7 @@ objects:
         data_type: uint32
         description: lband received byte count
         access_type: ro
+        unit: B
 
       - subindex: 0x2
         name: rx_packets
@@ -168,8 +179,9 @@ objects:
       - subindex: 0x3
         name: rssi
         data_type: int8
-        description: lband rssi of last packet received after lna, filters, and digital channel filter in dB
+        description: lband rssi of last packet received after lna, filters, and digital channel filter
         access_type: ro
+        unit: dB
 
   - index: 0x4007
     name: uhf
@@ -180,6 +192,7 @@ objects:
         data_type: uint32
         description: uhf received byte count
         access_type: ro
+        unit: B
 
       - subindex: 0x2
         name: rx_packets
@@ -190,8 +203,9 @@ objects:
       - subindex: 0x3
         name: rssi
         data_type: int8
-        description: uhf rssi of last packet received after lna, filters, and digital channel filter in dB
+        description: uhf rssi of last packet received after lna, filters, and digital channel filter
         access_type: ro
+        unit: dB
 
   - index: 0x4008
     name: edl
@@ -271,9 +285,10 @@ objects:
       - subindex: 0xc
         name: timeout
         data_type: uint32
-        description: edl timeout in seconds
+        description: edl timeout
         access_type: const
         default: 60
+        unit: s
 
   - index: 0x4009
     name: opd
@@ -299,8 +314,9 @@ objects:
       - subindex: 0x3
         name: current
         data_type: uint8
-        description: opd system current draw in mA
+        description: opd system current draw
         access_type: ro
+        unit: mA
 
       - subindex: 0x4
         name: scan
@@ -324,9 +340,10 @@ objects:
       - subindex: 0x7
         name: reset_delay
         data_type: uint8
-        description: number of seconds between opd system resets
+        description: delay between opd system resets
         access_type: rw
         default: 10
+        unit: s
 
       - subindex: 0x8
         name: nodes_status_json
@@ -401,9 +418,10 @@ objects:
       - subindex: 0x5
         name: delay
         data_type: uint32
-        description: delay between beacons in seconds or 0 to disable
+        description: delay between beacons or 0 to disable
         access_type: const
         default: 30
+        unit: s
 
       - subindex: 0x6
         name: send_now
@@ -467,7 +485,8 @@ objects:
       - subindex: 0x1
         name: timestamp
         data_type: uint32
-        description: the last saved timestamp in seconds
+        description: the last saved timestamp
+        unit: s
 
       - subindex: 0x2
         name: alarm_a

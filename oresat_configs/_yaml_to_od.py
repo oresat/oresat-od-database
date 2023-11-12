@@ -99,6 +99,8 @@ def _add_objects(od: canopen.ObjectDictionary, objects: list):
                 var.add_bit_definition(name, bits)
             for value, descr in obj.get("values", {}).items():
                 var.add_value_description(value, descr)
+            var.unit = obj.get("unit", "")
+            var.factor = obj.get("scaling", 1)
             var.data_type = OD_DATA_TYPES[obj["data_type"]]
             _set_var_default(obj, var)
             if var.data_type not in dynamic_len_data_types:
@@ -119,10 +121,12 @@ def _add_objects(od: canopen.ObjectDictionary, objects: list):
                 var.access_type = sub_obj["access_type"]
                 var.description = sub_obj["description"]
                 var.data_type = OD_DATA_TYPES[sub_obj["data_type"]]
-                for name, bits in obj.get("bitfield", {}).items():
+                for name, bits in sub_obj.get("bitfield", {}).items():
                     var.add_bit_definition(name, bits)
-                for value, descr in obj.get("values", {}).items():
+                for value, descr in sub_obj.get("values", {}).items():
                     var.add_value_description(value, descr)
+                var.unit = sub_obj.get("unit", "")
+                var.factor = sub_obj.get("scaling", 1)
                 _set_var_default(sub_obj, var)
                 if var.data_type not in dynamic_len_data_types:
                     var.pdo_mappable = True
@@ -145,10 +149,12 @@ def _add_objects(od: canopen.ObjectDictionary, objects: list):
                 var = canopen.objectdictionary.Variable(sub_name, index, subindex)
                 var.access_type = obj["access_type"]
                 var.data_type = OD_DATA_TYPES[obj["data_type"]]
-                for name, bits in obj.get("bitfield", {}).items():
+                for name, bits in sub_obj.get("bitfield", {}).items():
                     var.add_bit_definition(name, bits)
-                for value, descr in obj.get("values", {}).items():
+                for value, descr in sub_obj.get("values", {}).items():
                     var.add_value_description(value, descr)
+                var.unit = sub_obj.get("unit", "")
+                var.factor = sub_obj.get("scaling", 1)
                 _set_var_default(sub_obj, var)
                 if var.data_type not in dynamic_len_data_types:
                     var.pdo_mappable = True
@@ -348,6 +354,10 @@ def _add_rpdo_data(
             var.access_type = "rw"
             var.data_type = tpdo_mapped_obj.data_type
             var.default = tpdo_mapped_obj.default
+            var.unit = tpdo_mapped_obj.unit
+            var.factor = tpdo_mapped_obj.factor
+            var.bit_definitions = deepcopy(tpdo_mapped_obj.bit_definitions)
+            var.value_descriptions = deepcopy(tpdo_mapped_obj.value_descriptions)
             var.pdo_mappable = True
             rpdo_mapped_rec.add_member(var)
 
@@ -423,7 +433,11 @@ def read_yaml_od_config(file_path: str) -> dict:
             if "values" not in obj:
                 obj["values"] = {}
             if "bitfield" not in obj:
-                obj["bitfie"] = {}
+                obj["bitfield"] = {}
+            if "unit" not in obj:
+                obj["unit"] = ""
+            if "scaling" not in obj:
+                obj["scaling"] = 1
         elif "subindexes" not in obj:
             config["subindexes"] = []
         else:
@@ -440,6 +454,10 @@ def read_yaml_od_config(file_path: str) -> dict:
                     sub_obj["values"] = {}
                 if "bitfield" not in sub_obj:
                     sub_obj["bitfield"] = {}
+                if "unit" not in sub_obj:
+                    sub_obj["unit"] = ""
+                if "scaling" not in sub_obj:
+                    sub_obj["scaling"] = 1
 
     if "tpdos" not in config:
         config["tpdos"] = []

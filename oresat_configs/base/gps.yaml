@@ -46,104 +46,124 @@ objects:
       - subindex: 0x4
         name: tow
         data_type: uint32
-        description: time of the week in 0.01 seconds scaling
+        description: time of the week
         access_type: ro
+        scaling: 0.01
+        unit: s
 
       - subindex: 0x5
         name: latitude
         data_type: int32
-        description: latitude in 1e-7 degrees
+        description: latitude
         access_type: ro
+        scaling: 0.0000001 # 1e-7
+        unit: deg
 
       - subindex: 0x6
         name: longitude
         data_type: int32
-        description: longitude in 1e-7 degrees
+        description: longitude
         access_type: ro
+        scaling: 0.0000001 # 1e-7
+        unit: deg
 
       - subindex: 0x7
         name: ellipsoid_alt
         data_type: uint32
-        description: height above ellipsoid in cm
+        description: height above ellipsoid
         access_type: ro
+        unit: cm
 
       - subindex: 0x8
         name: mean_sea_lvl_alt
         data_type: uint32
-        description: mean sea level in cm
+        description: mean sea level
         access_type: ro
+        unit: cm
 
       - subindex: 0x9
         name: gdop
         data_type: uint16
-        description: geometric diluttion of precision in 0.01 scaling
+        description: geometric diluttion of precision
         access_type: ro
+        scaling: 0.01
 
       - subindex: 0xa
         name: pdop
         data_type: uint16
-        description: position diluttion of precision in 0.01 scaling
+        description: position diluttion of precision
         access_type: ro
+        scaling: 0.01
 
       - subindex: 0xb
         name: hdop
         data_type: uint16
-        description: height diluttion of precision in 0.01 scaling
+        description: height diluttion of precision
         access_type: ro
+        scaling: 0.01
 
       - subindex: 0xc
         name: vdop
         data_type: uint16
-        description: vertical diluttion of precision in 0.01 scaling
+        description: vertical diluttion of precision
         access_type: ro
+        scaling: 0.01
 
       - subindex: 0xd
         name: tdop
         data_type: uint16
-        description: time diluttion of precision in 0.01 scaling
+        description: time diluttion of precision
         access_type: ro
+        scaling: 0.01
 
       - subindex: 0xe
         name: ecef_x
         data_type: int32
-        description: ecef x coordinate in cm
+        description: ecef x coordinate
         access_type: ro
+        unit: cm
 
       - subindex: 0xf
         name: ecef_y
         data_type: int32
-        description: ecef y coordinate in cm
+        description: ecef y coordinate
         access_type: ro
+        unit: cm
 
       - subindex: 0x10
         name: ecef_z
         data_type: int32
-        description: ecef z coordinate in cm
+        description: ecef z coordinate
         access_type: ro
+        unit: cm
 
       - subindex: 0x11
         name: ecef_vx
         data_type: int32
-        description: ecef x velocity in cm/s
+        description: ecef x velocity
         access_type: ro
+        unit: cm/s
 
       - subindex: 0x12
         name: ecef_vy
         data_type: int32
-        description: ecef y velocity in cm/s
+        description: ecef y velocity
         access_type: ro
+        unit: cm/s
 
       - subindex: 0x13
         name: ecef_vz
         data_type: int32
-        description: ecef z velocity in cm/s
+        description: ecef z velocity
         access_type: ro
+        unit: cm/s
 
       - subindex: 0x14
         name: time_since_midnight
         data_type: uint32
-        description: the number of milliseconds since midnight when the gps data was received
+        description: time since midnight when the gps data was received
         access_type: ro
+        unit: ms
 
 tpdos:
   - num: 3

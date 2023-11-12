@@ -22,8 +22,9 @@ objects:
       - subindex: 0x3
         name: capture_delay
         data_type: uint32
-        description: delay between captures in milliseconds
+        description: delay between captures
         default: 1000
+        unit: ms
 
       - subindex: 0x4
         name: last_capture
@@ -42,6 +43,7 @@ objects:
         data_type: uint64
         description: the last capture timestamp
         access_type: ro
+        unit: scet
 
       - subindex: 0x7
         name: save_captures
@@ -59,13 +61,15 @@ objects:
       - subindex: 0x9
         name: integration_time
         data_type: uint32
-        description: camera integration time in milliseconds
+        description: camera integration time
+        unit: ms
 
       - subindex: 0xa
         name: temperature
         data_type: int8
-        description: the camera temperature in celsius
+        description: the camera temperature
         access_type: ro
+        unit: C
 
   - index: 0x4001
     name: tec
@@ -85,7 +89,8 @@ objects:
       - subindex: 0x3
         name: pid_setpoint
         data_type: int8
-        description: the tec target temperature in celsius
+        description: the tec target temperature
+        unit: C
 
       - subindex: 0x4
         name: pid_kp
@@ -114,6 +119,7 @@ objects:
         description: the delay between PID loops in milliseconds
         access_type: rw
         default: 250
+        unit: ms
 
       - subindex: 0x8
         name: moving_avg_samples
@@ -125,16 +131,18 @@ objects:
       - subindex: 0x9
         name: saturation_diff
         data_type: uint8
-        description: the difference between the lowest and current temperature (in celsius) to flag as saturated
+        description: the difference between the lowest and current temperature to flag as saturated
         access_type: rw
         default: 3
+        unit: C
 
       - subindex: 0xa
         name: cooldown_temperature
         data_type: int8
-        description: once saturated the TEC controller cannot be enable until the camera temperature (in celsius) is greater this value
+        description: once saturated the TEC controller cannot be enable until the camera temperature is greater this value
         access_type: rw
         default: 40
+        unit: C
 
       - subindex: 0xb
         name: pid_graph

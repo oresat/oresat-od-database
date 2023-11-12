@@ -6,37 +6,40 @@ objects:
       - subindex: 0x1
         name: pitch_rate
         data_type: int16
-        description: x axis rate deg/s
+        description: x-axis rate
         access_type: ro
+        unit: deg/s
 
       - subindex: 0x2
         name: yaw_rate
         data_type: int16
-        description: y axis rate deg/s
+        description: y-axis rate
         access_type: ro
+        unit: deg/s
 
       - subindex: 0x3
         name: roll_rate
         data_type: int16
-        description: z axis rate deg/s
+        description: z-axis rate
         access_type: ro
+        unit: deg/s
 
       - subindex: 0x4
         name: pitch_rate_raw
         data_type: uint16
-        description: raw x axis rate
+        description: raw x-axis rate
         access_type: ro
 
       - subindex: 0x5
         name: yaw_rate_raw
         data_type: uint16
-        description: raw y axis rate
+        description: raw y-axis rate
         access_type: ro
 
       - subindex: 0x6
         name: roll_rate_raw
         data_type: uint16
-        description: raw z axis rate
+        description: raw z-axis rate
         access_type: ro
 
   - index: 0x4001
@@ -46,19 +49,22 @@ objects:
       - subindex: 0x1
         name: x
         data_type: int16
-        description: x acceleration in milli-g's
+        description: x acceleration
         access_type: ro
+        unit: milli-g
 
       - subindex: 0x2
         name: y
         data_type: int16
-        description: y acceleration in milli-g's
+        description: y acceleration
         access_type: ro
+        unit: milli-g
 
       - subindex: 0x3
         name: z
         data_type: int16
-        description: z acceleration in milli-g's
+        description: z acceleration
+        unit: milli-g
         access_type: ro
 
       - subindex: 0x4
@@ -93,26 +99,29 @@ objects:
       - subindex: 0x1
         name: x
         data_type: int16
-        description: +z mag 1 x axis magnetic field in milligauss
+        description: +z mag 1 x-axis magnetic field
         access_type: ro
         low_limit: -8192
         high_limit: 8192
+        unit: milligauss
 
       - subindex: 0x2
         name: y
         data_type: int16
-        description: +z mag 1 y axis magnetic field in milligauss
+        description: +z mag 1 y-axis magnetic field
         access_type: ro
         low_limit: -8192
         high_limit: 8192
+        unit: milligauss
 
       - subindex: 0x3
         name: z
         data_type: int16
-        description: +z mag 1 z axis magnetic field in milligauss
+        description: +z mag 1 z-axis magnetic field
         access_type: ro
         low_limit: -8192
         high_limit: 8192
+        unit: milligauss
 
   - index: 0x4004
     name: pos_z_magnetometer_2
@@ -122,26 +131,29 @@ objects:
       - subindex: 0x1
         name: x
         data_type: int16
-        description: +z mag 2 x axis magnetic field in milligauss
+        description: +z mag 2 x-axis magnetic field
         access_type: ro
         low_limit: -8192
         high_limit: 8192
+        unit: milligauss
 
       - subindex: 0x2
         name: y
         data_type: int16
-        description: +z mag 2 y axis magnetic field in milligauss
+        description: +z mag 2 y-axis magnetic field
         access_type: ro
         low_limit: -8192
         high_limit: 8192
+        unit: milligauss
 
       - subindex: 0x3
         name: z
         data_type: int16
-        description: +z mag 2 z axis magnetic field in milligauss
+        description: +z mag 2 z-axis magnetic field
         access_type: ro
         low_limit: -8192
         high_limit: 8192
+        unit: milligauss
 
   - index: 0x4005
     name: min_z_magnetometer_1
@@ -151,26 +163,29 @@ objects:
       - subindex: 0x1
         name: x
         data_type: int16
-        description: -z mag 1 x axis magnetic field in milligauss
+        description: -z mag 1 x-axis magnetic field
         access_type: ro
         low_limit: -8192
         high_limit: 8192
+        unit: milligauss
 
       - subindex: 0x2
         name: y
         data_type: int16
-        description: -z mag 1 y axis magnetic field in milligauss
+        description: -z mag 1 y-axis magnetic field
         access_type: ro
         low_limit: -8192
         high_limit: 8192
+        unit: milligauss
 
       - subindex: 0x3
         name: z
         data_type: int16
-        description: -z mag 1 z axis magnetic field in milligauss
+        description: -z mag 1 z-axis magnetic field
         access_type: ro
         low_limit: -8192
         high_limit: 8192
+        unit: milligauss
 
   - index: 0x4006
     name: min_z_magnetometer_2
@@ -180,67 +195,75 @@ objects:
       - subindex: 0x1
         name: x
         data_type: int16
-        description: -z mag 2 x axis magnetic field in milligauss
+        description: -z mag 2 x-axis magnetic field
         access_type: ro
         low_limit: -8192
         high_limit: 8192
+        unit: milligauss
 
       - subindex: 0x2
         name: y
         data_type: int16
-        description: -z mag 2 y axis magnetic field in milligauss
+        description: -z mag 2 y-axis magnetic field
         access_type: ro
         low_limit: -8192
         high_limit: 8192
+        unit: milligauss
 
       - subindex: 0x3
         name: z
         data_type: int16
-        description: -z mag 2 z axis magnetic field in milligauss
+        description: -z mag 2 z-axis magnetic field
         access_type: ro
         low_limit: -8192
         high_limit: 8192
+        unit: milligauss
 
   - index: 0x4007
     name: magnetorquer
     object_type: record
-    description: Magnetorquer Current Feedback in uA
     subindexes:
       - subindex: 0x1
         name: current_x
         data_type: int32
-        description: current feedback
+        description: current feedback in the x-axis
         access_type: ro
+        unit: uA
         
       - subindex: 0x2
         name: current_y
         data_type: int32
-        description: current feedback
+        description: current feedback in the y-axis
         access_type: ro
+        unit: uA
         
       - subindex: 0x3
         name: current_z
         data_type: int32
-        description: current feedback
+        description: current feedback in the y-axis
         access_type: ro
+        unit: uA
 
       - subindex: 0x4
         name: current_x_setpoint
         data_type: int32
-        description: Set current
+        description: Setpoint for current in thex x-axis
         access_type: rw
+        unit: uA
         
       - subindex: 0x5
         name: current_y_setpoint
         data_type: int32
-        description: Set current
+        description: Setpoint for current in the y-axis
         access_type: rw
+        unit: uA
         
       - subindex: 0x6
         name: current_z_setpoint
         data_type: int32
-        description: Set current
+        description: Setpoint for current in thex z-axis
         access_type: rw
+        unit: uA
 
       - subindex: 0x7
         name: pwm_x
@@ -249,6 +272,8 @@ objects:
         access_type: ro
         low_limit: 0
         high_limit: 10000
+        scaling: 0.01
+        unit: "%"
 
       - subindex: 0x8
         name: pwm_y
@@ -257,6 +282,8 @@ objects:
         access_type: ro
         low_limit: 0
         high_limit: 10000
+        scaling: 0.01
+        unit: "%"
 
       - subindex: 0x9
         name: pwm_z
@@ -265,7 +292,8 @@ objects:
         access_type: ro
         low_limit: 0
         high_limit: 10000
-
+        scaling: 0.01
+        unit: "%"
 
 tpdos:
   - num: 1

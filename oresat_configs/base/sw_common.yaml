@@ -67,6 +67,11 @@ objects:
         name: reset
         data_type: uint8
         description: reset the app. See the olaf.NodeStop enum for values
+        values:
+          1: soft reset
+          2: hard reset
+          3: factory reset
+          4: power off
         access_type: wo
 
       - subindex: 0x2
@@ -75,6 +80,7 @@ objects:
         description: the current storage percent used
         access_type: ro
         high_level: 100
+        unit: "%"
 
       - subindex: 0x3
         name: ram_percent
@@ -82,18 +88,21 @@ objects:
         description: the current ram percent used
         access_type: ro
         high_level: 100
+        unit: "%"
 
       - subindex: 0x4
         name: unix_time
         data_type: uint32
-        description: unix time in seconds
+        description: unix time
         access_type: ro
+        unit: s
 
       - subindex: 0x5
         name: uptime
         data_type: uint32
-        description: uptime in seconds
+        description: uptime
         access_type: ro
+        unit: s
 
       - subindex: 0x6
         name: power_cycles
@@ -107,10 +116,9 @@ objects:
       - subindex: 0x9
         name: boot_select
         data_type: uint8
-        description: |
-          boot bank or mmc info
-          - bit 0: current boot bank/mmc
-          - bit 1: next boot bank/mmc
+        bitfield:
+          CURRENT_BOOT: 0
+          NEXT_BOOT: 1
         access_type: ro
 
   - index: 0x3004

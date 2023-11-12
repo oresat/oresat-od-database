@@ -24,14 +24,16 @@ objects:
       - subindex: 0x2
         name: delay
         data_type: uint32
-        description: delay between captures in ms
+        description: delay between captures
         default: 1000
+        unit: ms
 
       - subindex: 0x3
         name: duration
         data_type: uint32
-        description: how long to try to capture for in seconds
+        description: how long to try to capture for
         default: 1
+        unit: s
 
       - subindex: 0x4
         name: last_capture
@@ -71,26 +73,30 @@ objects:
       - subindex: 0x1
         name: right_ascension
         data_type: int16
-        description: the right ascension of the satellite in degrees
+        description: the right ascension of the satellite
         access_type: ro
+        unit: deg
 
       - subindex: 0x2
         name: declination
         data_type: int16
-        description: the delination of the satellite in degrees
+        description: the delination of the satellite
         access_type: ro
+        unit: deg
 
       - subindex: 0x3
         name: roll
         data_type: int16
-        description: the roll of the satellite in degrees
+        description: the roll of the satellite
         access_type: ro
+        unit: deg
 
       - subindex: 0x4
         name: time_since_midnight
         data_type: uint32
-        description: the number of milliseconds since midnight when the image was captured
+        description: time since midnight when the image was captured
         access_type: ro
+        unit: ms
 
   - index: 0x4003
     name: capture_filter

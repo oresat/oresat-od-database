@@ -68,8 +68,9 @@ objects:
       - subindex: 0x7
         name: temperature
         data_type: int8
-        description: the temperature of the processor in celsius
+        description: the temperature of the processor
         access_type: ro
+        unit: C
 
       - subindex: 0x8
         name: vrefint
