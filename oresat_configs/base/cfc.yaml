@@ -7,6 +7,11 @@ objects:
         name: status
         data_type: uint8
         description: the camera status
+        values:
+          0x1: OFF - Camera is off
+          0x2: STANDBY - Camera is on not doing anything
+          0x3: CAPTURE - Camera is capturing an image
+          0x4: ERROR - Error with camera hardware
 
       - subindex: 0x2
         name: number_to_capture

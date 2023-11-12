@@ -3,6 +3,11 @@ objects:
     name: status
     data_type: uint8
     description: the gps status
+    values:
+      0: off
+      1: searching for gps satellites
+      2: locked onto >4 gps satellites
+      3: error
     access_type: ro
 
   - index: 0x4001
@@ -18,19 +23,19 @@ objects:
       - subindex: 0x1
         name: fix_mode
         data_type: uint8
-        description: |
-          quality of fix:
-            - 0: no fix
-            - 1: 2d
-            - 2: 3d
-            - 3: 3d+dgps
+        values:
+          0: no fix
+          1: 2d
+          2: 3d
+          3: 3d+dgps
         access_type: ro
 
       - subindex: 0x2
         name: number_of_sv
         data_type: uint8
-        description: number of gps satellites locked onto. max 12
+        description: number of gps satellites locked onto
         access_type: ro
+        high_limit: 12
 
       - subindex: 0x3
         name: gps_week

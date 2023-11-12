@@ -2,15 +2,14 @@ objects:
   - index: 0x4000
     name: status
     data_type: uint8
-    description: |
-      the star tracker status
-      - 0x00: off
-      - 0x01: booting
-      - 0x02: standby
-      - 0x03: low power
-      - 0x04: star track
-      - 0x05: capture_only
-      - 0xFF: hardware error
+    values:
+      0x00: off
+      0x01: booting
+      0x02: standby
+      0x03: low power
+      0x04: star track
+      0x05: capture only
+      0xFF: hardware error
 
   - index: 0x4001
     name: capture

@@ -95,6 +95,10 @@ def _add_objects(od: canopen.ObjectDictionary, objects: list):
             var = canopen.objectdictionary.Variable(obj["name"], index)
             var.access_type = obj["access_type"]
             var.description = obj["description"]
+            for name, bits in obj.get("bitfield", {}).items():
+                var.add_bit_definition(name, bits)
+            for value, descr in obj.get("values", {}).items():
+                var.add_value_description(value, descr)
             var.data_type = OD_DATA_TYPES[obj["data_type"]]
             _set_var_default(obj, var)
             if var.data_type not in dynamic_len_data_types:
@@ -115,6 +119,10 @@ def _add_objects(od: canopen.ObjectDictionary, objects: list):
                 var.access_type = sub_obj["access_type"]
                 var.description = sub_obj["description"]
                 var.data_type = OD_DATA_TYPES[sub_obj["data_type"]]
+                for name, bits in obj.get("bitfield", {}).items():
+                    var.add_bit_definition(name, bits)
+                for value, descr in obj.get("values", {}).items():
+                    var.add_value_description(value, descr)
                 _set_var_default(sub_obj, var)
                 if var.data_type not in dynamic_len_data_types:
                     var.pdo_mappable = True
@@ -137,6 +145,10 @@ def _add_objects(od: canopen.ObjectDictionary, objects: list):
                 var = canopen.objectdictionary.Variable(sub_name, index, subindex)
                 var.access_type = obj["access_type"]
                 var.data_type = OD_DATA_TYPES[obj["data_type"]]
+                for name, bits in obj.get("bitfield", {}).items():
+                    var.add_bit_definition(name, bits)
+                for value, descr in obj.get("values", {}).items():
+                    var.add_value_description(value, descr)
                 _set_var_default(sub_obj, var)
                 if var.data_type not in dynamic_len_data_types:
                     var.pdo_mappable = True
@@ -408,6 +420,10 @@ def read_yaml_od_config(file_path: str) -> dict:
                 obj["access_type"] = "rw"
             if "default" not in obj:
                 obj["default"] = None
+            if "values" not in obj:
+                obj["values"] = {}
+            if "bitfield" not in obj:
+                obj["bitfie"] = {}
         elif "subindexes" not in obj:
             config["subindexes"] = []
         else:
@@ -420,6 +436,10 @@ def read_yaml_od_config(file_path: str) -> dict:
                     sub_obj["description"] = ""
                 if "default" not in sub_obj:
                     sub_obj["default"] = None
+                if "values" not in sub_obj:
+                    sub_obj["values"] = {}
+                if "bitfield" not in sub_obj:
+                    sub_obj["bitfield"] = {}
 
     if "tpdos" not in config:
         config["tpdos"] = []

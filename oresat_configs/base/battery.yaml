@@ -135,12 +135,12 @@ objects:
       - subindex: 0x16
         name: status
         data_type: uint8
-        description: |
-          - bit 0: heater on
-          - bit 1: discharge disable
-          - bit 2: charge disable
-          - bit 3: discharge status
-          - bit 4: charge status
+        bitfield:
+          HEATER_ON: 0
+          DISCHARGE_DISABLE: 1
+          CHARGE_DISABLE: 2
+          DISCHARGE_STATUS: 3
+          CHARGE_STATUS: 4
         access_type: ro
 
   - index: 0x4001
@@ -279,12 +279,12 @@ objects:
       - subindex: 0x16
         name: status
         data_type: uint8
-        description: |
-          - bit 0: heater on
-          - bit 1: discharge disable
-          - bit 2: charge disable
-          - bit 3: discharge status
-          - bit 4: charge status
+        bitfield:
+          HEATER_ON: 0
+          DISCHARGE_DISABLE: 1
+          CHARGE_DISABLE: 2
+          DISCHARGE_STATUS: 3
+          CHARGE_STATUS: 4
         access_type: ro
 
 tpdos:
