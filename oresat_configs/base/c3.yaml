@@ -9,7 +9,7 @@ objects:
     name: status
     data_type: uint8
     description: the c3 state
-    values:
+    value_descriptions:
       65: OFFLINE - This state is never actually reachable by the device. Reset vector is PRE_DEPLOY
       66: PRE_DEPLOY - Holding state after deployment of satellite but before deployment of antennas. Ensures a minimum amount of time passes before attempting to deploy antennas and going active
       67: DEPLOY - Antenna deployment state. Attempts to deploy antennas several times before moving to Standby
@@ -298,7 +298,7 @@ objects:
         name: status
         data_type: uint8
         description: opd system enable status
-        values:
+        value_descriptions:
           1: DISABLED - OPD system is off
           2: ENABLED - OPD system is on (no faults)
           3: FAULT - OPD system is on and has one or more faults
@@ -362,7 +362,7 @@ objects:
         name: node_status
         data_type: uint8
         description: enable/disable selected node on write or get current state by read
-        values:
+        value_descriptions:
           0x1: DISABLED - OPD node is off
           0x2: ENABLED - OPD node is on (no faults)
           0x3: FAULT - Fault input is set for OPD node

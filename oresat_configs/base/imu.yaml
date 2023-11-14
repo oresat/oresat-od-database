@@ -272,7 +272,7 @@ objects:
         access_type: ro
         low_limit: 0
         high_limit: 10000
-        scaling: 0.01
+        scale_factor: 0.01
         unit: "%"
 
       - subindex: 0x8
@@ -282,7 +282,7 @@ objects:
         access_type: ro
         low_limit: 0
         high_limit: 10000
-        scaling: 0.01
+        scale_factor: 0.01
         unit: "%"
 
       - subindex: 0x9
@@ -292,7 +292,7 @@ objects:
         access_type: ro
         low_limit: 0
         high_limit: 10000
-        scaling: 0.01
+        scale_factor: 0.01
         unit: "%"
 
 tpdos:

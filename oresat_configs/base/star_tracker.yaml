@@ -2,7 +2,7 @@ objects:
   - index: 0x4000
     name: status
     data_type: uint8
-    values:
+    value_descriptions:
       0x00: off
       0x01: booting
       0x02: standby

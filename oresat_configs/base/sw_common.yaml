@@ -66,8 +66,8 @@ objects:
       - subindex: 0x1
         name: reset
         data_type: uint8
-        description: reset the app. See the olaf.NodeStop enum for values
-        values:
+        description: reset the app
+        value_descriptions:
           1: soft reset
           2: hard reset
           3: factory reset
@@ -116,7 +116,7 @@ objects:
       - subindex: 0x9
         name: boot_select
         data_type: uint8
-        bitfield:
+        bit_definitions:
           CURRENT_BOOT: 0
           NEXT_BOOT: 1
         access_type: ro
@@ -197,7 +197,7 @@ objects:
         name: status
         data_type: uint8
         description: status of the updater
-        values:
+        value_descriptions:
           0x0: Last update was successfully installed (default value)
           0x1: Last update failed while pre-processing the update
           0x2: Last update failed while running the update

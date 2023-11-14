@@ -3,7 +3,7 @@ objects:
     name: status
     data_type: uint8
     description: the gps status
-    values:
+    value_descriptions:
       0: off
       1: searching for gps satellites
       2: locked onto >4 gps satellites
@@ -23,7 +23,7 @@ objects:
       - subindex: 0x1
         name: fix_mode
         data_type: uint8
-        values:
+        value_descriptions:
           0: no fix
           1: 2d
           2: 3d
@@ -48,7 +48,7 @@ objects:
         data_type: uint32
         description: time of the week
         access_type: ro
-        scaling: 0.01
+        scale_factor: 0.01
         unit: s
 
       - subindex: 0x5
@@ -56,7 +56,7 @@ objects:
         data_type: int32
         description: latitude
         access_type: ro
-        scaling: 0.0000001 # 1e-7
+        scale_factor: 0.0000001 # 1e-7
         unit: deg
 
       - subindex: 0x6
@@ -64,7 +64,7 @@ objects:
         data_type: int32
         description: longitude
         access_type: ro
-        scaling: 0.0000001 # 1e-7
+        scale_factor: 0.0000001 # 1e-7
         unit: deg
 
       - subindex: 0x7
@@ -86,35 +86,35 @@ objects:
         data_type: uint16
         description: geometric diluttion of precision
         access_type: ro
-        scaling: 0.01
+        scale_factor: 0.01
 
       - subindex: 0xa
         name: pdop
         data_type: uint16
         description: position diluttion of precision
         access_type: ro
-        scaling: 0.01
+        scale_factor: 0.01
 
       - subindex: 0xb
         name: hdop
         data_type: uint16
         description: height diluttion of precision
         access_type: ro
-        scaling: 0.01
+        scale_factor: 0.01
 
       - subindex: 0xc
         name: vdop
         data_type: uint16
         description: vertical diluttion of precision
         access_type: ro
-        scaling: 0.01
+        scale_factor: 0.01
 
       - subindex: 0xd
         name: tdop
         data_type: uint16
         description: time diluttion of precision
         access_type: ro
-        scaling: 0.01
+        scale_factor: 0.01
 
       - subindex: 0xe
         name: ecef_x

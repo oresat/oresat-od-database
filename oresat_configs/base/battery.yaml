@@ -155,7 +155,7 @@ objects:
       - subindex: 0x16
         name: status
         data_type: uint8
-        bitfield:
+        bit_definitions:
           HEATER_ON: 0
           DISCHARGE_DISABLE: 1
           CHARGE_DISABLE: 2
@@ -319,7 +319,7 @@ objects:
       - subindex: 0x16
         name: status
         data_type: uint8
-        bitfield:
+        bit_definitions:
           HEATER_ON: 0
           DISCHARGE_DISABLE: 1
           CHARGE_DISABLE: 2
