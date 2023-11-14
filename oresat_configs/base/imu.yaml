@@ -88,8 +88,9 @@ objects:
   - index: 0x4002
     name: temperature
     data_type: int8
-    description: temperature in celsius
+    description: imu sensor temperature
     access_type: ro
+    unit: C
 
   - index: 0x4003
     name: pos_z_magnetometer_1
