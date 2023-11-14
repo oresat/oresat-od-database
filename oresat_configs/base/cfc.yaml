@@ -6,7 +6,6 @@ objects:
       - subindex: 0x1
         name: status
         data_type: uint8
-        description: the camera status
         value_descriptions:
           0x1: OFF - Camera is off
           0x2: STANDBY - Camera is on not doing anything

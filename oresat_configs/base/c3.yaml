@@ -8,11 +8,9 @@ objects:
   - index: 0x4000
     name: status
     data_type: uint8
-    description: the c3 state
     value_descriptions:
-      65: OFFLINE - This state is never actually reachable by the device. Reset vector is PRE_DEPLOY
-      66: PRE_DEPLOY - Holding state after deployment of satellite but before deployment of antennas. Ensures a minimum amount of time passes before attempting to deploy antennas and going active
-      67: DEPLOY - Antenna deployment state. Attempts to deploy antennas several times before moving to Standby
+      66: PRE_DEPLOY - Holding state after deployment of satellite but before deployment of antennas.
+      67: DEPLOY - Antenna deployment state.
       68: STANDBY Satellite is functional but in standby state. Battery level is too low or tx is disabled
       69: BEACON- Active beaconing state. Broadcasts telemetry packets via radio periodically
       70: EDL - Currently receiving and/or transmitting engineering data link packets with a groundstation

@@ -2,7 +2,6 @@ objects:
   - index: 0x4000
     name: status
     data_type: uint8
-    description: the gps status
     value_descriptions:
       0: off
       1: searching for gps satellites

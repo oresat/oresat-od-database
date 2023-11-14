@@ -133,13 +133,15 @@ def gen_beacon_rst(config: OreSatConfig, file_path: str, url: str):
     lines.append(f'{"-" * len(def_title)}\n')
     lines.append("\n")
     lines.append(".. csv-table::\n")
-    lines.append('   :header: "Offset", "Card", "Data Name", "Data Type", "Size", "Description"\n')
+    lines.append(
+        '   :header: "Offset", "Card", "Name", "Unit", "Data Type", "Size", "Description"\n'
+    )
     lines.append("\n")
     offset = 0
     size = len(sd)
     desc = "\nax.25 packet header (see above)\n"
     desc = desc.replace("\n", "\n   ")
-    lines.append(f'   "{offset}", "c3", "ax25_header", "octet_str", "{size}", "{desc}"\n')
+    lines.append(f'   "{offset}", "c3", "ax25_header", "", "octet_str", "{size}", "{desc}"\n')
     offset += size
 
     for obj in config.beacon_def:
@@ -165,13 +167,28 @@ def gen_beacon_rst(config: OreSatConfig, file_path: str, url: str):
 
         data_type = OD_DATA_TYPES[obj.data_type]
         desc = "\n" + obj.description + "\n"
+        if obj.name in ["start_chars", "revision"]:
+            desc += f": {obj.value}\n"
+        if obj.name == "satellite_id":
+            sat_id = OreSatId(obj.value)
+            desc += f": {sat_id.value}\n"
+        if obj.value_descriptions:
+            desc += "\n\nValue Descriptions:\n"
+            for value, descr in obj.value_descriptions.items():
+                desc += f"\n- {value}: {descr}\n"
+        if obj.bit_definitions:
+            desc += "\n\nBit Definitions:\n"
+            for name_, bits in obj.bit_definitions.items():
+                desc += f"\n- {name_}: {bits}\n"
         desc = desc.replace("\n", "\n   ")
 
-        lines.append(f'   "{offset}", "{card}", "{name}", "{data_type}", "{size}", "{desc}"\n')
+        lines.append(
+            f'   "{offset}", "{card}", "{name}", "{obj.unit}", "{data_type}", "{size}", "{desc}"\n'
+        )
         offset += size
 
     size = 4
-    lines.append(f'   "{offset}", "c3", "crc32", "uint32", "{size}", "packet checksum"\n')
+    lines.append(f'   "{offset}", "c3", "crc32", "", "uint32", "{size}", "packet checksum"\n')
     offset += size
 
     lines.append("\n")
