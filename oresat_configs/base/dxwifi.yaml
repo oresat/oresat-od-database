@@ -16,6 +16,18 @@ objects:
         access_type: ro
         unit: C
 
+  - index: 0x4002
+    name: live_status
+    data_type: uint8
+    description: |
+      the oresat live service status
+      - 0x00: off
+      - 0x01: boot
+      - 0x02: standby
+      - 0x03: film
+      - 0x04: transmission
+      - 0xFF: error
+
 tpdos:
   - num: 3
     fields:
