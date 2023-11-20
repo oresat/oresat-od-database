@@ -4,6 +4,13 @@ objects:
     data_type: uint8
     description: the dxwifi status
     access_type: rw
+    value_descriptions:
+      0x00: is off
+      0x01: booting up
+      0x02: in standby
+      0x03: filming
+      0x04: transmitting
+      0xFF: error
 
   - index: 0x4001
     name: radio
@@ -15,18 +22,6 @@ objects:
         description: the temperature of the radio
         access_type: ro
         unit: C
-
-  - index: 0x4002
-    name: live_status
-    data_type: uint8
-    description: |
-      the oresat live service status
-      - 0x00: off
-      - 0x01: boot
-      - 0x02: standby
-      - 0x03: film
-      - 0x04: transmission
-      - 0xFF: error
 
 tpdos:
   - num: 3
