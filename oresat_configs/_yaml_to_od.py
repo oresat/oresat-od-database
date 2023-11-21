@@ -243,7 +243,7 @@ def _add_tpdo_data(od: canopen.ObjectDictionary, config: dict):
         comm_rec.add_member(var)
 
         var = canopen.objectdictionary.Variable("event_timer", comm_index, 0x5)
-        var.access_type = "const"
+        var.access_type = "rw"
         var.data_type = canopen.objectdictionary.UNSIGNED16
         var.default = tpdo.get("event_timer_ms", 0)
         comm_rec.add_member(var)
