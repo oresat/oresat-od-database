@@ -20,6 +20,7 @@ classifiers = [
 ]
 dependencies = [
     "canopen",
+    "dataclasses-json",
     "pyyaml",
 ]
 dynamic = ["version"]
@@ -62,7 +63,8 @@ linters = "pycodestyle,pyflakes,pylint,mccabe,mypy,radon"
 # W1514:    Using open without explicitly specifying an encoding
 # R1702:    Too many nested blocks
 # E0401:    Cannot find implementation or library stub for module named
-ignore = "E402,C901,C0103,E203,R0912,R0915,R901,R901,R0914,C0413,C0206,R1716,W1514,R1702,E0401"
+# R0902:    Too many instance attributes
+ignore = "E402,C901,C0103,E203,R0912,R0915,R901,R901,R0914,C0413,C0206,R1716,W1514,R1702,E0401,R0902"
 max_line_length = 100
 
 [[tool.pylama.files]]

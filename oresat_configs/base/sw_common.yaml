@@ -3,11 +3,11 @@ std_objects:
   - error_register
   - predefined_error_field
   - cob_id_sync
-  - identity
+  - communication_cycle_period
   - cob_id_emergency_message
   - inhibit_time_emcy
-  - consumer_heartbeat_time
   - producer_heartbeat_time
+  - identity
   - sdo_server_parameter
   - os_command
   - scet

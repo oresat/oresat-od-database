@@ -574,11 +574,9 @@ def write_canopennode_h(od: canopen.ObjectDictionary, dir_path: str = "."):
     lines.append("#define OD_CNT_NMT 1")
     lines.append("#define OD_CNT_EM 1")
     lines.append("#define OD_CNT_SYNC 1")
-    lines.append("#define OD_CNT_SYNC_PROD 1")
-    lines.append("#define OD_CNT_STORAGE 1")
     lines.append("#define OD_CNT_EM_PROD 1")
-    lines.append("#define OD_CNT_HB_CONS 1")
     lines.append("#define OD_CNT_HB_PROD 1")
+    lines.append("#define OD_CNT_HB_CONS 0")
     lines.append("#define OD_CNT_SDO_SRV 1")
     if 0x1280 in od:
         lines.append("#define OD_CNT_SDO_CLI 1")

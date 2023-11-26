@@ -1,24 +1,23 @@
 - index: 0x1000
   name: device_type
   object_type: variable
-  description: |
-    - bits 16-31: additional information
-    - bits 0-15: device profile number
+  bit_definitions:
+    additional_info: "31-16"
+    device_profile_numer: "15-0"
   data_type: uint32
   access_type: ro
 
 - index: 0x1001
   name: error_register
   object_type: variable
-  description: |
-    - bit 7: manufacturer specific
-    - bit 6: reserved (always 0)
-    - bit 5: device profile specific
-    - bit 4: communication error (overrun error state)
-    - bit 3: temperature
-    - bit 2: voltage
-    - bit 1: current
-    - bit 0: generic error
+  bit_definitions:
+    manufacturer_specific: 7
+    device_profile_specfic: 5
+    communication_error: 4
+    temperature: 3
+    voltage: 2
+    current: 1
+    generic_error: 0
   data_type: uint8
   access_type: ro
 
@@ -26,8 +25,10 @@
   name: predefined_error_field
   object_type: array
   description: emcy history for device
-  length: 8  # can be up to 127
-  data_type: uint32
+  generate_subindexes:
+    subindexes: fixed_length
+    length: 8  # can be up to 127
+    data_type: uint32
 
 - index: 0x1005
   name: cob_id_sync
@@ -36,6 +37,10 @@
   data_type: uint32
   access_type: rw
   default: 0x80
+  bit_definitions:
+    gen: 30
+    frame: 29
+    can_id: "10-0"
 
 - index: 0x1006
   name: communication_cycle_period
@@ -47,11 +52,10 @@
 - index: 0x1014
   name: cob_id_emergency_message
   object_type: variable
-  description: |
-    - bit 31: not valid
-    - bit 30: reserved
-    - bits 29-11: always 0
-    - bits 10-0: CAN-ID
+  bit_definitions:
+    not_valid: 31
+    frame: 29
+    can_id: "10-0"
   data_type: uint32
   access_type: rw
   default: "0x80+$NODE_ID"
@@ -67,14 +71,16 @@
   name: consumer_heartbeat_time
   object_type: array
   description: expected heartbeat cycle times in milliseconds for all other nodes
-  length: 127
-  data_type: uint32
-  default: 1000
+  generate_subindexes:
+    subindexes: node_ids
+    name: node_ids
+    data_type: uint32
+    default: 1000
 
 - index: 0x1017
   name: producer_heartbeat_time
   object_type: variable
-  description: heartbeat producer time in ms, 0 = disable
+  description: heartbeat producer time in ms or 0 to disable
   data_type: uint16
   access_type: rw
   default: 1000
@@ -97,9 +103,9 @@
     
     - subindex: 0x3
       name: revision_number
-      description: |
-        - bits 16-31: major version
-        - bits 0-15: minor version
+      bit_definitions:
+        major: "31-16"
+        minor: "15-0"
       data_type: uint32
       access_type: ro
     
@@ -165,12 +171,12 @@
     
     - subindex: 0x2
       name: status
-      description: |
-        - 0x00: Command completed no error no reply
-        - 0x01: Command completed no error reply
-        - 0x02: Command completed error no reply
-        - 0x03: Command completed error reply
-        - 0xFF: Command executing
+      value_descriptions:
+        0x00: Command completed no error no reply
+        0x01: Command completed no error reply
+        0x02: Command completed error no reply
+        0x03: Command completed error reply
+        0xFF: Command executing
       data_type: uint32
       access_type: ro
     

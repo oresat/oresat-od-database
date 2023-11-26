@@ -2,6 +2,7 @@ bitstring
 black
 build
 canopen
+dataclasses-json
 isort
 pylama[all]
 pylama[toml]
