@@ -27,9 +27,13 @@ release = __version__
 # -- General configuration ---------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#general-configuration
 
-extensions: list = []
+extensions: list = [
+    "sphinx.ext.autodoc",
+    "sphinx.ext.intersphinx",
+]
 templates_path: list = []
 exclude_patterns: list = []
+add_module_names = False
 
 # -- Options for HTML output -------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#options-for-html-output
@@ -37,6 +41,12 @@ exclude_patterns: list = []
 html_theme = "sphinx_rtd_theme"
 html_static_path = ["static"]
 html_css_files = ["custom.css"]
+
+# -- Others Options ----------------------------------------------------------
+
+# Example configuration for intersphinx: refer to the Python standard library.
+# To add links to stand python type definitions.
+intersphinx_mapping = {"python": ("https://docs.python.org/3/", None)}
 
 # -- Gen rst scripts ---------------------------------------------------------
 
