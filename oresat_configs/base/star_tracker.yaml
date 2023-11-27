@@ -3,13 +3,13 @@ objects:
     name: status
     data_type: uint8
     value_descriptions:
-      0x00: off
-      0x01: booting
-      0x02: standby
-      0x03: low power
-      0x04: star track
-      0x05: capture only
-      0xFF: hardware error
+      off: 0
+      boot: 1
+      standby: 2
+      low_power: 3
+      star_track: 4
+      capture: 5
+      error: 0xff
 
   - index: 0x4001
     name: capture

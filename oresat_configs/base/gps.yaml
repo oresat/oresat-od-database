@@ -3,10 +3,10 @@ objects:
     name: status
     data_type: uint8
     value_descriptions:
-      0: off
-      1: searching for gps satellites
-      2: locked onto >4 gps satellites
-      3: error
+      off: 0
+      searching: 1
+      locked: 2
+      error: 3
     access_type: ro
 
   - index: 0x4001
@@ -23,10 +23,10 @@ objects:
         name: fix_mode
         data_type: uint8
         value_descriptions:
-          0: no fix
-          1: 2d
-          2: 3d
-          3: 3d+dgps
+          no_fix: 0
+          2d: 1
+          3d: 2
+          3d_dgps: 3
         access_type: ro
 
       - subindex: 0x2

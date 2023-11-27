@@ -172,11 +172,11 @@
     - subindex: 0x2
       name: status
       value_descriptions:
-        0x00: Command completed no error no reply
-        0x01: Command completed no error reply
-        0x02: Command completed error no reply
-        0x03: Command completed error reply
-        0xFF: Command executing
+        no_error_no_reply: 0x00
+        no_error_reply: 0x01
+        error_no_reply: 0x02
+        error_reply: 0x03
+        executing: 0xFF
       data_type: uint32
       access_type: ro
     

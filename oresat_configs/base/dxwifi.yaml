@@ -5,12 +5,12 @@ objects:
     description: the dxwifi status
     access_type: rw
     value_descriptions:
-      0x00: is off
-      0x01: booting up
-      0x02: in standby
-      0x03: filming
-      0x04: transmitting
-      0xFF: error
+      off: 0
+      boot: 1
+      standby: 2
+      film: 3
+      transmit: 4
+      error: 0xff
 
   - index: 0x4001
     name: radio

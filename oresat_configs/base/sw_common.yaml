@@ -68,10 +68,10 @@ objects:
         data_type: uint8
         description: reset the app
         value_descriptions:
-          1: soft reset
-          2: hard reset
-          3: factory reset
-          4: power off
+          soft_reset: 1
+          hard_reset: 2
+          factory_reset: 3
+          poweroff: 4
         access_type: wo
 
       - subindex: 0x2
@@ -198,10 +198,10 @@ objects:
         data_type: uint8
         description: status of the updater
         value_descriptions:
-          0x0: Last update was successfully installed (default value)
-          0x1: Last update failed while pre-processing the update
-          0x2: Last update failed while running the update
-          0xFF: Update is in progress
+          successful: 0
+          pre_process_error: 1
+          run_error: 2
+          in_progress: 0xff
         access_type: ro
 
       - subindex: 0x2

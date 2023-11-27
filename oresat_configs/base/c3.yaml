@@ -9,11 +9,11 @@ objects:
     name: status
     data_type: uint8
     value_descriptions:
-      66: PRE_DEPLOY - Holding state after deployment of satellite but before deployment of antennas.
-      67: DEPLOY - Antenna deployment state.
-      68: STANDBY Satellite is functional but in standby state. Battery level is too low or tx is disabled
-      69: BEACON- Active beaconing state. Broadcasts telemetry packets via radio periodically
-      70: EDL - Currently receiving and/or transmitting engineering data link packets with a groundstation
+      pre_deply: 66
+      deploy: 67
+      standby: 68
+      beacon: 69
+      edl: 70
     access_type: ro
 
   - index: 0x4001
@@ -297,10 +297,10 @@ objects:
         data_type: uint8
         description: opd system enable status
         value_descriptions:
-          1: DISABLED - OPD system is off
-          2: ENABLED - OPD system is on (no faults)
-          3: FAULT - OPD system is on and has one or more faults
-          4: DEAD - OPD system is considered dead (too may faults in a row)
+          disable: 1
+          enable: 2
+          fault: 3
+          dead: 4
         access_type: rw
 
       - subindex: 0x2
@@ -361,11 +361,11 @@ objects:
         data_type: uint8
         description: enable/disable selected node on write or get current state by read
         value_descriptions:
-          0x1: DISABLED - OPD node is off
-          0x2: ENABLED - OPD node is on (no faults)
-          0x3: FAULT - Fault input is set for OPD node
-          0x4: DEAD - OPD node is considered dead (too may faults in a row)
-          0xFF: NOT_FOUND - OPD not is not found
+          disable: 0x1
+          enable: 0x2
+          fault: 0x3
+          dead: 0x4
+          not_found: 0xff
         access_type: rw
 
       - subindex: 0xb

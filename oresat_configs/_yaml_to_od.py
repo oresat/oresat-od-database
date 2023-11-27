@@ -104,8 +104,8 @@ def _make_var(obj, index: int, subindex: int = 0) -> canopen.objectdictionary.Va
     var.description = obj.description
     for name, bits in obj.bit_definitions.items():
         var.add_bit_definition(name, bits)
-    for value, descr in obj.value_descriptions.items():
-        var.add_value_description(value, descr)
+    for name, value in obj.value_descriptions.items():
+        var.add_value_description(value, name)
     var.unit = obj.unit
     if obj.scale_factor != 1:
         var.factor = obj.scale_factor
@@ -158,8 +158,8 @@ def _make_arr(obj, node_ids: list) -> canopen.objectdictionary.Array:
         var.data_type = OD_DATA_TYPES[generate_subindexes.data_type]
         for name, bits in generate_subindexes.bit_definitions.items():
             var.add_bit_definition(name, bits)
-        for value, descr in generate_subindexes.value_descriptions.items():
-            var.add_value_description(value, descr)
+        for name, value in generate_subindexes.value_descriptions.items():
+            var.add_value_description(value, name)
         var.unit = generate_subindexes.unit
         var.factor = generate_subindexes.scale_factor
         _set_var_default(generate_subindexes, var)
@@ -580,6 +580,8 @@ def _gen_od_db(oresat_id: OreSatId, beacon_def: BeaconConfig, configs: dict) -> 
         od["versions"]["configs_version"].default = __version__
         od["satellite_id"].default = oresat_id.value
         if node_id == NodeId.C3:
+            for oid in list(OreSatId):
+                od["satellite_id"].value_descriptions[oid.value] = oid.name
             od["beacon"]["revision"].default = beacon_def.revision
             od["beacon"]["dest_callsign"].default = beacon_def.ax25.dest_callsign
             od["beacon"]["dest_ssid"].default = beacon_def.ax25.dest_ssid
