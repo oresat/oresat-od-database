@@ -168,3 +168,6 @@ OD.*
 
 # generated docs
 **/gen/*.rst
+
+# Beacon def formats
+*xtce.xml

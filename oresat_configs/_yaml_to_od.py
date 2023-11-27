@@ -581,7 +581,7 @@ def _gen_od_db(oresat_id: OreSatId, beacon_def: BeaconConfig, configs: dict) -> 
         od["satellite_id"].default = oresat_id.value
         if node_id == NodeId.C3:
             for oid in list(OreSatId):
-                od["satellite_id"].value_descriptions[oid.value] = oid.name
+                od["satellite_id"].value_descriptions[oid.value] = oid.name.lower()
             od["beacon"]["revision"].default = beacon_def.revision
             od["beacon"]["dest_callsign"].default = beacon_def.ax25.dest_callsign
             od["beacon"]["dest_ssid"].default = beacon_def.ax25.dest_ssid
