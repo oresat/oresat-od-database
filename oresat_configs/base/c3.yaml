@@ -501,6 +501,76 @@ objects:
         data_type: uint32
         description: the last state of wakeup interval
 
+  - index: 0x400c
+    name: node_manager
+    object_type: record
+    subindexes:
+      - subindex: 0x1
+        name: status_json
+        data_type: str
+        description: JSON with status of all nodes
+        access_type: ro
+        default: "[]"
+
+      - subindex: 0x2
+        name: total_nodes
+        data_type: uint8
+        description: total number of OreSat nodes
+        access_type: ro
+
+      - subindex: 0x3
+        name: nodes_off
+        data_type: uint8
+        description: number of OreSat nodes in off state
+        access_type: ro
+
+      - subindex: 0x3
+        name: nodes_booting
+        data_type: uint8
+        description: number of OreSat nodes in boot state
+        access_type: ro
+
+      - subindex: 0x4
+        name: nodes_on
+        data_type: uint8
+        description: number of OreSat nodes in on state
+        access_type: ro
+
+      - subindex: 0x5
+        name: nodes_with_errors
+        data_type: uint8
+        description: number of OreSat nodes in error state
+        access_type: ro
+
+      - subindex: 0x6
+        name: nodes_not_found
+        data_type: uint8
+        description: number of OreSat nodes in not_found state
+        access_type: ro
+
+      - subindex: 0x7
+        name: nodes_dead
+        data_type: uint8
+        description: number of OreSat nodes in dead state
+        access_type: ro
+
+  - index: 0x400d
+    name: node_status
+    object_type: array
+    description: OreSat node status
+    generate_subindexes:
+      subindexes: node_ids
+      names: node_ids
+      data_type: uint8
+      access_type: ro
+      value_descriptions:
+        off: 0
+        boot: 1
+        on: 2
+        error: 3
+        not_found: 4
+        dead: 0xff
+
 tpdos:
   - num: 1 # time sync TPDO
     fields:
