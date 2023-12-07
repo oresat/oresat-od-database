@@ -6,7 +6,13 @@ from dataclasses import dataclass
 
 from dataclasses_json import dataclass_json
 
-from ._yaml_to_od import _gen_c3_beacon_defs, _gen_c3_fram_defs, _gen_fw_base_od, _gen_od_db
+from ._yaml_to_od import (
+    _gen_c3_beacon_defs,
+    _gen_c3_fram_defs,
+    _gen_fw_base_od,
+    _gen_od_db,
+    _load_configs,
+)
 from .base import FW_COMMON_CONFIG_PATH
 from .beacon_config import BeaconConfig
 from .constants import ORESAT_NICE_NAMES, NodeId, OreSatId, __version__
@@ -35,13 +41,13 @@ class Card:
 class OreSatConfig:
     """All the configs for an OreSat mission."""
 
-    CARD_CONFIGS = {
+    CARD_CONFIG_PATHS = {
         OreSatId.ORESAT0: ORESAT0_CARD_CONFIGS_PATH,
         OreSatId.ORESAT0_5: ORESAT0_5_CARD_CONFIGS_PATH,
         OreSatId.ORESAT1: ORESAT1_CARD_CONFIGS_PATH,
     }
 
-    BEACON_CONFIGS = {
+    BEACON_CONFIG_PATHS = {
         OreSatId.ORESAT0: ORESAT0_BEACON_CONFIG_PATH,
         OreSatId.ORESAT0_5: ORESAT0_5_BEACON_CONFIG_PATH,
         OreSatId.ORESAT1: ORESAT1_BEACON_CONFIG_PATH,
@@ -49,9 +55,9 @@ class OreSatConfig:
 
     def __init__(self, oresat_id: OreSatId):
         self.oresat_id = oresat_id
-        beacon_config_path = self.BEACON_CONFIGS[oresat_id]
+        beacon_config_path = self.BEACON_CONFIG_PATHS[oresat_id]
         beacon_config = BeaconConfig.from_yaml(beacon_config_path)
-        card_configs = self.CARD_CONFIGS[oresat_id]
+        card_configs_path = self.CARD_CONFIG_PATHS[oresat_id]
 
         self.cards = {}
         file_path = f"{os.path.dirname(os.path.abspath(__file__))}/cards.csv"
@@ -59,7 +65,7 @@ class OreSatConfig:
             reader = csv.DictReader(f)
             for row in reader:
                 name = row["name"]
-                if name in card_configs:
+                if name in card_configs_path:
                     del row["name"]
                     self.cards[name] = Card(
                         row["nice_name"],
@@ -69,8 +75,9 @@ class OreSatConfig:
                         row["opd_always_on"].lower() == "true",
                     )
 
-        self.od_db = _gen_od_db(oresat_id, self.cards, beacon_config, card_configs)
+        self.configs = _load_configs(card_configs_path)
+        self.od_db = _gen_od_db(oresat_id, self.cards, beacon_config, self.configs)
         c3_od = self.od_db["c3"]
         self.beacon_def = _gen_c3_beacon_defs(c3_od, beacon_config)
-        self.fram_def: list = []  # _gen_c3_fram_defs(c3_od, c3_config)
+        self.fram_def = _gen_c3_fram_defs(c3_od, self.configs["c3"])
         self.fw_base_od = _gen_fw_base_od(oresat_id, FW_COMMON_CONFIG_PATH)

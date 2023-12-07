@@ -2,6 +2,7 @@
 
 import os
 from copy import deepcopy
+from typing import Dict
 
 import canopen
 import yaml
@@ -516,27 +517,17 @@ def overlay_configs(card_config, overlay_config):
             card_config.rpdos.append(deepcopy(overlay_rpdo))
 
 
-def _gen_od_db(oresat_id: OreSatId, cards: dict, beacon_def: BeaconConfig, configs: dict) -> dict:
+def _load_configs(config_paths: dict) -> Dict[str, CardConfig]:
     """Generate all ODs for a OreSat mission."""
 
-    od_db = {}
+    configs: Dict[str, CardConfig] = {}
 
-    node_ids = {name: cards[name].node_id for name in configs}
-    node_ids["c3"] = 0x1
-
-    std_objs = _load_std_objs(STD_OBJS_FILE_NAME, node_ids)
-
-    # don"t apply overlays to original configs
-    configs = deepcopy(configs)
-
-    tmp_configs = {}
-
-    for name in configs:
-        if configs[name] is None:
+    for name, paths in config_paths.items():
+        if paths is None:
             continue
 
-        card_config = CardConfig.from_yaml(configs[name][0])
-        common_config = CardConfig.from_yaml(configs[name][1])
+        card_config = CardConfig.from_yaml(paths[0])
+        common_config = CardConfig.from_yaml(paths[1])
 
         conf = CardConfig()
         conf.std_objects = list(set(common_config.std_objects + card_config.std_objects))
@@ -548,16 +539,24 @@ def _gen_od_db(oresat_id: OreSatId, cards: dict, beacon_def: BeaconConfig, confi
         else:
             conf.tpdos = common_config.tpdos + card_config.tpdos
 
-        if len(configs[name]) > 2:
-            overlay_config = CardConfig.from_yaml(configs[name][2])
+        if len(paths) > 2:
+            overlay_config = CardConfig.from_yaml(paths[2])
             overlay_configs(conf, overlay_config)
 
-        tmp_configs[name] = conf
+        configs[name] = conf
+
+    return configs
+
+
+def _gen_od_db(oresat_id: OreSatId, cards: dict, beacon_def: BeaconConfig, configs: dict) -> dict:
+    od_db = {}
+    node_ids = {name: cards[name].node_id for name in configs}
+    node_ids["c3"] = 0x1
+
+    std_objs = _load_std_objs(STD_OBJS_FILE_NAME, node_ids)
 
     # make od with common and card objects and tpdos
-    for name in tmp_configs:
-        config = tmp_configs[name]
-
+    for name, config in configs.items():
         od = canopen.ObjectDictionary()
         od.bitrate = 1_000_000  # bps
         od.node_id = cards[name].node_id
@@ -609,11 +608,11 @@ def _gen_od_db(oresat_id: OreSatId, cards: dict, beacon_def: BeaconConfig, confi
         od_db[name] = od
 
     # add all RPDOs
-    for name in tmp_configs:
+    for name in configs:
         if name == "c3":
             continue
         _add_all_rpdo_data(od_db["c3"], od_db[name], name)
-        _add_node_rpdo_data(tmp_configs[name], od_db[name], od_db)
+        _add_node_rpdo_data(configs[name], od_db[name], od_db)
 
     # set all object values to its default value
     for od in od_db.values():
