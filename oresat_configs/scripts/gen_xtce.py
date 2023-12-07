@@ -7,7 +7,7 @@ from datetime import datetime
 
 import canopen
 
-from .. import ORESAT_NICE_NAMES, NodeId, OreSatConfig, OreSatId
+from .. import ORESAT_NICE_NAMES, OreSatConfig, OreSatId
 
 GEN_XTCE = "generate beacon xtce file"
 GEN_XTCE_PROG = "oresat-gen-xtce"
@@ -102,7 +102,7 @@ def write_xtce(config: OreSatConfig, dir_path: str = "."):
         attrib={
             "validationStatus": "Working",
             "classification": "NotClassified",
-            "version": f'{config.od_db[NodeId.C3]["beacon"]["revision"].value}.0',
+            "version": f'{config.od_db["c3"]["beacon"]["revision"].value}.0',
             "date": datetime.now().strftime("%Y-%m-%d"),
         },
     )

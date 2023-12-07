@@ -7,7 +7,7 @@ from argparse import ArgumentParser
 
 import canopen
 
-from .. import NodeId, OreSatConfig, OreSatId
+from .. import OreSatConfig, OreSatId
 
 GEN_FW_FILES = "generate CANopenNode OD.[c/h] files for a OreSat firmware card"
 GEN_FW_FILES_PROG = "oresat-gen-fw-files"

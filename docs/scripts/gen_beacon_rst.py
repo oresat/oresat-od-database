@@ -10,7 +10,7 @@ sys.path.insert(0, _FILE_PATH)
 import bitstring
 import canopen
 
-from oresat_configs import NodeId, OreSatConfig, OreSatId
+from oresat_configs import OreSatConfig, OreSatId
 
 OD_DATA_TYPES = {
     canopen.objectdictionary.BOOLEAN: "bool",
@@ -47,7 +47,7 @@ def gen_beacon_rst(config: OreSatConfig, file_path: str, url: str):
         "\n",
     ]
 
-    c3_od = config.od_db[NodeId.C3]
+    c3_od = config.od_db["c3"]
     src_callsign = c3_od["beacon"]["src_callsign"].value
     src_callsign = src_callsign + " " * (6 - len(src_callsign))
     src_ssid = c3_od["beacon"]["src_ssid"].value

@@ -11,7 +11,7 @@ from argparse import ArgumentParser
 
 import canopen
 
-from .. import NodeId, OreSatConfig, OreSatId
+from .. import OreSatConfig, OreSatId
 
 SDO_TRANSFER = "read or write value to a node's object dictionary via SDO transfers"
 SDO_TRANSFER_PROG = "oresat-sdo-transfer"
@@ -64,8 +64,8 @@ def sdo_transfer(sys_args=None):
             print(f"file does not exist {args.value[5:]}")
             sys.exit()
 
-    node_id = NodeId[args.node.upper()]
-    od = config.od_db[node_id]
+    node_name = args.node.lower()
+    od = config.od_db[node_name]
 
     # connect to CAN network
     network = canopen.Network()

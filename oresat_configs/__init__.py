@@ -9,7 +9,7 @@ from dataclasses_json import dataclass_json
 from ._yaml_to_od import _gen_c3_beacon_defs, _gen_c3_fram_defs, _gen_fw_base_od, _gen_od_db
 from .base import FW_COMMON_CONFIG_PATH
 from .beacon_config import BeaconConfig
-from .constants import NODE_NICE_NAMES, ORESAT_NICE_NAMES, NodeId, OreSatId, __version__
+from .constants import ORESAT_NICE_NAMES, NodeId, OreSatId, __version__
 from .oresat0 import ORESAT0_BEACON_CONFIG_PATH, ORESAT0_CARD_CONFIGS_PATH
 from .oresat0_5 import ORESAT0_5_BEACON_CONFIG_PATH, ORESAT0_5_CARD_CONFIGS_PATH
 from .oresat1 import ORESAT1_BEACON_CONFIG_PATH, ORESAT1_CARD_CONFIGS_PATH

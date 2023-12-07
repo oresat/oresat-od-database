@@ -6,7 +6,7 @@ from typing import Any
 
 import canopen
 
-from .. import NodeId, OreSatConfig, OreSatId
+from .. import OreSatConfig, OreSatId
 from .._yaml_to_od import OD_DATA_TYPES
 
 PRINT_OD = "print the object dictionary out to stdout"
