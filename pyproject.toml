@@ -40,7 +40,7 @@ version = {attr = "oresat_configs.constants.__version__"}
 exclude = ["docs*", "tests*"] 
 
 [tool.setuptools.package-data]
-"*" = ["*.yaml"]
+"*" = ["*.yaml", "*.csv"]
 
 [tool.black]
 line_length = 100

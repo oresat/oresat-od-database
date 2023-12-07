@@ -133,7 +133,7 @@ def _make_rec(obj) -> canopen.objectdictionary.Record:
     return rec
 
 
-def _make_arr(obj, node_ids: list) -> canopen.objectdictionary.Array:
+def _make_arr(obj, node_ids: dict) -> canopen.objectdictionary.Array:
     index = obj.index
     arr = canopen.objectdictionary.Array(obj.name, index)
 
@@ -149,8 +149,8 @@ def _make_arr(obj, node_ids: list) -> canopen.objectdictionary.Array:
         subindexes = list(range(1, obj.generate_subindexes.length + 1))
         names = [obj.name + f"_{subindex}" for subindex in subindexes]
     elif generate_subindexes.subindexes == "node_ids":
-        subindexes = [node_id.value for node_id in node_ids]
-        names = [node_id.name.lower() for node_id in node_ids]
+        subindexes = list(node_ids.values())
+        names = list(node_ids.keys())
 
     for subindex, name in zip(subindexes, names):
         var = canopen.objectdictionary.Variable(name, index, subindex)
@@ -171,7 +171,7 @@ def _make_arr(obj, node_ids: list) -> canopen.objectdictionary.Array:
     return arr
 
 
-def _add_objects(od: canopen.ObjectDictionary, objects: list, node_ids: list):
+def _add_objects(od: canopen.ObjectDictionary, objects: list, node_ids: dict):
     """File a objectdictionary with all the objects."""
 
     for obj in objects:
@@ -414,8 +414,7 @@ def _add_node_rpdo_data(config, od: canopen.ObjectDictionary, od_db: dict):
     """Add all configured RPDO object to OD based off of TPDO objects from another OD."""
 
     for rpdo in config.rpdos:
-        node_id = NodeId[rpdo.card.upper()]
-        _add_rpdo_data(rpdo.tpdo_num, od, od_db[node_id])
+        _add_rpdo_data(rpdo.tpdo_num, od, od_db[rpdo.card])
 
 
 def _add_all_rpdo_data(master_node_od: canopen.ObjectDictionary, node_od: canopen.ObjectDictionary):
@@ -431,7 +430,7 @@ def _add_all_rpdo_data(master_node_od: canopen.ObjectDictionary, node_od: canope
         _add_rpdo_data(i, master_node_od, node_od)
 
 
-def _load_std_objs(file_path: str, node_ids: list) -> dict:
+def _load_std_objs(file_path: str, node_ids: dict) -> dict:
     """Load the standard objects."""
 
     with open(file_path, "r") as f:
@@ -508,11 +507,13 @@ def overlay_configs(card_config, overlay_config):
             card_config.rpdos.append(deepcopy(overlay_rpdo))
 
 
-def _gen_od_db(oresat_id: OreSatId, beacon_def: BeaconConfig, configs: dict) -> dict:
+def _gen_od_db(oresat_id: OreSatId, cards: dict, beacon_def: BeaconConfig, configs: dict) -> dict:
     """Generate all ODs for a OreSat mission."""
 
     od_db = {}
-    node_ids = list(configs.keys())
+
+    node_ids = {name: cards[name].node_id for name in configs}
+    node_ids["c3"] = 0x1
 
     std_objs = _load_std_objs(STD_OBJS_FILE_NAME, node_ids)
 
@@ -521,37 +522,40 @@ def _gen_od_db(oresat_id: OreSatId, beacon_def: BeaconConfig, configs: dict) -> 
 
     tmp_configs = {}
 
-    for node_id in configs:
-        card_config = CardConfig.from_yaml(configs[node_id][0])
-        common_config = CardConfig.from_yaml(configs[node_id][1])
+    for name in configs:
+        if configs[name] is None:
+            continue
+
+        card_config = CardConfig.from_yaml(configs[name][0])
+        common_config = CardConfig.from_yaml(configs[name][1])
 
         conf = CardConfig()
         conf.std_objects = list(set(common_config.std_objects + card_config.std_objects))
         conf.objects = common_config.objects + card_config.objects
         conf.rpdos = common_config.rpdos + card_config.rpdos
-        if node_id == NodeId.C3:
+        if name == "c3":
             conf.fram = card_config.fram
             conf.tpdos = card_config.tpdos
         else:
             conf.tpdos = common_config.tpdos + card_config.tpdos
 
-        if len(configs[node_id]) > 2:
-            overlay_config = CardConfig.from_yaml(configs[node_id][2])
+        if len(configs[name]) > 2:
+            overlay_config = CardConfig.from_yaml(configs[name][2])
             overlay_configs(conf, overlay_config)
 
-        tmp_configs[node_id] = conf
+        tmp_configs[name] = conf
 
     # make od with common and card objects and tpdos
-    for node_id in tmp_configs:
-        config = tmp_configs[node_id]
+    for name in tmp_configs:
+        config = tmp_configs[name]
 
         od = canopen.ObjectDictionary()
         od.bitrate = 1_000_000  # bps
-        od.node_id = node_id.value
+        od.node_id = cards[name].node_id
         od.device_information.allowed_baudrates = set([1000])
         od.device_information.vendor_name = "PSAS"
         od.device_information.vendor_number = 0
-        od.device_information.product_name = NODE_NICE_NAMES[node_id]
+        od.device_information.product_name = cards[name].nice_name
         od.device_information.product_number = 0
         od.device_information.revision_number = 0
         od.device_information.order_code = 0
@@ -568,10 +572,10 @@ def _gen_od_db(oresat_id: OreSatId, beacon_def: BeaconConfig, configs: dict) -> 
         _add_objects(od, config.objects, node_ids)
 
         # add any standard objects
-        for name in config.std_objects:
-            od[std_objs[name].index] = deepcopy(std_objs[name])
-            if name == "cob_id_emergency_message":
-                od["cob_id_emergency_message"].default = 0x80 + node_id
+        for obj_name in config.std_objects:
+            od[std_objs[obj_name].index] = deepcopy(std_objs[obj_name])
+            if obj_name == "cob_id_emergency_message":
+                od["cob_id_emergency_message"].default = 0x80 + cards[name].node_id
 
         # add TPDSs
         _add_tpdo_data(od, config)
@@ -579,9 +583,9 @@ def _gen_od_db(oresat_id: OreSatId, beacon_def: BeaconConfig, configs: dict) -> 
         # set specific obj defaults
         od["versions"]["configs_version"].default = __version__
         od["satellite_id"].default = oresat_id.value
-        if node_id == NodeId.C3:
-            for oid in list(OreSatId):
-                od["satellite_id"].value_descriptions[oid.value] = oid.name.lower()
+        for oid in list(OreSatId):
+            od["satellite_id"].value_descriptions[oid.value] = oid.name.lower()
+        if name == "c3":
             od["beacon"]["revision"].default = beacon_def.revision
             od["beacon"]["dest_callsign"].default = beacon_def.ax25.dest_callsign
             od["beacon"]["dest_ssid"].default = beacon_def.ax25.dest_ssid
@@ -593,14 +597,14 @@ def _gen_od_db(oresat_id: OreSatId, beacon_def: BeaconConfig, configs: dict) -> 
             od["beacon"]["pid"].default = beacon_def.ax25.pid
             od["flight_mode"].access_type = "ro"
 
-        od_db[node_id] = od
+        od_db[name] = od
 
     # add all RPDOs
-    for node_id in tmp_configs:
-        if node_id == NodeId.C3:
+    for name in tmp_configs:
+        if name == "c3":
             continue
-        _add_all_rpdo_data(od_db[NodeId.C3], od_db[node_id])
-        _add_node_rpdo_data(tmp_configs[node_id], od_db[node_id], od_db)
+        _add_all_rpdo_data(od_db["c3"], od_db[name])
+        _add_node_rpdo_data(tmp_configs[name], od_db[name], od_db)
 
     # set all object values to its default value
     for od in od_db.values():
@@ -668,9 +672,9 @@ def _gen_fw_base_od(oresat_id: OreSatId, config_path: str) -> canopen.ObjectDict
 
     config = CardConfig.from_yaml(config_path)
 
-    _add_objects(od, config.objects, [])
+    _add_objects(od, config.objects, {})
 
-    std_objs = _load_std_objs(STD_OBJS_FILE_NAME, [])
+    std_objs = _load_std_objs(STD_OBJS_FILE_NAME, {})
     for name in config.std_objects:
         od[std_objs[name].index] = deepcopy(std_objs[name])
         if name == "cob_id_emergency_message":

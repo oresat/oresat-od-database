@@ -6,7 +6,7 @@ from datetime import datetime
 
 import canopen
 
-from .. import NodeId, OreSatConfig, OreSatId
+from .. import OreSatConfig, OreSatId
 
 GEN_DCF = "generate DCF file for OreSat node(s)"
 GEN_DCF_PROG = "oresat-gen-dcf"
@@ -239,5 +239,5 @@ def gen_dcf(sys_args=None):
         for od in config.od_db.values():
             write_od(od, args.dir_path)
     else:
-        od = config.od_db[NodeId[args.card.upper()]]
+        od = config.od_db[args.card.lower()]
         write_od(od, args.dir_path)

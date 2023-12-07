@@ -670,17 +670,17 @@ def gen_fw_files(sys_args=None):
 
     config = OreSatConfig(oresat_id)
 
-    arg_card = args.card.lower()
+    arg_card = args.card.lower().replace("-", "_")
     if arg_card == "c3":
-        od = config.od_db[NodeId.C3]
-    elif arg_card in ["solar", "solar-module", "solar_module"]:
-        od = config.od_db[NodeId.SOLAR_MODULE_1]
+        od = config.od_db["c3"]
+    elif arg_card in ["solar", "solar_module"]:
+        od = config.od_db["solar_1"]
     elif arg_card in ["battery", "bat"]:
-        od = config.od_db[NodeId.BATTERY_1]
+        od = config.od_db["battery"]
     elif arg_card == "imu":
-        od = config.od_db[NodeId.IMU]
-    elif arg_card in ["rw", "reaction-wheel", "reaction_wheel"]:
-        od = config.od_db[NodeId.REACTION_WHEEL_1]
+        od = config.od_db["adcs"]
+    elif arg_card in ["rw", "reaction_wheel"]:
+        od = config.od_db["rw_1"]
     elif arg_card == "base":
         od = config.fw_base_od
     else:

@@ -47,13 +47,12 @@ def print_od(sys_args=None):
     config = OreSatConfig(oresat_id)
 
     inverted_od_data_types = {}
-    for key in OD_DATA_TYPES:
-        inverted_od_data_types[OD_DATA_TYPES[key]] = key
+    for key, value in OD_DATA_TYPES.items():
+        inverted_od_data_types[value] = key
 
-    arg_card = args.card.upper().replace("-", "_")
+    arg_card = args.card.lower().replace("-", "_")
 
-    node_id = NodeId[arg_card]
-    od = config.od_db[node_id]
+    od = config.od_db[arg_card]
     for i in od:
         if isinstance(od[i], canopen.objectdictionary.Variable):
             data_type = inverted_od_data_types[od[i].data_type]
