@@ -8,7 +8,7 @@ import yaml
 
 from .beacon_config import BeaconConfig
 from .card_config import CardConfig, IndexObject
-from .constants import NODE_NICE_NAMES, NodeId, OreSatId, __version__
+from .constants import OreSatId, __version__
 
 STD_OBJS_FILE_NAME = f"{os.path.dirname(os.path.abspath(__file__))}/standard_objects.yaml"
 
@@ -149,8 +149,11 @@ def _make_arr(obj, node_ids: dict) -> canopen.objectdictionary.Array:
         subindexes = list(range(1, obj.generate_subindexes.length + 1))
         names = [obj.name + f"_{subindex}" for subindex in subindexes]
     elif generate_subindexes.subindexes == "node_ids":
-        subindexes = list(node_ids.values())
-        names = list(node_ids.keys())
+        for name, sub in node_ids.items():
+            if sub == 0:
+                continue  # a node_id of 0 is flag for not on can bus
+            names.append(name)
+            subindexes.append(sub)
 
     for subindex, name in zip(subindexes, names):
         var = canopen.objectdictionary.Variable(name, index, subindex)
@@ -242,9 +245,9 @@ def _add_tpdo_data(od: canopen.ObjectDictionary, config: CardConfig):
         var.access_type = "const"
         var.data_type = canopen.objectdictionary.UNSIGNED32
         node_id = od.node_id
-        if od.node_id == NodeId.GPS and tpdo.num == 16:
+        if od.device_information.product_name == "gps" and tpdo.num == 16:
             # time sync TPDO from GPS uses C3 TPDO 1
-            node_id = NodeId.C3.value
+            node_id = 0x1
             tpdo.num = 1
         var.default = node_id + (((tpdo.num - 1) % 4) * 0x100) + ((tpdo.num - 1) // 4) + 0x180
         if tpdo.rtr:
@@ -280,9 +283,11 @@ def _add_tpdo_data(od: canopen.ObjectDictionary, config: CardConfig):
 
 
 def _add_rpdo_data(
-    tpdo_num: int, rpdo_node_od: canopen.ObjectDictionary, tpdo_node_od: canopen.ObjectDictionary
+    tpdo_num: int,
+    rpdo_node_od: canopen.ObjectDictionary,
+    tpdo_node_od: canopen.ObjectDictionary,
+    tpdo_node_name: str,
 ):
-    node_name = NodeId(tpdo_node_od.node_id).name.lower()
     tpdo_comm_index = TPDO_COMM_START + tpdo_num - 1
     tpdo_mapping_index = TPDO_PARA_START + tpdo_num - 1
 
@@ -294,8 +299,8 @@ def _add_rpdo_data(
     else:
         rpdo_mapped_index = 0x5000 + tpdo_node_od.node_id
         if rpdo_mapped_index not in rpdo_node_od:
-            rpdo_mapped_rec = canopen.objectdictionary.Record(node_name, rpdo_mapped_index)
-            rpdo_mapped_rec.description = f"{node_name} tpdo mapped data"
+            rpdo_mapped_rec = canopen.objectdictionary.Record(tpdo_node_name, rpdo_mapped_index)
+            rpdo_mapped_rec.description = f"{tpdo_node_name} tpdo mapped data"
             rpdo_node_od.add_object(rpdo_mapped_rec)
 
             # index 0 for node data index
@@ -414,10 +419,14 @@ def _add_node_rpdo_data(config, od: canopen.ObjectDictionary, od_db: dict):
     """Add all configured RPDO object to OD based off of TPDO objects from another OD."""
 
     for rpdo in config.rpdos:
-        _add_rpdo_data(rpdo.tpdo_num, od, od_db[rpdo.card])
+        _add_rpdo_data(rpdo.tpdo_num, od, od_db[rpdo.card], rpdo.card)
 
 
-def _add_all_rpdo_data(master_node_od: canopen.ObjectDictionary, node_od: canopen.ObjectDictionary):
+def _add_all_rpdo_data(
+    master_node_od: canopen.ObjectDictionary,
+    node_od: canopen.ObjectDictionary,
+    node_name: str,
+):
     """Add all RPDO object to OD based off of TPDO objects from another OD."""
 
     if not node_od.device_information.nr_of_TXPDO:
@@ -427,7 +436,7 @@ def _add_all_rpdo_data(master_node_od: canopen.ObjectDictionary, node_od: canope
         if TPDO_COMM_START + i - 1 not in node_od:
             continue
 
-        _add_rpdo_data(i, master_node_od, node_od)
+        _add_rpdo_data(i, master_node_od, node_od, node_name)
 
 
 def _load_std_objs(file_path: str, node_ids: dict) -> dict:
@@ -603,7 +612,7 @@ def _gen_od_db(oresat_id: OreSatId, cards: dict, beacon_def: BeaconConfig, confi
     for name in tmp_configs:
         if name == "c3":
             continue
-        _add_all_rpdo_data(od_db["c3"], od_db[name])
+        _add_all_rpdo_data(od_db["c3"], od_db[name], name)
         _add_node_rpdo_data(tmp_configs[name], od_db[name], od_db)
 
     # set all object values to its default value

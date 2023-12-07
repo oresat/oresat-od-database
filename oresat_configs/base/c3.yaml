@@ -297,10 +297,10 @@ objects:
         data_type: uint8
         description: opd system enable status
         value_descriptions:
-          disable: 1
-          enable: 2
-          fault: 3
-          dead: 4
+          disable: 0
+          enable: 1
+          fault: 2
+          dead: 3
         access_type: rw
 
       - subindex: 0x2

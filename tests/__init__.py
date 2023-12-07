@@ -19,9 +19,9 @@ class TestConfig(unittest.TestCase):
     def test_tpdo_sizes(self):
         """Validate TPDO sizes."""
 
-        for node in self.config.od_db:
+        for name in self.config.od_db:
             tpdos = 0
-            od = self.config.od_db[node]
+            od = self.config.od_db[name]
             for i in range(16):
                 tpdo_comm_index = TPDO_COMM_START + i
                 tpdo_para_index = TPDO_PARA_START + i
@@ -43,11 +43,11 @@ class TestConfig(unittest.TestCase):
                         mapped_obj = mapped_obj[mapped_subindex]
                     self.assertTrue(
                         mapped_obj.pdo_mappable,
-                        f"{self.id.name} {node.name} {mapped_obj.name} is not pdo mappable",
+                        f"{self.id.name} {name} {mapped_obj.name} is not pdo mappable",
                     )
                     size += OD_DATA_TYPE_SIZE[mapped_obj.data_type]
                 self.assertLessEqual(
-                    size, 64, f"{self.id.name} {node.name} TPDO{i + 1} is more than 64 bits"
+                    size, 64, f"{self.id.name} {name} TPDO{i + 1} is more than 64 bits"
                 )
                 tpdos += 1
 
@@ -154,7 +154,7 @@ class TestConfig(unittest.TestCase):
     def test_objects(self):
         """Test that all objects are valid."""
 
-        for od in self.config.od_db.values():
+        for name, od in self.config.od_db.items():
             for index in od:
                 if isinstance(od[index], canopen.objectdictionary.Variable):
                     self._test_variable(od[index])
@@ -162,12 +162,20 @@ class TestConfig(unittest.TestCase):
                     self._test_snake_case(od[index].name)
 
                     # test subindex 0
-                    self.assertIn(0, od[index])
-                    self.assertEqual(od[index][0].data_type, canopen.objectdictionary.UNSIGNED8)
+                    self.assertIn(
+                        0,
+                        od[index],
+                        f"{name} index 0x{index:X} is missing subindex 0x0",
+                    )
+                    self.assertEqual(
+                        od[index][0].data_type,
+                        canopen.objectdictionary.UNSIGNED8,
+                        f"{name} index 0x{index:X} subindex 0x0 is not a uint8",
+                    )
                     self.assertEqual(
                         od[index][0].default,
                         max(list(od[index])),
-                        f"index 0x{index:X} mismatch highest subindex",
+                        f"{name} index 0x{index:X} mismatch highest subindex",
                     )
 
                     # test all other subindexes
