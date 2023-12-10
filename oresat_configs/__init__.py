@@ -36,6 +36,8 @@ class Card:
     """OPD address."""
     opd_always_on: bool
     """Keep the card on all the time. Only for battery cards."""
+    child: str = ""
+    """Optional child node name. Useful for CFC cards."""
 
 
 class OreSatConfig:
@@ -73,6 +75,7 @@ class OreSatConfig:
                         row["processor"],
                         int(row["opd_address"], 16),
                         row["opd_always_on"].lower() == "true",
+                        row["child"],
                     )
 
         self.configs = _load_configs(card_configs_path)
