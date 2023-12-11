@@ -676,8 +676,8 @@ def gen_fw_files(sys_args=None):
     elif arg_card in ["solar", "solar_module"]:
         od = config.od_db["solar_1"]
     elif arg_card in ["battery", "bat"]:
-        od = config.od_db["battery"]
-    elif arg_card == "imu":
+        od = config.od_db["battery_1"]
+    elif arg_card in ["imu", "adcs"]:
         od = config.od_db["adcs"]
     elif arg_card in ["rw", "reaction_wheel"]:
         od = config.od_db["rw_1"]
