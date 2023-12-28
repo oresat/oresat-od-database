@@ -1,2 +1,155 @@
-objects: []
-tpdos: []
+objects:
+  - index: 0x4000
+    name:  controller
+    description: reaction wheel controller states and temperatures
+    object_type: record
+    subindexes:
+      - subindex: 0x1
+        name: latest_state
+        data_type: uint8
+        description: latest controller state AKA current state
+        access_type: ro
+
+      - subindex: 0x2
+        name: requested_state
+        data_type: uint8
+        description: requested controller state
+        access_type: rw
+
+      - subindex: 0x3
+        name: return_code
+        data_type: uint8
+        description: last state return code
+        access_type: ro
+
+      - subindex: 0x4
+        name: temp_1
+        data_type: int16
+        description: temperature sensor 1 temp
+        access_type: ro
+        unit: C
+
+      - subindex: 0x5
+        name: temp_2
+        data_type: int16
+        description: temperature sensor 2 temp
+        access_type: ro
+        unit: C
+
+      - subindex: 0x6
+        name: temp_3
+        data_type: int16
+        description: temperature sensor 3 temp
+        access_type: ro
+        unit: C
+
+      # Use EMCY messages for errors
+      #- subindex: 0x3
+      #  name: errors
+      #  data_type: uint32
+      #  description: system error bitmask
+      #  access_type: ro
+
+
+  - index: 0x4001
+    name: motor
+    description: reaction wheel motor vel/current
+    object_type: record
+    subindexes:
+      - subindex: 0x1
+        name: velocity
+        data_type: float32
+        description: motor velocity
+        access_type: ro
+        unit: rev/s
+
+      - subindex: 0x2
+        name: current
+        data_type: float32
+        description: motor current
+        access_type: ro
+        unit: A
+
+      - subindex: 0x3
+        name: setpoint1
+        data_type: float32
+        description: motor setpoint 1
+        access_type: rw
+      
+      - subindex: 0x4
+        name: setpoint2
+        data_type: float32
+        description: setpoint 2
+        access_type: rw
+
+
+  - index: 0x4002
+    name: bus
+    description: reaction wheel DC bus
+    object_type: record
+    subindexes:
+      - subindex: 0x4
+        name: voltage
+        data_type: float32
+        description: bus voltage
+        access_type: ro
+        unit: V
+
+      - subindex: 0x5
+        name: current
+        data_type: float32
+        description: bus current
+        access_type: ro
+
+
+  - index: 0x4006
+    name: other
+    description: reaction wheel config params - reserved
+    object_type: record
+    subindexes:
+      - subindex: 0x1
+        name: reserved_1
+        data_type: float32
+        description: reserved 1
+        access_type: rw
+
+      - subindex: 0x2
+        name: reserved_2
+        data_type: float32
+        description: reserved 2
+        access_type: rw
+      
+      - subindex: 0x3
+        name: reboot_request
+        data_type: uint8
+        description: write 1 to reboot
+        access_type: rw
+
+
+tpdos:
+  - num: 1
+    fields: 
+      - [controller, latest_state]
+      - [controller, requested_state]
+      - [controller, return_code]
+    event_timer_ms: 100
+
+  - num: 2
+    fields: 
+      - [motor, velocity]
+      - [motor, current]
+    event_timer_ms: 100
+
+  - num: 3
+    fields: 
+      - [bus, voltage]
+      - [bus, current]
+    event_timer_ms: 100
+      
+  - num: 4
+    fields: 
+      - [controller, temp_1]
+      - [controller, temp_2]
+      - [controller, temp_3]
+    event_timer_ms: 100
+
