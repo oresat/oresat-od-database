@@ -100,7 +100,7 @@ objects:
         data_type: float32
         description: bus current
         access_type: ro
-
+        unit: A
 
   - index: 0x4006
     name: other
