@@ -571,6 +571,35 @@ objects:
         not_found: 4
         dead: 0xff
 
+  - index: 0x400e
+    name: adcs_manager
+    object_type: record
+    description: OreSat adcs management
+    subindexes:
+      - subindex: 0x1
+        name: reserved
+        data_type: int8
+        description: reserved subindex
+      
+      - subindex: 0x2
+        name: reserved_ro
+        data_type: int8
+        description: reserved read-only subindex
+        access_type: ro
+
+      - subindex: 0x3
+        name: reserved_wo
+        data_type: int8
+        description: reserved write-only subindex
+        access_type: wo
+
+      - subindex: 0x4
+        name: reserved_rw
+        data_type: int8
+        descrption: reserved read-write subindex
+        access_type: rw
+
+
 tpdos:
   - num: 1 # time sync TPDO
     fields:
