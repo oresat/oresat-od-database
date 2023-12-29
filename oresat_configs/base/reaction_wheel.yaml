@@ -1,54 +1,26 @@
 objects:
   - index: 0x4000
-    name:  controller
-    description: reaction wheel controller states and temperatures
+    name:  ctrl_stat
+    description: reaction wheel controller status
     object_type: record
     subindexes:
       - subindex: 0x1
-        name: latest_state
+        name: current_state
         data_type: uint8
-        description: latest controller state AKA current state
+        description: controller state
         access_type: ro
 
       - subindex: 0x2
-        name: requested_state
-        data_type: uint8
-        description: requested controller state
-        access_type: rw
-
-      - subindex: 0x3
-        name: return_code
+        name: procedure_result
         data_type: uint8
         description: last state return code
         access_type: ro
 
-      - subindex: 0x4
-        name: temp_1
-        data_type: int16
-        description: temperature sensor 1 temp
+      - subindex: 0x3
+        name: errors
+        data_type: uint32
+        description: system error bitmask
         access_type: ro
-        unit: C
-
-      - subindex: 0x5
-        name: temp_2
-        data_type: int16
-        description: temperature sensor 2 temp
-        access_type: ro
-        unit: C
-
-      - subindex: 0x6
-        name: temp_3
-        data_type: int16
-        description: temperature sensor 3 temp
-        access_type: ro
-        unit: C
-
-      # Use EMCY messages for errors
-      #- subindex: 0x3
-      #  name: errors
-      #  data_type: uint32
-      #  description: system error bitmask
-      #  access_type: ro
 
 
   - index: 0x4001
@@ -70,68 +42,119 @@ objects:
         access_type: ro
         unit: A
 
-      - subindex: 0x3
-        name: setpoint1
-        data_type: float32
-        description: motor setpoint 1
-        access_type: rw
-      
-      - subindex: 0x4
-        name: setpoint2
-        data_type: float32
-        description: setpoint 2
-        access_type: rw
-
 
   - index: 0x4002
     name: bus
-    description: reaction wheel DC bus
+    description: reaction wheel DC bus voltage/current
     object_type: record
     subindexes:
-      - subindex: 0x4
+      - subindex: 0x1
         name: voltage
         data_type: float32
         description: bus voltage
         access_type: ro
         unit: V
 
-      - subindex: 0x5
+      - subindex: 0x2
         name: current
         data_type: float32
         description: bus current
         access_type: ro
         unit: A
 
+
+  - index: 0x4003
+    name: temperature
+    description: reaction wheel controller temperatures
+    object_type: record
+    subindexes:
+      - subindex: 0x1
+        name: sensor_1
+        data_type: int16
+        description: temperature sensor 1 temp
+        access_type: ro
+        unit: C
+
+      - subindex: 0x2
+        name: sensor_2
+        data_type: int16
+        description: temperature sensor 2 temp
+        access_type: ro
+        unit: C
+
+      - subindex: 0x3
+        name: sensor_3
+        data_type: int16
+        description: temperature sensor 3 temp
+        access_type: ro
+        unit: C
+
+
+  - index: 0x4004
+    name: requested
+    description: reaction wheel requested state
+    object_type: record
+    subindexes:
+      - subindex: 0x1
+        name: state
+        data_type: uint8
+        description: requested state
+        access_type: rw
+
+
+  - index: 0x4005
+    name: signals
+    description: reaction wheel setpoints
+    object_type: record
+    subindexes:
+      - subindex: 0x1
+        name: setpoint
+        data_type: float32
+        description: setpoint 1
+        access_type: rw
+
+      - subindex: 0x2
+        name: reserved_feedforward
+        data_type: float32
+        description: setpoint 2 (e.g. feedforward)
+        access_type: rw
+
+
   - index: 0x4006
-    name: other
+    name: reserved
     description: reaction wheel config params - reserved
     object_type: record
     subindexes:
       - subindex: 0x1
-        name: reserved_1
+        name: subindex_1
         data_type: float32
         description: reserved 1
         access_type: rw
 
       - subindex: 0x2
-        name: reserved_2
+        name: subindex_2
         data_type: float32
         description: reserved 2
         access_type: rw
-      
-      - subindex: 0x3
-        name: reboot_request
+
+
+  - index: 0x4007
+    name: reboot
+    description: reaction wheel reboot request
+    object_type: record
+    subindexes:
+      - subindex: 0x1
+        name: request
         data_type: uint8
         description: write 1 to reboot
         access_type: rw
 
-
 tpdos:
   - num: 1
     fields: 
-      - [controller, latest_state]
-      - [controller, requested_state]
-      - [controller, return_code]
+      - [ctrl_stat, current_state]
+      - [ctrl_stat, procedure_result]
+      - [ctrl_stat, errors]
     event_timer_ms: 100
 
   - num: 2
@@ -148,8 +171,8 @@ tpdos:
       
   - num: 4
     fields: 
-      - [controller, temp_1]
-      - [controller, temp_2]
-      - [controller, temp_3]
+      - [temperature, sensor_1]
+      - [temperature, sensor_2]
+      - [temperature, sensor_3]
     event_timer_ms: 100
 
