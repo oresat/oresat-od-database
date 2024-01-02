@@ -132,7 +132,7 @@ def write_xtce(config: OreSatConfig, dir_path: str = "."):
     )
     ref_time = ET.SubElement(para_type, "ReferenceTime")
     epoch = ET.SubElement(ref_time, "Epoch")
-    epoch.text = "1970-01-01T00:00.00.000"
+    epoch.text = "1970-01-01T00:00:00.000"
 
     para_types = ["unix_time"]
     for obj in config.beacon_def:
@@ -151,6 +151,16 @@ def write_xtce(config: OreSatConfig, dir_path: str = "."):
                     "oneStringValue": "1",
                 },
             )
+            unit_set = ET.SubElement(para_type, "UnitSet")
+            dt_len = DT_LEN[obj.data_type] # Length of the data type
+            # Integer-type encoding for enums
+            int_dt_enc = ET.SubElement(
+                para_type,
+                "IntegerDataEncoding",
+                attrib={
+                    "sizeInBits": str(dt_len)
+                }
+            )
         elif obj.data_type in canopen.objectdictionary.UNSIGNED_TYPES and obj.value_descriptions:
             para_type = ET.SubElement(
                 tm_meta_para,
@@ -158,6 +168,16 @@ def write_xtce(config: OreSatConfig, dir_path: str = "."):
                 attrib={
                     "name": name,
                 },
+            )
+            unit_set = ET.SubElement(para_type, "UnitSet")
+            dt_len = DT_LEN[obj.data_type] # Length of the data type
+            # Integer-type encoding for enums
+            int_dt_enc = ET.SubElement(
+                para_type,
+                "IntegerDataEncoding",
+                attrib={
+                    "sizeInBits": str(dt_len)
+                }
             )
             enum_list = ET.SubElement(para_type, "EnumerationList")
             for value, name in obj.value_descriptions.items():
@@ -175,7 +195,7 @@ def write_xtce(config: OreSatConfig, dir_path: str = "."):
                 encoding = "unsigned"
             else:
                 signed = True
-                encoding = "twoComplement"
+                encoding = "twosComplement"
 
             para_type = ET.SubElement(
                 tm_meta_para,
@@ -223,12 +243,11 @@ def write_xtce(config: OreSatConfig, dir_path: str = "."):
                 "StringParameterType",
                 attrib={
                     "name": name,
-                    "baseType": CANOPEN_TO_XTCE_DT[obj.data_type],
                 },
             )
             str_para_type = ET.SubElement(
                 para_type,
-                "StringParameterType",
+                "StringDataEncoding",
                 attrib={
                     "encoding": "UTF-8",
                 },
@@ -271,7 +290,7 @@ def write_xtce(config: OreSatConfig, dir_path: str = "."):
     # write
     tree = ET.ElementTree(root)
     ET.indent(tree, space="  ", level=0)
-    file_name = f"{config.oresat_id.name.lower()}-xtce.xml"
+    file_name = f"{config.oresat_id.name.lower()}.xtce"
     tree.write(f"{dir_path}/{file_name}", encoding="utf-8", xml_declaration=True)
 
 
