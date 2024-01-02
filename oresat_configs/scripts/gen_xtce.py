@@ -290,7 +290,7 @@ def write_xtce(config: OreSatConfig, dir_path: str = "."):
     # write
     tree = ET.ElementTree(root)
     ET.indent(tree, space="  ", level=0)
-    file_name = f"{config.oresat_id.name.lower().replace('_', '.')}.xtce"
+    file_name = f"{config.oresat_id.name.lower()}.xtce"
     tree.write(f"{dir_path}/{file_name}", encoding="utf-8", xml_declaration=True)
 
 
