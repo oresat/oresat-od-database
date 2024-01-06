@@ -127,6 +127,8 @@ def _make_rec(obj) -> canopen.objectdictionary.Record:
     rec.add_member(var0)
 
     for sub_obj in obj.subindexes:
+        if sub_obj.subindex in rec.subindices:
+            raise ValueError(f"subindex 0x{sub_obj.subindex:X} aleady in record at record 0x{index:X}")
         var = _make_var(sub_obj, index, sub_obj.subindex)
         rec.add_member(var)
         var0.default = sub_obj.subindex
@@ -157,6 +159,8 @@ def _make_arr(obj, node_ids: dict) -> canopen.objectdictionary.Array:
             subindexes.append(sub)
 
     for subindex, name in zip(subindexes, names):
+        if subindex in arr.subindices:
+            raise ValueError(f"subindex 0x{subindex:X} aleady in record at array 0x{index:X}")
         var = canopen.objectdictionary.Variable(name, index, subindex)
         var.access_type = generate_subindexes.access_type
         var.data_type = OD_DATA_TYPES[generate_subindexes.data_type]
@@ -179,6 +183,9 @@ def _add_objects(od: canopen.ObjectDictionary, objects: list, node_ids: dict):
     """File a objectdictionary with all the objects."""
 
     for obj in objects:
+        if obj.index in od.indices:
+            raise ValueError(f"index 0x{obj.index:X} aleady in OD")
+
         if obj.object_type == "variable":
             var = _make_var(obj, obj.index)
             od.add_object(var)
