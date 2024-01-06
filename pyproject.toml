@@ -28,6 +28,7 @@ dynamic = ["version"]
 [project.scripts]
 oresat-configs = "oresat_configs.__main__:oresat_configs"
 oresat-gen-fw-files = "oresat_configs.scripts.gen_fw_files:gen_fw_files"
+oresat-gen-dbc = "oresat_configs.scripts.gen_dbc:gen_dbc"
 oresat-gen-dcf = "oresat_configs.scripts.gen_dcf:gen_dcf"
 oresat-print-od = "oresat_configs.scripts.print_od:print_od"
 oresat-sdo-transfer = "oresat_configs.scripts.sdo_transfer:sdo_transfer"

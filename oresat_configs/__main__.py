@@ -3,6 +3,7 @@
 import sys
 
 from .constants import __version__
+from .scripts.gen_dbc import GEN_DBC, GEN_DBC_PROG, gen_dbc
 from .scripts.gen_dcf import GEN_DCF, GEN_DCF_PROG, gen_dcf
 from .scripts.gen_fw_files import GEN_FW_FILES, GEN_FW_FILES_PROG, gen_fw_files
 from .scripts.gen_xtce import GEN_XTCE, GEN_XTCE_PROG, gen_xtce
@@ -10,6 +11,7 @@ from .scripts.print_od import PRINT_OD, PRINT_OD_PROG, print_od
 from .scripts.sdo_transfer import SDO_TRANSFER, SDO_TRANSFER_PROG, sdo_transfer
 
 SCRIPTS = {
+    GEN_DBC_PROG: GEN_DBC,
     GEN_DCF_PROG: GEN_DCF,
     GEN_XTCE_PROG: GEN_XTCE,
     GEN_FW_FILES_PROG: GEN_FW_FILES,
@@ -43,5 +45,7 @@ if __name__ == "__main__":
         sdo_transfer(sys.argv[2:])
     elif sys.argv[1] == GEN_XTCE_PROG:
         gen_xtce(sys.argv[2:])
+    elif sys.argv[1] == GEN_DBC_PROG:
+        gen_dbc(sys.argv[2:])
     else:
         oresat_configs()
