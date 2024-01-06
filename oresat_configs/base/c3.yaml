@@ -181,7 +181,7 @@ objects:
         access_type: ro
         unit: dB
 
-      - subindex: 0x3
+      - subindex: 0x4
         name: synth_lock
         data_type: bool
         description: lband si41xx synthesizer lock indicator
