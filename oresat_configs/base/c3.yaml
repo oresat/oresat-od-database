@@ -181,6 +181,12 @@ objects:
         access_type: ro
         unit: dB
 
+      - subindex: 0x4
+        name: synth_lock
+        data_type: bool
+        description: lband si41xx synthesizer lock indicator
+        access_type: ro
+
   - index: 0x4007
     name: uhf
     object_type: record

@@ -22,6 +22,7 @@ fields:
   - [lband, rx_bytes]
   - [lband, rx_packets]
   - [lband, rssi]
+  - [lband, synth_lock]
   - [uhf, rx_bytes]
   - [uhf, rx_packets]
   - [uhf, rssi]

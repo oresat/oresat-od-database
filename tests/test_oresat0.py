@@ -9,5 +9,5 @@ class TestOreSat0(TestConfig):
     """Test the OreSat0 OD database."""
 
     def setUp(self):
-        self.id = OreSatId.ORESAT0_5
+        self.id = OreSatId.ORESAT0
         self.config = OreSatConfig(self.id)
