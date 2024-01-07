@@ -5,7 +5,11 @@ from copy import deepcopy
 from typing import Dict
 
 import canopen
-import yaml
+from yaml import load
+try:
+    from yaml import CLoader as Loader
+except ImportError:
+    from yaml import Loader
 
 from .beacon_config import BeaconConfig
 from .card_config import CardConfig, IndexObject
@@ -451,7 +455,7 @@ def _load_std_objs(file_path: str, node_ids: dict) -> dict:
     """Load the standard objects."""
 
     with open(file_path, "r") as f:
-        std_objs_raw = yaml.safe_load(f)
+        std_objs_raw = load(f, Loader=Loader)
 
     std_objs = {}
     for obj_raw in std_objs_raw:
