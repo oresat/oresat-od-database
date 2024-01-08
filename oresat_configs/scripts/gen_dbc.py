@@ -1,5 +1,6 @@
 """Generage DBC Files"""
 
+import os
 from argparse import ArgumentParser
 from .. import ORESAT_NICE_NAMES, OreSatConfig, OreSatId
 
@@ -8,7 +9,13 @@ GEN_DBC_PROG = "oresat-gen-dbc"
 
 
 def write_dbc(config: OreSatConfig, dir_path: str = '.') -> None:
-   __import__('ipdb').set_trace() 
+    dir_path = os.path.abspath(dir_path)
+    output_dbc_fn = f'{dir_path}/{config.oresat_id.name.lower()}.dbc'
+    print(f'Writing DBC to {output_dbc_fn}')
+
+    with open(output_dbc_fn, 'w+') as file:
+        for card_name, od in config.od_db.items():
+            print(f'Parsing {card_name}')
 
 
 def gen_dbc(sys_args: any) -> None:
