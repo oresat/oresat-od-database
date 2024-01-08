@@ -187,6 +187,12 @@ objects:
         description: lband si41xx synthesizer lock indicator
         access_type: ro
 
+      - subindex: 0x5
+        name: synth_relock_count
+        data_type: uint8
+        description: lband si41xx synthesizer relock count since boot
+        access_type: ro
+
   - index: 0x4007
     name: uhf
     object_type: record
@@ -576,6 +582,17 @@ objects:
         error: 3
         not_found: 4
         dead: 0xff
+
+  - index: 0x400e
+    name: adcs_manager
+    object_type: record
+    subindexes:
+      - subindex: 0x1
+        name: mode
+        data_type: uint8
+        description: current adcs mode
+        access_type: ro
+
 
 tpdos:
   - num: 1 # time sync TPDO
