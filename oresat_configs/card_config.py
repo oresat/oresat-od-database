@@ -3,7 +3,11 @@
 from dataclasses import dataclass, field
 from typing import Any, Dict, List, Optional, Union
 
-import yaml
+from yaml import load
+try:
+    from yaml import CLoader as Loader
+except ImportError:
+    from yaml import Loader
 from dataclasses_json import dataclass_json
 
 
@@ -231,5 +235,5 @@ class CardConfig:
         """Load a card YAML config file."""
 
         with open(config_path, "r") as f:
-            config_raw = yaml.safe_load(f)
+            config_raw = load(f, Loader=Loader)
         return cls.from_dict(config_raw)  # type: ignore  # pylint: disable=E1101

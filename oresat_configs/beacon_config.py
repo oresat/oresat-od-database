@@ -3,7 +3,11 @@
 from dataclasses import dataclass, field
 from typing import List
 
-import yaml
+from yaml import load
+try:
+    from yaml import CLoader as Loader
+except ImportError:
+    from yaml import Loader
 from dataclasses_json import dataclass_json
 
 
@@ -85,5 +89,5 @@ class BeaconConfig:
         """Load a beacon YAML config file."""
 
         with open(config_path, "r") as f:
-            config_raw = yaml.safe_load(f)
+            config_raw = load(f, Loader=Loader)
         return cls.from_dict(config_raw)  # type: ignore  # pylint: disable=E1101
