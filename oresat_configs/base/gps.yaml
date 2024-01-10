@@ -188,6 +188,7 @@ tpdos:
     fields:
       - [status]
       - [skytraq, number_of_sv]
+      - [skytraq, fix_mode]
       - [time_syncd]
 
   - num: 16 # the time sync TPDO

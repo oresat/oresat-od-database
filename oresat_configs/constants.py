@@ -6,7 +6,7 @@ Seperate from __init__.py to avoid cirular imports.
 
 from enum import IntEnum
 
-__version__ = "0.2.0"
+__version__ = "0.3.0"
 
 
 class OreSatId(IntEnum):
