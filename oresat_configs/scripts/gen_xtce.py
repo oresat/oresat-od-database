@@ -113,6 +113,33 @@ def write_xtce(config: OreSatConfig, dir_path: str = "."):
     tm_meta = ET.SubElement(root, "TelemetryMetaData")
     tm_meta_para = ET.SubElement(tm_meta, "ParameterTypeSet")
 
+    # Hard-code the 128b type for the AX.25 parameter
+    uint128_type = ET.SubElement(
+        tm_meta_para,
+        "BinaryParameterType",
+        attrib={
+            "name": "b128_type",
+            "shortDescription": "128 bitfield",
+        },
+    )
+    ET.SubElement(uint128_type, "UnitSet")
+    bin_data_enc = ET.SubElement(
+        uint128_type,
+        "BinaryDataEncoding",
+        attrib={
+            "bitOrder": "leastSignificantBitFirst"
+        }
+    )
+    bin_data_enc_size = ET.SubElement(
+        bin_data_enc,
+        "SizeInBits",
+    )
+    bin_data_enc_size_fixed = ET.SubElement(
+        bin_data_enc_size,
+        "FixedValue",
+    )
+    bin_data_enc_size_fixed.text = "128"
+
     para_type = ET.SubElement(
         tm_meta_para,
         "AbsoluteTimeParameterType",
@@ -153,7 +180,7 @@ def write_xtce(config: OreSatConfig, dir_path: str = "."):
             )
             unit_set = ET.SubElement(para_type, "UnitSet")
             dt_len = DT_LEN[obj.data_type] # Length of the data type
-            # Integer-type encoding for enums
+            # Integer-type encoding for Integers
             int_dt_enc = ET.SubElement(
                 para_type,
                 "IntegerDataEncoding",
@@ -258,6 +285,17 @@ def write_xtce(config: OreSatConfig, dir_path: str = "."):
             fixed_value.text = str(len(obj.default) * 8)
 
     para_set = ET.SubElement(tm_meta, "ParameterSet")
+
+    # Hard-code the AX.25 headers as a Binary128 type
+    ET.SubElement(
+        para_set,
+        "Parameter",
+        attrib={
+            "name": "ax25_header",
+            "parameterTypeRef": "b128_type",
+            "shortDescription": "AX.25 Header"
+        },
+    )
     for obj in config.beacon_def:
         ET.SubElement(
             para_set,
@@ -278,6 +316,13 @@ def write_xtce(config: OreSatConfig, dir_path: str = "."):
         },
     )
     entry_list = ET.SubElement(seq_cont, "EntryList")
+    ET.SubElement(
+        entry_list,
+        "ParameterRefEntry",
+        attrib={
+            "parameterRef": "ax25_header"
+        },
+    )
     for obj in config.beacon_def:
         ET.SubElement(
             entry_list,
