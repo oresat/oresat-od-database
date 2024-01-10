@@ -361,6 +361,3 @@ tpdos:
       - [magnetorquer, current_z]
       - [magnetorquer, pwm_z]
     event_timer_ms: 1000
-
-
-

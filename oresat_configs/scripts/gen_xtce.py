@@ -113,6 +113,33 @@ def write_xtce(config: OreSatConfig, dir_path: str = "."):
     tm_meta = ET.SubElement(root, "TelemetryMetaData")
     tm_meta_para = ET.SubElement(tm_meta, "ParameterTypeSet")
 
+    # Hard-code the 128b type for the AX.25 parameter
+    uint128_type = ET.SubElement(
+        tm_meta_para,
+        "BinaryParameterType",
+        attrib={
+            "name": "b128_type",
+            "shortDescription": "128 bitfield",
+        },
+    )
+    ET.SubElement(uint128_type, "UnitSet")
+    bin_data_enc = ET.SubElement(
+        uint128_type,
+        "BinaryDataEncoding",
+        attrib={
+            "bitOrder": "leastSignificantBitFirst"
+        }
+    )
+    bin_data_enc_size = ET.SubElement(
+        bin_data_enc,
+        "SizeInBits",
+    )
+    bin_data_enc_size_fixed = ET.SubElement(
+        bin_data_enc_size,
+        "FixedValue",
+    )
+    bin_data_enc_size_fixed.text = "128"
+
     para_type = ET.SubElement(
         tm_meta_para,
         "AbsoluteTimeParameterType",
@@ -132,7 +159,7 @@ def write_xtce(config: OreSatConfig, dir_path: str = "."):
     )
     ref_time = ET.SubElement(para_type, "ReferenceTime")
     epoch = ET.SubElement(ref_time, "Epoch")
-    epoch.text = "1970-01-01T00:00.00.000"
+    epoch.text = "1970-01-01T00:00:00.000"
 
     para_types = ["unix_time"]
     for obj in config.beacon_def:
@@ -151,6 +178,16 @@ def write_xtce(config: OreSatConfig, dir_path: str = "."):
                     "oneStringValue": "1",
                 },
             )
+            unit_set = ET.SubElement(para_type, "UnitSet")
+            dt_len = DT_LEN[obj.data_type] # Length of the data type
+            # Integer-type encoding for Integers
+            int_dt_enc = ET.SubElement(
+                para_type,
+                "IntegerDataEncoding",
+                attrib={
+                    "sizeInBits": str(dt_len)
+                }
+            )
         elif obj.data_type in canopen.objectdictionary.UNSIGNED_TYPES and obj.value_descriptions:
             para_type = ET.SubElement(
                 tm_meta_para,
@@ -158,6 +195,16 @@ def write_xtce(config: OreSatConfig, dir_path: str = "."):
                 attrib={
                     "name": name,
                 },
+            )
+            unit_set = ET.SubElement(para_type, "UnitSet")
+            dt_len = DT_LEN[obj.data_type] # Length of the data type
+            # Integer-type encoding for enums
+            int_dt_enc = ET.SubElement(
+                para_type,
+                "IntegerDataEncoding",
+                attrib={
+                    "sizeInBits": str(dt_len)
+                }
             )
             enum_list = ET.SubElement(para_type, "EnumerationList")
             for value, name in obj.value_descriptions.items():
@@ -175,7 +222,7 @@ def write_xtce(config: OreSatConfig, dir_path: str = "."):
                 encoding = "unsigned"
             else:
                 signed = True
-                encoding = "twoComplement"
+                encoding = "twosComplement"
 
             para_type = ET.SubElement(
                 tm_meta_para,
@@ -223,12 +270,11 @@ def write_xtce(config: OreSatConfig, dir_path: str = "."):
                 "StringParameterType",
                 attrib={
                     "name": name,
-                    "baseType": CANOPEN_TO_XTCE_DT[obj.data_type],
                 },
             )
             str_para_type = ET.SubElement(
                 para_type,
-                "StringParameterType",
+                "StringDataEncoding",
                 attrib={
                     "encoding": "UTF-8",
                 },
@@ -239,6 +285,17 @@ def write_xtce(config: OreSatConfig, dir_path: str = "."):
             fixed_value.text = str(len(obj.default) * 8)
 
     para_set = ET.SubElement(tm_meta, "ParameterSet")
+
+    # Hard-code the AX.25 headers as a Binary128 type
+    ET.SubElement(
+        para_set,
+        "Parameter",
+        attrib={
+            "name": "ax25_header",
+            "parameterTypeRef": "b128_type",
+            "shortDescription": "AX.25 Header"
+        },
+    )
     for obj in config.beacon_def:
         ET.SubElement(
             para_set,
@@ -259,6 +316,13 @@ def write_xtce(config: OreSatConfig, dir_path: str = "."):
         },
     )
     entry_list = ET.SubElement(seq_cont, "EntryList")
+    ET.SubElement(
+        entry_list,
+        "ParameterRefEntry",
+        attrib={
+            "parameterRef": "ax25_header"
+        },
+    )
     for obj in config.beacon_def:
         ET.SubElement(
             entry_list,
@@ -271,7 +335,7 @@ def write_xtce(config: OreSatConfig, dir_path: str = "."):
     # write
     tree = ET.ElementTree(root)
     ET.indent(tree, space="  ", level=0)
-    file_name = f"{config.oresat_id.name.lower()}-xtce.xml"
+    file_name = f"{config.oresat_id.name.lower()}.xtce"
     tree.write(f"{dir_path}/{file_name}", encoding="utf-8", xml_declaration=True)
 
 
