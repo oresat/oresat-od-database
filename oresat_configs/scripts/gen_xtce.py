@@ -258,6 +258,16 @@ def write_xtce(config: OreSatConfig, dir_path: str = "."):
             fixed_value.text = str(len(obj.default) * 8)
 
     para_set = ET.SubElement(tm_meta, "ParameterSet")
+    # Hard-code the AX.25 headers as a U16
+    ET.SubElement(
+        para_set,
+        "Parameter",
+        attrib={
+            "name": "ax25_header",
+            "parameterTypeRef": "uint16_type",
+            "shortDescription": "AX.25 Header"
+        },
+    )
     for obj in config.beacon_def:
         ET.SubElement(
             para_set,
@@ -278,6 +288,13 @@ def write_xtce(config: OreSatConfig, dir_path: str = "."):
         },
     )
     entry_list = ET.SubElement(seq_cont, "EntryList")
+    ET.SubElement(
+        entry_list,
+        "ParameterRefEntry",
+        attrib={
+            "parameterRef": "ax25_header"
+        },
+    )
     for obj in config.beacon_def:
         ET.SubElement(
             entry_list,
