@@ -4,6 +4,7 @@ from dataclasses import dataclass, field
 from typing import List
 
 from yaml import load
+
 try:
     from yaml import CLoader as Loader
 except ImportError:

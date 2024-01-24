@@ -6,6 +6,7 @@ from typing import Dict
 
 import canopen
 from yaml import load
+
 try:
     from yaml import CLoader as Loader
 except ImportError:
@@ -132,7 +133,9 @@ def _make_rec(obj) -> canopen.objectdictionary.Record:
 
     for sub_obj in obj.subindexes:
         if sub_obj.subindex in rec.subindices:
-            raise ValueError(f"subindex 0x{sub_obj.subindex:X} aleady in record at record 0x{index:X}")
+            raise ValueError(
+                f"subindex 0x{sub_obj.subindex:X} aleady in record at record 0x{index:X}"
+            )
         var = _make_var(sub_obj, index, sub_obj.subindex)
         rec.add_member(var)
         var0.default = sub_obj.subindex
