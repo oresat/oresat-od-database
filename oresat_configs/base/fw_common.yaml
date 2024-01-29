@@ -8,6 +8,7 @@ std_objects:
   - inhibit_time_emcy
   - producer_heartbeat_time
   - identity
+  - synchronous_counter_overflow_value
   - sdo_server_parameter
   - scet
   - utc
