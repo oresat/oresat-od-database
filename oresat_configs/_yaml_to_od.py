@@ -119,6 +119,8 @@ def _make_var(obj, index: int, subindex: int = 0) -> canopen.objectdictionary.Va
     _set_var_default(obj, var)
     if var.data_type not in DYNAMIC_LEN_DATA_TYPES:
         var.pdo_mappable = True
+    var.high_limit = obj.high_limit
+    var.low_limit = obj.low_limit
     return var
 
 
