@@ -7,7 +7,8 @@ node's Object Dictionaries.
 
 import os
 import sys
-from argparse import ArgumentParser
+from argparse import ArgumentParser, Namespace
+from typing import Optional
 
 import canopen
 
@@ -17,13 +18,12 @@ SDO_TRANSFER = "read or write value to a node's object dictionary via SDO transf
 SDO_TRANSFER_PROG = "oresat-sdo-transfer"
 
 
-def sdo_transfer(sys_args=None):
-    """Read or write data to a node using a SDO."""
+def build_parser(parser: ArgumentParser) -> ArgumentParser:
+    """Configures an ArgumentParser suitable for this script.
 
-    if sys_args is None:
-        sys_args = sys.argv[1:]
-
-    parser = ArgumentParser(description=SDO_TRANSFER, prog=SDO_TRANSFER_PROG)
+    The given parser may be standalone or it may be used as a subcommand in another ArgumentParser.
+    """
+    parser.description = SDO_TRANSFER
     parser.add_argument("bus", metavar="BUS", help="CAN bus to use (e.g., can0, vcan0)")
     parser.add_argument("node", metavar="NODE", help="device node name (e.g. gps, solar_module_1)")
     parser.add_argument("mode", metavar="MODE", help="r[ead] or w[rite] (e.g. r, read, w, write)")
@@ -44,7 +44,27 @@ def sdo_transfer(sys_args=None):
         default="oresat0.5",
         help="oresat# (e.g.: oresat0, oresat0.5, oresat1)",
     )
-    args = parser.parse_args(sys_args)
+    return parser
+
+
+def register_subparser(subparsers):
+    """Registers an ArgumentParser as a subcommand of another parser.
+
+    Intended to be called by __main__.py for each script. Given the output of add_subparsers(),
+    (which I think is a subparser group, but is technically unspecified) this function should
+    create its own ArgumentParser via add_parser(). It must also set_default() the func argument
+    to designate the entry point into this script.
+    See https://docs.python.org/3/library/argparse.html#sub-commands, especially the end of that
+    section, for more.
+    """
+    parser = build_parser(subparsers.add_parser(SDO_TRANSFER_PROG, help=SDO_TRANSFER))
+    parser.set_defaults(func=sdo_transfer)
+
+
+def sdo_transfer(args: Optional[Namespace] = None):
+    """Read or write data to a node using a SDO."""
+    if args is None:
+        args = build_parser(ArgumentParser()).parse_args()
 
     arg_oresat = args.oresat.lower()
     if arg_oresat in ["0", "oresat0"]:

@@ -3,7 +3,8 @@
 import math as m
 import os
 import sys
-from argparse import ArgumentParser
+from argparse import ArgumentParser, Namespace
+from typing import Optional
 
 import canopen
 
@@ -11,6 +12,33 @@ from .. import OreSatConfig, OreSatId
 
 GEN_FW_FILES = "generate CANopenNode OD.[c/h] files for a OreSat firmware card"
 GEN_FW_FILES_PROG = "oresat-gen-fw-files"
+
+
+def build_parser(parser: ArgumentParser) -> ArgumentParser:
+    """Configures an ArgumentParser suitable for this script.
+
+    The given parser may be standalone or it may be used as a subcommand in another ArgumentParser.
+    """
+    parser.description = GEN_FW_FILES
+    parser.add_argument("oresat", help="oresat mission; oresat0 or oresat0.5")
+    parser.add_argument("card", help="card name; c3, battery, solar, imu, or reaction_wheel")
+    parser.add_argument("-d", "--dir-path", default=".", help='output directory path, default: "."')
+    return parser
+
+
+def register_subparser(subparsers):
+    """Registers an ArgumentParser as a subcommand of another parser.
+
+    Intended to be called by __main__.py for each script. Given the output of add_subparsers(),
+    (which I think is a subparser group, but is technically unspecified) this function should
+    create its own ArgumentParser via add_parser(). It must also set_default() the func argument
+    to designate the entry point into this script.
+    See https://docs.python.org/3/library/argparse.html#sub-commands, especially the end of that
+    section, for more.
+    """
+    parser = build_parser(subparsers.add_parser(GEN_FW_FILES_PROG, help=GEN_FW_FILES))
+    parser.set_defaults(func=gen_fw_files)
+
 
 INDENT4 = " " * 4
 INDENT8 = " " * 8
@@ -645,17 +673,10 @@ def write_canopennode_h(od: canopen.ObjectDictionary, dir_path: str = "."):
             f.write(i + "\n")
 
 
-def gen_fw_files(sys_args=None):
+def gen_fw_files(args: Optional[Namespace] = None):
     """generate CANopenNode firmware files main"""
-
-    if sys_args is None:
-        sys_args = sys.argv[1:]
-
-    parser = ArgumentParser(description=GEN_FW_FILES, prog=GEN_FW_FILES_PROG)
-    parser.add_argument("oresat", help="oresat mission; oresat0 or oresat0.5")
-    parser.add_argument("card", help="card name; c3, battery, solar, imu, or reaction_wheel")
-    parser.add_argument("-d", "--dir-path", default=".", help='output directory path, default: "."')
-    args = parser.parse_args(sys_args)
+    if args is None:
+        args = build_parser(ArgumentParser()).parse_args()
 
     arg_oresat = args.oresat.lower()
     if arg_oresat in ["0", "oresat0"]:

@@ -1,47 +1,45 @@
 """oresat_configs main"""
 
-import sys
+# Process for adding a new script:
+# - Add module to scripts/ directory
+#  - It must have register_subparser() which takes a subparsers list
+# - import the module here and add it to the SCRIPTS list
+# - If it can also be a standalone script then update the pyproject.toml [project.scripts] section
+#
+# test it out - both through oresat_configs and directly
+
+import argparse
 
 from .constants import __version__
-from .scripts.gen_dcf import GEN_DCF, GEN_DCF_PROG, gen_dcf
-from .scripts.gen_fw_files import GEN_FW_FILES, GEN_FW_FILES_PROG, gen_fw_files
-from .scripts.gen_xtce import GEN_XTCE, GEN_XTCE_PROG, gen_xtce
-from .scripts.print_od import PRINT_OD, PRINT_OD_PROG, print_od
-from .scripts.sdo_transfer import SDO_TRANSFER, SDO_TRANSFER_PROG, sdo_transfer
+from .scripts import gen_dcf
+from .scripts import gen_fw_files
+from .scripts import gen_xtce
+from .scripts import print_od
+from .scripts import sdo_transfer
 
-SCRIPTS = {
-    GEN_DCF_PROG: GEN_DCF,
-    GEN_XTCE_PROG: GEN_XTCE,
-    GEN_FW_FILES_PROG: GEN_FW_FILES,
-    PRINT_OD_PROG: PRINT_OD,
-    SDO_TRANSFER_PROG: SDO_TRANSFER,
-}
+
+SCRIPTS = [
+    gen_dcf,
+    gen_fw_files,
+    gen_xtce,
+    print_od,
+    sdo_transfer,
+]
 
 
 def oresat_configs():
     """oresat_configs main."""
+    parser = argparse.ArgumentParser(prog="oresat_configs")
+    parser.add_argument('--version', action='version', version='%(prog)s v' + __version__)
+    parser.set_defaults(func=lambda x: parser.print_help())
+    subparsers = parser.add_subparsers(title="subcommands")
 
-    print("oresat_configs v" + __version__)
-    print("")
+    for subcommand in SCRIPTS:
+        subcommand.register_subparser(subparsers)
 
-    print("command : description")
-    print("--------------------------")
-    for key in SCRIPTS:
-        print(f"{key} : {SCRIPTS[key]}")
+    args = parser.parse_args()
+    args.func(args)
 
 
 if __name__ == "__main__":
-    if len(sys.argv) < 2:
-        oresat_configs()
-    elif sys.argv[1] == GEN_DCF_PROG:
-        gen_dcf(sys.argv[2:])
-    elif sys.argv[1] == GEN_FW_FILES_PROG:
-        gen_fw_files(sys.argv[2:])
-    elif sys.argv[1] == PRINT_OD_PROG:
-        print_od(sys.argv[2:])
-    elif sys.argv[1] == SDO_TRANSFER_PROG:
-        sdo_transfer(sys.argv[2:])
-    elif sys.argv[1] == GEN_XTCE_PROG:
-        gen_xtce(sys.argv[2:])
-    else:
-        oresat_configs()
+    oresat_configs()

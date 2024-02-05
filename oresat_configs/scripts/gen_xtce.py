@@ -2,8 +2,9 @@
 
 import sys
 import xml.etree.ElementTree as ET
-from argparse import ArgumentParser
+from argparse import ArgumentParser, Namespace
 from datetime import datetime
+from typing import Optional
 
 import canopen
 
@@ -11,6 +12,34 @@ from .. import ORESAT_NICE_NAMES, OreSatConfig, OreSatId
 
 GEN_XTCE = "generate beacon xtce file"
 GEN_XTCE_PROG = "oresat-gen-xtce"
+
+
+def build_parser(parser: ArgumentParser) -> ArgumentParser:
+    """Configures an ArgumentParser suitable for this script.
+
+    The given parser may be standalone or it may be used as a subcommand in another ArgumentParser.
+    """
+    parser.description = GEN_XTCE
+    parser.add_argument(
+        "oresat", default="oresat0", help="oresat mission; oresat0, oresat0.5, or oresat1"
+    )
+    parser.add_argument("-d", "--dir-path", default=".", help='directory path; defautl "."')
+    return parser
+
+
+def register_subparser(subparsers):
+    """Registers an ArgumentParser as a subcommand of another parser.
+
+    Intended to be called by __main__.py for each script. Given the output of add_subparsers(),
+    (which I think is a subparser group, but is technically unspecified) this function should
+    create its own ArgumentParser via add_parser(). It must also set_default() the func argument
+    to designate the entry point into this script.
+    See https://docs.python.org/3/library/argparse.html#sub-commands, especially the end of that
+    section, for more.
+    """
+    parser = build_parser(subparsers.add_parser(GEN_XTCE_PROG, help=GEN_XTCE))
+    parser.set_defaults(func=gen_xtce)
+
 
 CANOPEN_TO_XTCE_DT = {
     canopen.objectdictionary.BOOLEAN: "bool",
@@ -313,18 +342,10 @@ def write_xtce(config: OreSatConfig, dir_path: str = "."):
     tree.write(f"{dir_path}/{file_name}", encoding="utf-8", xml_declaration=True)
 
 
-def gen_xtce(sys_args=None):
+def gen_xtce(args: Optional[Namespace] = None):
     """Gen_dcf main."""
-
-    if sys_args is None:
-        sys_args = sys.argv[1:]
-
-    parser = ArgumentParser(description=GEN_XTCE, prog=GEN_XTCE_PROG)
-    parser.add_argument(
-        "oresat", default="oresat0", help="oresat mission; oresat0, oresat0.5, or oresat1"
-    )
-    parser.add_argument("-d", "--dir-path", default=".", help='directory path; defautl "."')
-    args = parser.parse_args(sys_args)
+    if args is None:
+        args = build_parser(ArgumentParser()).parse_args()
 
     arg_oresat = args.oresat.lower()
     if arg_oresat in ["0", "oresat0"]:
