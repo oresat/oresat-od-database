@@ -174,12 +174,6 @@ def write_xtce(config: OreSatConfig, dir_path: str = "."):
                     "oneStringValue": "1",
                 },
             )
-            unit_set = ET.SubElement(para_type, "UnitSet")
-            dt_len = DT_LEN[obj.data_type]  # Length of the data type
-            # Integer-type encoding for Integers
-            int_dt_enc = ET.SubElement(
-                para_type, "IntegerDataEncoding", attrib={"sizeInBits": str(dt_len)}
-            )
         elif obj.data_type in canopen.objectdictionary.UNSIGNED_TYPES and obj.value_descriptions:
             para_type = ET.SubElement(
                 tm_meta_para,
@@ -187,12 +181,6 @@ def write_xtce(config: OreSatConfig, dir_path: str = "."):
                 attrib={
                     "name": name,
                 },
-            )
-            unit_set = ET.SubElement(para_type, "UnitSet")
-            dt_len = DT_LEN[obj.data_type]  # Length of the data type
-            # Integer-type encoding for enums
-            int_dt_enc = ET.SubElement(
-                para_type, "IntegerDataEncoding", attrib={"sizeInBits": str(dt_len)}
             )
             enum_list = ET.SubElement(para_type, "EnumerationList")
             for value, name in obj.value_descriptions.items():
