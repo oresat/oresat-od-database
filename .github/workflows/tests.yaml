@@ -27,8 +27,20 @@ jobs:
         python -m pip install --upgrade pip
         pip install -r requirements.txt
 
+    - name: Lint with Pylama
+      run: pylama
+
+    - name: Check format with Black
+      run: black --check --diff .
+
+    - name: Check format with isort
+      run: isort --check --diff .
+
     - name: Test with Python's unittest
       run: python -m unittest
 
     - name: Test building pypi package
       run: python -m build
+
+    - name: Test building sphinx docs
+      run: make -C docs html
