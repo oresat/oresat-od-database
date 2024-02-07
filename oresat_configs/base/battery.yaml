@@ -361,7 +361,6 @@ tpdos:
 
   - num: 5
     fields:
-      - [pack_1, temperature_min]
       - [pack_1, full_capacity]
       - [pack_1, reported_capacity]
       - [pack_1, reported_state_of_charge]
