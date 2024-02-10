@@ -1,6 +1,5 @@
 """Generate XTCE for the beacon."""
 
-import sys
 import xml.etree.ElementTree as ET
 from argparse import ArgumentParser, Namespace
 from datetime import datetime
@@ -8,7 +7,7 @@ from typing import Optional
 
 import canopen
 
-from .. import ORESAT_NICE_NAMES, OreSatConfig, OreSatId
+from .. import OreSatConfig, Consts
 
 GEN_XTCE = "generate beacon xtce file"
 GEN_XTCE_PROG = "oresat-gen-xtce"
@@ -20,9 +19,9 @@ def build_parser(parser: ArgumentParser) -> ArgumentParser:
     The given parser may be standalone or it may be used as a subcommand in another ArgumentParser.
     """
     parser.description = GEN_XTCE
-    parser.add_argument(
-        "oresat", default="oresat0", help="oresat mission; oresat0, oresat0.5, or oresat1"
-    )
+    parser.add_argument("--oresat", default=Consts.default().arg, choices=[m.arg for m in Consts],
+                        type=lambda x: x.lower().removeprefix("oresat"),
+                        help="oresat mission, defaults to %(default)s")
     parser.add_argument("-d", "--dir-path", default=".", help='directory path; defautl "."')
     return parser
 
@@ -115,7 +114,7 @@ def write_xtce(config: OreSatConfig, dir_path: str = "."):
     root = ET.Element(
         "SpaceSystem",
         attrib={
-            "name": ORESAT_NICE_NAMES[config.oresat_id],
+            "name": str(config.oresat),
             "xmlns:xtce": "http://www.omg.org/space/xtce",
             "xmlns:xsi": "http://www.w3.org/2001/XMLSchema-instance",
             "xsi:schemaLocation": (
@@ -338,7 +337,7 @@ def write_xtce(config: OreSatConfig, dir_path: str = "."):
     # write
     tree = ET.ElementTree(root)
     ET.indent(tree, space="  ", level=0)
-    file_name = f"{config.oresat_id.name.lower()}.xtce"
+    file_name = f"{config.oresat.name.lower()}.xtce"
     tree.write(f"{dir_path}/{file_name}", encoding="utf-8", xml_declaration=True)
 
 
@@ -347,16 +346,5 @@ def gen_xtce(args: Optional[Namespace] = None):
     if args is None:
         args = build_parser(ArgumentParser()).parse_args()
 
-    arg_oresat = args.oresat.lower()
-    if arg_oresat in ["0", "oresat0"]:
-        oresat_id = OreSatId.ORESAT0
-    elif arg_oresat in ["0.5", "oresat0.5"]:
-        oresat_id = OreSatId.ORESAT0_5
-    elif arg_oresat in ["1", "oresat1"]:
-        oresat_id = OreSatId.ORESAT1
-    else:
-        print(f"invalid oresat mission: {args.oresat}")
-        sys.exit()
-
-    config = OreSatConfig(oresat_id)
+    config = OreSatConfig(args.oresat)
     write_xtce(config, args.dir_path)

@@ -4,25 +4,69 @@ OreSat OD constants
 Seperate from __init__.py to avoid cirular imports.
 """
 
-from enum import IntEnum
+from __future__ import annotations
+from dataclasses import dataclass
+from enum import Enum, IntEnum, unique
 
 __version__ = "0.3.1"
 
 
+@dataclass
+class Mission:
+    """A specific set of constants associated with an OreSat Mission"""
+    id: int
+    arg: str
+
+
+@unique
+class Consts(Mission, Enum):
+    """Constants associated with each OreSat Mission"""
+    ORESAT0 = 1, "0"
+    ORESAT0_5 = 2, "0.5"
+    ORESAT1 = 3, "1"
+
+    def __str__(self) -> str:
+        return "OreSat" + self.arg
+
+    @classmethod
+    def default(cls) -> Consts:
+        """Returns the currently active mission"""
+        return cls.ORESAT0_5
+
+    @classmethod
+    def from_string(cls, val: str) -> Consts:
+        """Fetches the Mission associated with an appropriate string
+
+        Appropriate strings are the arg (0, 0.5, ...), optionally prefixed with
+        OreSat or oresat
+        """
+        arg = val.lower().removeprefix("oresat")
+        for m in cls:
+            if m.arg == arg:
+                return m
+        raise ValueError(f"invalid oresat mission: {val}")
+
+    @classmethod
+    def from_id(cls, val: OreSatId | int) -> Consts:
+        """Fetches the Mission associated with an integer ID"""
+        if isinstance(val, OreSatId):
+            val = val.value
+        elif not isinstance(val, int):
+            raise TypeError(f"Unsupported val type: '{type(val)}'")
+
+        for m in cls:
+            if m.id == val:
+                return m
+        raise ValueError(f"invalid OreSatId: {val}")
+
+
+@unique
 class OreSatId(IntEnum):
     """Unique ID for each OreSat."""
 
     ORESAT0 = 1
     ORESAT0_5 = 2
     ORESAT1 = 3
-
-
-ORESAT_NICE_NAMES = {
-    OreSatId.ORESAT0: "OreSat0",
-    OreSatId.ORESAT0_5: "OreSat0.5",
-    OreSatId.ORESAT1: "OreSat1",
-}
-"""Nice name for OreSat missions."""
 
 
 class NodeId(IntEnum):

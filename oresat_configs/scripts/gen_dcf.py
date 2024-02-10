@@ -1,13 +1,12 @@
 """Generate a DCF for from an OreSat card's object directory."""
 
-import sys
 from argparse import ArgumentParser, Namespace
 from datetime import datetime
 from typing import Optional
 
 import canopen
 
-from .. import OreSatConfig, OreSatId
+from .. import OreSatConfig, Consts
 
 GEN_DCF = "generate DCF file for OreSat node(s)"
 GEN_DCF_PROG = "oresat-gen-dcf"
@@ -19,9 +18,9 @@ def build_parser(parser: ArgumentParser) -> ArgumentParser:
     The given parser may be standalone or it may be used as a subcommand in another ArgumentParser.
     """
     parser.description = GEN_DCF
-    parser.add_argument(
-        "oresat", default="oresat0", help="oresat mission; oresat0, oresat0.5, or oresat1"
-    )
+    parser.add_argument("--oresat", default=Consts.default().arg, choices=[m.arg for m in Consts],
+                        type=lambda x: x.lower().removeprefix("oresat"),
+                        help="oresat mission, defaults to %(default)s")
     parser.add_argument("card", help="card name; all, c3, gps, star_tracker_1, etc")
     parser.add_argument("-d", "--dir-path", default=".", help='directory path; defautl "."')
     return parser
@@ -242,18 +241,7 @@ def gen_dcf(args: Optional[Namespace] = None):
     if args is None:
         args = build_parser(ArgumentParser()).parse_args()
 
-    arg_oresat = args.oresat.lower()
-    if arg_oresat in ["0", "oresat0"]:
-        oresat_id = OreSatId.ORESAT0
-    elif arg_oresat in ["0.5", "oresat0.5"]:
-        oresat_id = OreSatId.ORESAT0_5
-    elif arg_oresat in ["1", "oresat1"]:
-        oresat_id = OreSatId.ORESAT1
-    else:
-        print(f"invalid oresat mission: {args.oresat}")
-        sys.exit()
-
-    config = OreSatConfig(oresat_id)
+    config = OreSatConfig(args.oresat)
 
     if args.card.lower() == "all":
         for od in config.od_db.values():

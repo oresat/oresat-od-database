@@ -12,7 +12,7 @@ from typing import Optional
 
 import canopen
 
-from .. import OreSatConfig, OreSatId
+from .. import OreSatConfig, Consts
 
 SDO_TRANSFER = "read or write value to a node's object dictionary via SDO transfers"
 SDO_TRANSFER_PROG = "oresat-sdo-transfer"
@@ -37,13 +37,9 @@ def build_parser(parser: ArgumentParser) -> ArgumentParser:
         help="data to write or for only octet/domain data types a path to a file "
         "(e.g. file:data.bin)",
     )
-    parser.add_argument(
-        "-o",
-        "--oresat",
-        metavar="ORESAT",
-        default="oresat0.5",
-        help="oresat# (e.g.: oresat0, oresat0.5, oresat1)",
-    )
+    parser.add_argument("--oresat", default=Consts.default().arg, choices=[m.arg for m in Consts],
+                        type=lambda x: x.lower().removeprefix("oresat"),
+                        help="oresat mission, defaults to %(default)s")
     return parser
 
 
@@ -66,18 +62,7 @@ def sdo_transfer(args: Optional[Namespace] = None):
     if args is None:
         args = build_parser(ArgumentParser()).parse_args()
 
-    arg_oresat = args.oresat.lower()
-    if arg_oresat in ["0", "oresat0"]:
-        oresat_id = OreSatId.ORESAT0
-    elif arg_oresat in ["0.5", "oresat0.5"]:
-        oresat_id = OreSatId.ORESAT0_5
-    elif arg_oresat in ["1", "oresat1"]:
-        oresat_id = OreSatId.ORESAT1
-    else:
-        print(f"invalid oresat mission: {args.oresat}")
-        sys.exit()
-
-    config = OreSatConfig(oresat_id)
+    config = OreSatConfig(args.oresat)
 
     if args.value.startswith("file:"):
         if not os.path.isfile(args.value[5:]):

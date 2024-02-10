@@ -8,7 +8,7 @@ from typing import Optional
 
 import canopen
 
-from .. import OreSatConfig, OreSatId
+from .. import OreSatConfig, Consts
 
 GEN_FW_FILES = "generate CANopenNode OD.[c/h] files for a OreSat firmware card"
 GEN_FW_FILES_PROG = "oresat-gen-fw-files"
@@ -20,7 +20,9 @@ def build_parser(parser: ArgumentParser) -> ArgumentParser:
     The given parser may be standalone or it may be used as a subcommand in another ArgumentParser.
     """
     parser.description = GEN_FW_FILES
-    parser.add_argument("oresat", help="oresat mission; oresat0 or oresat0.5")
+    parser.add_argument("--oresat", default=Consts.default().arg, choices=[m.arg for m in Consts],
+                        type=lambda x: x.lower().removeprefix("oresat"),
+                        help="oresat mission, defaults to %(default)s")
     parser.add_argument("card", help="card name; c3, battery, solar, imu, or reaction_wheel")
     parser.add_argument("-d", "--dir-path", default=".", help='output directory path, default: "."')
     return parser
@@ -678,18 +680,7 @@ def gen_fw_files(args: Optional[Namespace] = None):
     if args is None:
         args = build_parser(ArgumentParser()).parse_args()
 
-    arg_oresat = args.oresat.lower()
-    if arg_oresat in ["0", "oresat0"]:
-        oresat_id = OreSatId.ORESAT0
-    elif arg_oresat in ["0.5", "oresat0.5"]:
-        oresat_id = OreSatId.ORESAT0_5
-    elif arg_oresat in ["1", "oresat1"]:
-        oresat_id = OreSatId.ORESAT1
-    else:
-        print(f"invalid oresat mission: {args.oresat}")
-        sys.exit()
-
-    config = OreSatConfig(oresat_id)
+    config = OreSatConfig(args.oresat)
 
     arg_card = args.card.lower().replace("-", "_")
     if arg_card == "c3":
