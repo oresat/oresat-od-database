@@ -15,7 +15,6 @@ import canopen
 from .. import OreSatConfig, Consts
 
 SDO_TRANSFER = "read or write value to a node's object dictionary via SDO transfers"
-SDO_TRANSFER_PROG = "oresat-sdo-transfer"
 
 
 def build_parser(parser: ArgumentParser) -> ArgumentParser:
@@ -53,7 +52,7 @@ def register_subparser(subparsers):
     See https://docs.python.org/3/library/argparse.html#sub-commands, especially the end of that
     section, for more.
     """
-    parser = build_parser(subparsers.add_parser(SDO_TRANSFER_PROG, help=SDO_TRANSFER))
+    parser = build_parser(subparsers.add_parser("sdo", help=SDO_TRANSFER))
     parser.set_defaults(func=sdo_transfer)
 
 

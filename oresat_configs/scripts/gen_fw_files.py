@@ -11,7 +11,6 @@ import canopen
 from .. import OreSatConfig, Consts
 
 GEN_FW_FILES = "generate CANopenNode OD.[c/h] files for a OreSat firmware card"
-GEN_FW_FILES_PROG = "oresat-gen-fw-files"
 
 
 def build_parser(parser: ArgumentParser) -> ArgumentParser:
@@ -38,7 +37,7 @@ def register_subparser(subparsers):
     See https://docs.python.org/3/library/argparse.html#sub-commands, especially the end of that
     section, for more.
     """
-    parser = build_parser(subparsers.add_parser(GEN_FW_FILES_PROG, help=GEN_FW_FILES))
+    parser = build_parser(subparsers.add_parser("fw-files", help=GEN_FW_FILES))
     parser.set_defaults(func=gen_fw_files)
 
 

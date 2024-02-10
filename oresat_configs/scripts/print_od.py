@@ -9,7 +9,6 @@ from .. import OreSatConfig, Consts
 from .._yaml_to_od import OD_DATA_TYPES
 
 PRINT_OD = "print the object dictionary out to stdout"
-PRINT_OD_PROG = "oresat-print-od"
 
 
 def build_parser(parser: ArgumentParser) -> ArgumentParser:
@@ -35,7 +34,7 @@ def register_subparser(subparsers):
     See https://docs.python.org/3/library/argparse.html#sub-commands, especially the end of that
     section, for more.
     """
-    parser = build_parser(subparsers.add_parser(PRINT_OD_PROG, help=PRINT_OD))
+    parser = build_parser(subparsers.add_parser("od", help=PRINT_OD))
     parser.set_defaults(func=print_od)
 
 

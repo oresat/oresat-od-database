@@ -9,7 +9,6 @@ import canopen
 from .. import OreSatConfig, Consts
 
 GEN_DCF = "generate DCF file for OreSat node(s)"
-GEN_DCF_PROG = "oresat-gen-dcf"
 
 
 def build_parser(parser: ArgumentParser) -> ArgumentParser:
@@ -36,7 +35,7 @@ def register_subparser(subparsers):
     See https://docs.python.org/3/library/argparse.html#sub-commands, especially the end of that
     section, for more.
     """
-    parser = build_parser(subparsers.add_parser(GEN_DCF_PROG, help=GEN_DCF))
+    parser = build_parser(subparsers.add_parser("dcf", help=GEN_DCF))
     parser.set_defaults(func=gen_dcf)
 
 
