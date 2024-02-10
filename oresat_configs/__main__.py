@@ -16,6 +16,7 @@ from .scripts import gen_fw_files
 from .scripts import gen_xtce
 from .scripts import print_od
 from .scripts import sdo_transfer
+from .scripts import list_cards
 
 
 SCRIPTS = [
@@ -24,6 +25,7 @@ SCRIPTS = [
     gen_xtce,
     print_od,
     sdo_transfer,
+    list_cards,
 ]
 
 

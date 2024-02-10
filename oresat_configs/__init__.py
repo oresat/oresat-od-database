@@ -37,6 +37,21 @@ class Card:
     """Optional child node name. Useful for CFC cards."""
 
 
+def cards_from_csv(oresat: Consts) -> dict[str, Card]:
+    """Turns cards.csv into a dict of names->Cards, filtered by the current mission"""
+
+    file_path = f"{os.path.dirname(os.path.abspath(__file__))}/cards.csv"
+    with open(file_path, "r") as f:
+        return {row["name"] : Card(
+            row["nice_name"],
+            int(row["node_id"], 16),
+            row["processor"],
+            int(row["opd_address"], 16),
+            row["opd_always_on"].lower() == "true",
+            row["child"],
+        ) for row in csv.DictReader(f) if row["name"] in oresat.cards_path}
+
+
 class OreSatConfig:
     """All the configs for an OreSat mission."""
 
@@ -47,26 +62,10 @@ class OreSatConfig:
             oresat = Consts.from_id(oresat)
         elif not isinstance(oresat, Consts):
             raise TypeError(f"Unsupported oresat type: '{type(oresat)}'")
+
         self.oresat = oresat
-
         beacon_config = BeaconConfig.from_yaml(oresat.beacon_path)
-        self.cards = {}
-        file_path = f"{os.path.dirname(os.path.abspath(__file__))}/cards.csv"
-        with open(file_path, "r") as f:
-            reader = csv.DictReader(f)
-            for row in reader:
-                name = row["name"]
-                if name in oresat.cards_path:
-                    del row["name"]
-                    self.cards[name] = Card(
-                        row["nice_name"],
-                        int(row["node_id"], 16),
-                        row["processor"],
-                        int(row["opd_address"], 16),
-                        row["opd_always_on"].lower() == "true",
-                        row["child"],
-                    )
-
+        self.cards = cards_from_csv(oresat)
         self.configs = _load_configs(oresat.cards_path)
         self.od_db = _gen_od_db(oresat, self.cards, beacon_config, self.configs)
         c3_od = self.od_db["c3"]

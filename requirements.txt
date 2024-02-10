@@ -10,4 +10,6 @@ pyyaml
 setuptools
 sphinx
 sphinx-rtd-theme
+tabulate
+types-tabulate
 wheel
