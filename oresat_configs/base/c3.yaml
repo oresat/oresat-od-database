@@ -606,6 +606,14 @@ objects:
         description: json string of feedback signals
         access_type: rw
         default: "{}"
+
+      - subindex: 0x4
+        name: calibrate
+        data_type: str
+        description: temporary for calibrating via adcs manager
+        access_type: rw
+        default: "no"
+
 tpdos:
   - num: 1 # time sync TPDO
     fields:
