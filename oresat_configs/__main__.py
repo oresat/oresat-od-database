@@ -17,15 +17,24 @@ from .scripts import gen_xtce
 from .scripts import print_od
 from .scripts import sdo_transfer
 from .scripts import list_cards
+from .scripts import pdo
 
+# TODO: Group by three categories in help:
+#   - info (card, od)
+#   - action (sdo, pdo)
+#   - generate (dcf, xtce, fw)
+# There can only be one subparsers group though, the other groupings
+# would have to be done through add_argument_group() but those can't
+# make subparser groups.
 
 SCRIPTS = [
-    gen_dcf,
-    gen_fw_files,
-    gen_xtce,
+    list_cards,
     print_od,
     sdo_transfer,
-    list_cards,
+    pdo,
+    gen_dcf,
+    gen_xtce,
+    gen_fw_files,
 ]
 
 
