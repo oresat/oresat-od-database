@@ -10,7 +10,7 @@ sys.path.insert(0, _FILE_PATH)
 import bitstring
 import canopen
 
-from oresat_configs import OreSatConfig, Consts
+from oresat_configs import Consts, OreSatConfig
 
 OD_DATA_TYPES = {
     canopen.objectdictionary.BOOLEAN: "bool",
