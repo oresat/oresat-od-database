@@ -7,7 +7,7 @@ from typing import Optional
 
 import canopen
 
-from .. import OreSatConfig, Consts
+from .. import Consts, OreSatConfig
 
 GEN_XTCE = "generate beacon xtce file"
 

@@ -5,7 +5,7 @@ from typing import Any, Optional
 
 import canopen
 
-from .. import OreSatConfig, Consts
+from .. import Consts, OreSatConfig
 from .._yaml_to_od import OD_DATA_TYPES
 
 PRINT_OD = "print the object dictionary out to stdout"

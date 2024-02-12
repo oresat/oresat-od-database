@@ -5,6 +5,7 @@ Seperate from __init__.py to avoid cirular imports.
 """
 
 from __future__ import annotations
+
 from dataclasses import dataclass
 from enum import Enum, IntEnum, unique
 

@@ -11,13 +11,7 @@
 import argparse
 
 from .constants import __version__
-from .scripts import gen_dcf
-from .scripts import gen_fw_files
-from .scripts import gen_xtce
-from .scripts import print_od
-from .scripts import sdo_transfer
-from .scripts import list_cards
-from .scripts import pdo
+from .scripts import gen_dcf, gen_fw_files, gen_xtce, list_cards, pdo, print_od, sdo_transfer
 
 # TODO: Group by three categories in help:
 #   - info (card, od)

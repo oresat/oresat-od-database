@@ -1,12 +1,12 @@
 """Tools for working with PDOs"""
 
-from argparse import ArgumentParser, Namespace
 import time
+from argparse import ArgumentParser, Namespace
 from typing import Optional
+
 import canopen
 
-from .. import OreSatConfig, Consts
-
+from .. import Consts, OreSatConfig
 
 PDO = "list or receive PDOs from the specified card"
 

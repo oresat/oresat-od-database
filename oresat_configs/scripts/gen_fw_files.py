@@ -8,7 +8,7 @@ from typing import Optional
 
 import canopen
 
-from .. import OreSatConfig, Consts
+from .. import Consts, OreSatConfig
 
 GEN_FW_FILES = "generate CANopenNode OD.[c/h] files for a OreSat firmware card"
 

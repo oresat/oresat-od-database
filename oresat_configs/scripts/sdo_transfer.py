@@ -12,7 +12,7 @@ from typing import Optional, Union
 
 import canopen
 
-from .. import OreSatConfig, Consts
+from .. import Consts, OreSatConfig
 
 SDO_TRANSFER = "read or write value to a node's object dictionary via SDO transfers"
 

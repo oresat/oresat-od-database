@@ -2,11 +2,12 @@
 
 from argparse import ArgumentParser, Namespace, RawDescriptionHelpFormatter
 from collections import defaultdict
-from dataclasses import fields, asdict
+from dataclasses import asdict, fields
 from typing import Optional
+
 from tabulate import tabulate
 
-from .. import cards_from_csv, Consts, Card
+from .. import Card, Consts, cards_from_csv
 
 LIST_CARDS = "list oresat cards, suitable as arguments to other commands"
 

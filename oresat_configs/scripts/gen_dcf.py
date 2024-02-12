@@ -6,7 +6,7 @@ from typing import Optional
 
 import canopen
 
-from .. import OreSatConfig, Consts
+from .. import Consts, OreSatConfig
 
 GEN_DCF = "generate DCF file for OreSat node(s)"
 
