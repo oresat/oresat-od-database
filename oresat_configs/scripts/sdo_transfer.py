@@ -36,9 +36,13 @@ def build_parser(parser: ArgumentParser) -> ArgumentParser:
         help="data to write or for only octet/domain data types a path to a file "
         "(e.g. file:data.bin)",
     )
-    parser.add_argument("--oresat", default=Consts.default().arg, choices=[m.arg for m in Consts],
-                        type=lambda x: x.lower().removeprefix("oresat"),
-                        help="oresat mission, defaults to %(default)s")
+    parser.add_argument(
+        "--oresat",
+        default=Consts.default().arg,
+        choices=[m.arg for m in Consts],
+        type=lambda x: x.lower().removeprefix("oresat"),
+        help="oresat mission, defaults to %(default)s",
+    )
     return parser
 
 

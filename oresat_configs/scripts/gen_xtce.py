@@ -18,9 +18,13 @@ def build_parser(parser: ArgumentParser) -> ArgumentParser:
     The given parser may be standalone or it may be used as a subcommand in another ArgumentParser.
     """
     parser.description = GEN_XTCE
-    parser.add_argument("--oresat", default=Consts.default().arg, choices=[m.arg for m in Consts],
-                        type=lambda x: x.lower().removeprefix("oresat"),
-                        help="oresat mission, defaults to %(default)s")
+    parser.add_argument(
+        "--oresat",
+        default=Consts.default().arg,
+        choices=[m.arg for m in Consts],
+        type=lambda x: x.lower().removeprefix("oresat"),
+        help="oresat mission, defaults to %(default)s",
+    )
     parser.add_argument("-d", "--dir-path", default=".", help='directory path; defautl "."')
     return parser
 

@@ -18,9 +18,13 @@ def build_parser(parser: ArgumentParser) -> ArgumentParser:
     """
     parser.description = LIST_CARDS
     parser.formatter_class = RawDescriptionHelpFormatter
-    parser.add_argument("--oresat", default=Consts.default().arg, choices=[m.arg for m in Consts],
-                        type=lambda x: x.lower().removeprefix("oresat"),
-                        help="oresat mission, defaults to %(default)s")
+    parser.add_argument(
+        "--oresat",
+        default=Consts.default().arg,
+        choices=[m.arg for m in Consts],
+        type=lambda x: x.lower().removeprefix("oresat"),
+        help="oresat mission, defaults to %(default)s",
+    )
     # I'd like to pull the descriptions directly out of Card but attribute docstrings are discarded
     # and not accessable at runtime.
     rows = [

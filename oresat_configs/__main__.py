@@ -41,7 +41,7 @@ SCRIPTS = [
 def oresat_configs():
     """oresat_configs main."""
     parser = argparse.ArgumentParser(prog="oresat_configs")
-    parser.add_argument('--version', action='version', version='%(prog)s v' + __version__)
+    parser.add_argument("--version", action="version", version="%(prog)s v" + __version__)
     parser.set_defaults(func=lambda x: parser.print_help())
     subparsers = parser.add_subparsers(title="subcommands")
 

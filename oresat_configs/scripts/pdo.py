@@ -17,14 +17,20 @@ def build_parser(parser: ArgumentParser) -> ArgumentParser:
     The given parser may be standalone or it may be used as a subcommand in another ArgumentParser.
     """
     parser.description = PDO
-    parser.add_argument("--oresat", default=Consts.default().arg, choices=[m.arg for m in Consts],
-                        type=lambda x: x.lower().removeprefix("oresat"),
-                        help="oresat mission, defaults to %(default)s")
+    parser.add_argument(
+        "--oresat",
+        default=Consts.default().arg,
+        choices=[m.arg for m in Consts],
+        type=lambda x: x.lower().removeprefix("oresat"),
+        help="oresat mission, defaults to %(default)s",
+    )
     parser.add_argument("card", help="card name")
-    parser.add_argument("--list", action="store_true",
-                        help="list PDOs expected for the particular card")
-    parser.add_argument("--bus", default="vcan0",
-                        help="CAN bus to listen on, defaults to %(default)s")
+    parser.add_argument(
+        "--list", action="store_true", help="list PDOs expected for the particular card"
+    )
+    parser.add_argument(
+        "--bus", default="vcan0", help="CAN bus to listen on, defaults to %(default)s"
+    )
     return parser
 
 
@@ -43,23 +49,23 @@ def register_subparser(subparsers):
 
 
 typenames = {
-    canopen.objectdictionary.BOOLEAN: 'bool',
-    canopen.objectdictionary.INTEGER8: 'i8',
-    canopen.objectdictionary.INTEGER16: 'i16',
-    canopen.objectdictionary.INTEGER32: 'i32',
-    canopen.objectdictionary.UNSIGNED8: 'u8',
-    canopen.objectdictionary.UNSIGNED16: 'u16',
-    canopen.objectdictionary.UNSIGNED32: 'u32',
-    canopen.objectdictionary.REAL32: 'f32',
-    canopen.objectdictionary.VISIBLE_STRING: 'str',
-    canopen.objectdictionary.OCTET_STRING: 'bytes',
-    canopen.objectdictionary.UNICODE_STRING: 'ustr',
-    canopen.objectdictionary.DOMAIN: 'domain',
+    canopen.objectdictionary.BOOLEAN: "bool",
+    canopen.objectdictionary.INTEGER8: "i8",
+    canopen.objectdictionary.INTEGER16: "i16",
+    canopen.objectdictionary.INTEGER32: "i32",
+    canopen.objectdictionary.UNSIGNED8: "u8",
+    canopen.objectdictionary.UNSIGNED16: "u16",
+    canopen.objectdictionary.UNSIGNED32: "u32",
+    canopen.objectdictionary.REAL32: "f32",
+    canopen.objectdictionary.VISIBLE_STRING: "str",
+    canopen.objectdictionary.OCTET_STRING: "bytes",
+    canopen.objectdictionary.UNICODE_STRING: "ustr",
+    canopen.objectdictionary.DOMAIN: "domain",
     # canopen.objectdictionary.INTEGER24: 'i24',
-    canopen.objectdictionary.REAL64: 'f64',
-    canopen.objectdictionary.INTEGER64: 'i64',
+    canopen.objectdictionary.REAL64: "f64",
+    canopen.objectdictionary.INTEGER64: "i64",
     # canopen.objectdictionary.UNSIGNED24: 'u24',
-    canopen.objectdictionary.UNSIGNED64: 'u64',
+    canopen.objectdictionary.UNSIGNED64: "u64",
 }
 
 
@@ -91,7 +97,7 @@ def print_map(m: canopen.pdo.base.Map):
     data = []
     for v in m:
         signed = v.od.data_type in canopen.objectdictionary.SIGNED_TYPES
-        value = int.from_bytes(v.get_data(), byteorder='little', signed=signed)
+        value = int.from_bytes(v.get_data(), byteorder="little", signed=signed)
         data.append(f"{v.name}: {value}")
     print(f'{m.cob_id:03X} {m.name} {" ".join(data)}')
 
@@ -99,7 +105,7 @@ def print_map(m: canopen.pdo.base.Map):
 def listen(bus: str, node_id: int, od: canopen.ObjectDictionary):
     """Listens for PDOs from the given node, formats and prints them to stdout"""
     network = canopen.Network()
-    network.connect(channel=bus, bustype='socketcan')
+    network.connect(channel=bus, bustype="socketcan")
 
     node = network.add_node(node_id, od)
     node.tpdo.read(from_od=True)

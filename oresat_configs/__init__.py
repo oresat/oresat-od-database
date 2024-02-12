@@ -43,14 +43,18 @@ def cards_from_csv(oresat: Consts) -> dict[str, Card]:
 
     file_path = f"{os.path.dirname(os.path.abspath(__file__))}/cards.csv"
     with open(file_path, "r") as f:
-        return {row["name"] : Card(
-            row["nice_name"],
-            int(row["node_id"], 16),
-            row["processor"],
-            int(row["opd_address"], 16),
-            row["opd_always_on"].lower() == "true",
-            row["child"],
-        ) for row in csv.DictReader(f) if row["name"] in oresat.cards_path}
+        return {
+            row["name"]: Card(
+                row["nice_name"],
+                int(row["node_id"], 16),
+                row["processor"],
+                int(row["opd_address"], 16),
+                row["opd_always_on"].lower() == "true",
+                row["child"],
+            )
+            for row in csv.DictReader(f)
+            if row["name"] in oresat.cards_path
+        }
 
 
 class OreSatConfig:

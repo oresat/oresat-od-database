@@ -16,6 +16,7 @@ __version__ = "0.3.1"
 @dataclass
 class Mission:
     """A specific set of constants associated with an OreSat Mission"""
+
     id: int
     arg: str
     beacon_path: str
@@ -25,6 +26,7 @@ class Mission:
 @unique
 class Consts(Mission, Enum):
     """Constants associated with each OreSat Mission"""
+
     ORESAT0 = 1, "0", oresat0.BEACON_CONFIG_PATH, oresat0.CARD_CONFIGS_PATH
     ORESAT0_5 = 2, "0.5", oresat0_5.BEACON_CONFIG_PATH, oresat0_5.CARD_CONFIGS_PATH
     ORESAT1 = 3, "1", oresat1.BEACON_CONFIG_PATH, oresat1.CARD_CONFIGS_PATH
