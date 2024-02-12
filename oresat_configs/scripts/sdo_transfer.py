@@ -8,7 +8,7 @@ node's Object Dictionaries.
 import os
 import sys
 from argparse import ArgumentParser, Namespace
-from typing import Optional
+from typing import Optional, Union
 
 import canopen
 
@@ -97,6 +97,10 @@ def sdo_transfer(args: Optional[Namespace] = None):
 
     # send SDO
     try:
+        # Type definiton to satisfy mypy, matches canopen.Variable.raw and .phys type
+        # While canopen does declare types, it's not fully set up to have outside
+        # projects use them?
+        value: Union[int, bool, float, str, bytes]
         if args.mode in ["r", "read"]:
             if obj.data_type == binary_type:
                 with open(args.value[5:], "wb") as f:
