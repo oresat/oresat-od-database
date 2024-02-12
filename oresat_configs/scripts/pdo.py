@@ -2,6 +2,7 @@
 
 from argparse import ArgumentParser, Namespace
 import time
+from typing import Optional
 import canopen
 
 from .. import OreSatConfig, Consts
@@ -126,7 +127,7 @@ def listpdos(node_id: int, od: canopen.ObjectDictionary):
         print(f"PDO {index:2} {pdo.cob_id:03X} ({ttype}) => {names}")
 
 
-def pdo_main(args: Namespace | None = None):
+def pdo_main(args: Optional[Namespace] = None):
     """The utility for managing PDOs"""
     if args is None:
         args = build_parser(ArgumentParser()).parse_args()

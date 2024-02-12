@@ -3,6 +3,7 @@
 from argparse import ArgumentParser, Namespace, RawDescriptionHelpFormatter
 from collections import defaultdict
 from dataclasses import fields, asdict
+from typing import Optional
 from tabulate import tabulate
 
 from .. import cards_from_csv, Consts, Card
@@ -53,7 +54,7 @@ def register_subparser(subparsers):
     parser.set_defaults(func=list_cards)
 
 
-def list_cards(args: Namespace | None = None):
+def list_cards(args: Optional[Namespace] = None):
     """Lists oresat cards and their configurations"""
     if args is None:
         args = build_parser(ArgumentParser()).parse_args()

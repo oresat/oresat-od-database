@@ -3,6 +3,7 @@
 import csv
 import os
 from dataclasses import dataclass
+from typing import Union
 
 from dataclasses_json import dataclass_json
 
@@ -55,7 +56,7 @@ def cards_from_csv(oresat: Consts) -> dict[str, Card]:
 class OreSatConfig:
     """All the configs for an OreSat mission."""
 
-    def __init__(self, oresat: OreSatId | Consts | str):
+    def __init__(self, oresat: Union[OreSatId, Consts, str]):
         if isinstance(oresat, str):
             oresat = Consts.from_string(oresat)
         elif isinstance(oresat, OreSatId):
