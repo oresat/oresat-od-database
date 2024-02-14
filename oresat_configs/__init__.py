@@ -1,11 +1,7 @@
 """OreSat OD database"""
 
-import csv
-import os
 from dataclasses import dataclass
 from typing import Union
-
-from dataclasses_json import dataclass_json
 
 from ._yaml_to_od import (
     _gen_c3_beacon_defs,
@@ -16,45 +12,10 @@ from ._yaml_to_od import (
 )
 from .base import FW_COMMON_CONFIG_PATH
 from .beacon_config import BeaconConfig
+from .card_info import Card, cards_from_csv
 from .constants import Consts, NodeId, OreSatId, __version__
 
-
-@dataclass_json
-@dataclass
-class Card:
-    """Card info."""
-
-    nice_name: str
-    """A nice name for the card."""
-    node_id: int
-    """CANopen node id."""
-    processor: str
-    """Processor type; e.g.: "octavo", "stm32", or "none"."""
-    opd_address: int
-    """OPD address."""
-    opd_always_on: bool
-    """Keep the card on all the time. Only for battery cards."""
-    child: str = ""
-    """Optional child node name. Useful for CFC cards."""
-
-
-def cards_from_csv(oresat: Consts) -> dict[str, Card]:
-    """Turns cards.csv into a dict of names->Cards, filtered by the current mission"""
-
-    file_path = f"{os.path.dirname(os.path.abspath(__file__))}/cards.csv"
-    with open(file_path, "r") as f:
-        return {
-            row["name"]: Card(
-                row["nice_name"],
-                int(row["node_id"], 16),
-                row["processor"],
-                int(row["opd_address"], 16),
-                row["opd_always_on"].lower() == "true",
-                row["child"],
-            )
-            for row in csv.DictReader(f)
-            if row["name"] in oresat.cards_path
-        }
+__all__ = ["Card", "Consts", "NodeId", "OreSatId", "__version__"]
 
 
 class OreSatConfig:

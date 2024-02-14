@@ -32,7 +32,7 @@ SCRIPTS = [
 ]
 
 
-def oresat_configs():
+def oresat_configs() -> None:
     """oresat_configs main."""
     parser = argparse.ArgumentParser(prog="oresat_configs")
     parser.add_argument("--version", action="version", version="%(prog)s v" + __version__)

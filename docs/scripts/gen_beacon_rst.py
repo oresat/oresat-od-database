@@ -31,7 +31,7 @@ OD_DATA_TYPES = {
 """Nice names for CANopen data types."""
 
 
-def gen_beacon_rst(config: OreSatConfig, file_path: str, url: str):
+def gen_beacon_rst(config: OreSatConfig, file_path: str, url: str) -> None:
     """Genetate a rst file for a beacon definition."""
 
     title = "Beacon Definition"
@@ -202,7 +202,7 @@ def gen_beacon_rst(config: OreSatConfig, file_path: str, url: str):
         f.writelines(lines)
 
 
-def gen_beacon_rst_files():
+def gen_beacon_rst_files() -> None:
     """Generate all beacon rst files."""
 
     parent_dir = os.path.dirname(os.path.abspath(__file__ + "/.."))

@@ -1,14 +1,18 @@
 """Load a card config file."""
 
+from __future__ import annotations
+
 from dataclasses import dataclass, field
-from typing import Any, Dict, List, Optional, Union
+from typing import Any, Optional, Union
 
 from yaml import load
 
+Loader: Any
 try:
     from yaml import CLoader as Loader
 except ImportError:
     from yaml import Loader
+
 from dataclasses_json import dataclass_json
 
 
@@ -29,9 +33,9 @@ class ConfigObject:
     """Default value of object."""
     description: str = ""
     """Description of object."""
-    value_descriptions: Dict[str, int] = field(default_factory=dict)
+    value_descriptions: dict[str, int] = field(default_factory=dict)
     """Optional: Can be used to define enum values for an unsigned integer data types."""
-    bit_definitions: Dict[str, Union[int, str]] = field(default_factory=dict)
+    bit_definitions: dict[str, Union[int, str]] = field(default_factory=dict)
     """Optional: Can be used to define bitfield of an unsigned integer data types."""
     unit: str = ""
     """Optional unit for the object."""
@@ -127,7 +131,7 @@ class IndexObject(ConfigObject):
     """Index of object, fw/sw common object are in 0x3000, card objects are in 0x4000."""
     object_type: str = "variable"
     """Object type; must be ``"variable"``, ``"array"``, or ``"record"``."""
-    subindexes: List[SubindexObject] = field(default_factory=list)
+    subindexes: list[SubindexObject] = field(default_factory=list)
     """Defines subindexes for records and arrays."""
     generate_subindexes: Optional[GenerateSubindex] = None
     """Used to generate subindexes for arrays."""
@@ -168,7 +172,7 @@ class Tpdo:
     """Send the TPDO periodicly in milliseconds."""
     inhibit_time_ms: int = 0
     """Delay after boot before the event timer starts in milliseconds."""
-    fields: List[List[str]] = field(default_factory=list)
+    fields: list[list[str]] = field(default_factory=list)
     """Index and subindexes of objects to map to the TPDO."""
 
 
@@ -229,19 +233,19 @@ class CardConfig:
           ...
     """
 
-    std_objects: List[str] = field(default_factory=list)
+    std_objects: list[str] = field(default_factory=list)
     """Standard object to include in OD."""
-    objects: List[IndexObject] = field(default_factory=list)
+    objects: list[IndexObject] = field(default_factory=list)
     """Unique card objects."""
-    tpdos: List[Tpdo] = field(default_factory=list)
+    tpdos: list[Tpdo] = field(default_factory=list)
     """TPDOs for the card."""
-    rpdos: List[Rpdo] = field(default_factory=list)
+    rpdos: list[Rpdo] = field(default_factory=list)
     """RPDOs for the card."""
-    fram: List[List[str]] = field(default_factory=list)
+    fram: list[list[str]] = field(default_factory=list)
     """C3 only. List of index and subindex for the c3 to save the values of to F-RAM."""
 
     @classmethod
-    def from_yaml(cls, config_path: str):
+    def from_yaml(cls, config_path: str) -> CardConfig:
         """Load a card YAML config file."""
 
         with open(config_path, "r") as f:

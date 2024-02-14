@@ -1,6 +1,9 @@
 """OreSat od base configs."""
 
 import os
+from typing import Optional
+
+ConfigPaths = dict[str, Optional[tuple[str, ...]]]
 
 _CONFIGS_DIR = os.path.dirname(os.path.abspath(__file__))
 FW_COMMON_CONFIG_PATH = f"{_CONFIGS_DIR}/fw_common.yaml"

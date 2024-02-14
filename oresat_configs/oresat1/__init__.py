@@ -1,7 +1,6 @@
 """OreSat1 object dictionary and beacon constants."""
 
 import os
-from typing import Optional
 
 from ..base import (
     BAT_CONFIG_PATH,
@@ -15,13 +14,14 @@ from ..base import (
     SOLAR_CONFIG_PATH,
     ST_CONFIG_PATH,
     SW_COMMON_CONFIG_PATH,
+    ConfigPaths,
 )
 
 _CONFIGS_DIR = os.path.dirname(os.path.abspath(__file__))
 
 BEACON_CONFIG_PATH: str = f"{_CONFIGS_DIR}/beacon.yaml"
 
-CARD_CONFIGS_PATH: dict[str, Optional[tuple[str, ...]]] = {
+CARD_CONFIGS_PATH: ConfigPaths = {
     "c3": (C3_CONFIG_PATH, SW_COMMON_CONFIG_PATH),
     "battery_1": (BAT_CONFIG_PATH, FW_COMMON_CONFIG_PATH),
     "battery_2": (BAT_CONFIG_PATH, FW_COMMON_CONFIG_PATH),

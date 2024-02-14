@@ -8,6 +8,6 @@ from . import TestConfig
 class TestOreSat1(TestConfig):
     """Test the OreSat1 OD database"""
 
-    def setUp(self):
-        self.id = Consts.ORESAT1
-        self.config = OreSatConfig(self.id)
+    def setUp(self) -> None:
+        self.oresatid = Consts.ORESAT1
+        self.config = OreSatConfig(self.oresatid)

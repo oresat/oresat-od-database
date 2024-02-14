@@ -10,6 +10,7 @@ from dataclasses import dataclass
 from enum import Enum, IntEnum, unique
 
 from . import oresat0, oresat0_5, oresat1
+from .base import ConfigPaths
 
 __version__ = "0.3.1"
 
@@ -21,7 +22,7 @@ class Mission:
     id: int
     arg: str
     beacon_path: str
-    cards_path: dict[str, tuple[str, ...] | None]
+    cards_path: ConfigPaths
 
 
 @unique

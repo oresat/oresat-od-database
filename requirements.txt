@@ -8,6 +8,7 @@ isort
 pylama[all]
 pylama[toml]
 pyyaml
+types-pyyaml
 setuptools
 sphinx
 sphinx-rtd-theme

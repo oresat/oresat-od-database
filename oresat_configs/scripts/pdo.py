@@ -2,7 +2,7 @@
 
 import time
 from argparse import ArgumentParser, Namespace
-from typing import Optional
+from typing import Any, Optional
 
 import canopen
 
@@ -34,7 +34,7 @@ def build_parser(parser: ArgumentParser) -> ArgumentParser:
     return parser
 
 
-def register_subparser(subparsers):
+def register_subparser(subparsers: Any) -> None:
     """Registers an ArgumentParser as a subcommand of another parser.
 
     Intended to be called by __main__.py for each script. Given the output of add_subparsers(),
@@ -89,7 +89,7 @@ def transmission_type(t: int) -> str:
     raise ValueError(f"Invalid transmission type 0x{t:X}")
 
 
-def print_map(m: canopen.pdo.base.Map):
+def print_map(m: canopen.pdo.base.Map) -> None:
     """Prints out a received PDO.
 
     Which from this library means a PDO Mapping
@@ -102,7 +102,7 @@ def print_map(m: canopen.pdo.base.Map):
     print(f'{m.cob_id:03X} {m.name} {" ".join(data)}')
 
 
-def listen(bus: str, node_id: int, od: canopen.ObjectDictionary):
+def listen(bus: str, node_id: int, od: canopen.ObjectDictionary) -> None:
     """Listens for PDOs from the given node, formats and prints them to stdout"""
     network = canopen.Network()
     network.connect(channel=bus, bustype="socketcan")
@@ -121,7 +121,7 @@ def listen(bus: str, node_id: int, od: canopen.ObjectDictionary):
         network.disconnect()
 
 
-def listpdos(node_id: int, od: canopen.ObjectDictionary):
+def listpdos(node_id: int, od: canopen.ObjectDictionary) -> None:
     """Prints PDO communication and associated mapping parameters for the given node"""
 
     network = canopen.Network()
@@ -133,7 +133,7 @@ def listpdos(node_id: int, od: canopen.ObjectDictionary):
         print(f"PDO {index:2} {pdo.cob_id:03X} ({ttype}) => {names}")
 
 
-def pdo_main(args: Optional[Namespace] = None):
+def pdo_main(args: Optional[Namespace] = None) -> None:
     """The utility for managing PDOs"""
     if args is None:
         args = build_parser(ArgumentParser()).parse_args()

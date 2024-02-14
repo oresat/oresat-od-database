@@ -3,7 +3,7 @@
 import xml.etree.ElementTree as ET
 from argparse import ArgumentParser, Namespace
 from datetime import datetime
-from typing import Optional
+from typing import Any, Optional
 
 import canopen
 
@@ -29,7 +29,7 @@ def build_parser(parser: ArgumentParser) -> ArgumentParser:
     return parser
 
 
-def register_subparser(subparsers):
+def register_subparser(subparsers: Any) -> None:
     """Registers an ArgumentParser as a subcommand of another parser.
 
     Intended to be called by __main__.py for each script. Given the output of add_subparsers(),
@@ -89,7 +89,7 @@ def make_obj_name(obj: canopen.objectdictionary.Variable) -> str:
     return name
 
 
-def make_dt_name(obj) -> str:
+def make_dt_name(obj: canopen.objectdictionary.Variable) -> str:
     """Make xtce data type name."""
 
     type_name = CANOPEN_TO_XTCE_DT[obj.data_type]
@@ -111,7 +111,7 @@ def make_dt_name(obj) -> str:
     return type_name
 
 
-def write_xtce(config: OreSatConfig, dir_path: str = "."):
+def write_xtce(config: OreSatConfig, dir_path: str = ".") -> None:
     """Write beacon configs to a xtce file."""
 
     root = ET.Element(
@@ -344,7 +344,7 @@ def write_xtce(config: OreSatConfig, dir_path: str = "."):
     tree.write(f"{dir_path}/{file_name}", encoding="utf-8", xml_declaration=True)
 
 
-def gen_xtce(args: Optional[Namespace] = None):
+def gen_xtce(args: Optional[Namespace] = None) -> None:
     """Gen_dcf main."""
     if args is None:
         args = build_parser(ArgumentParser()).parse_args()
