@@ -576,9 +576,9 @@ objects:
       data_type: uint8
       access_type: ro
       value_descriptions:
-        off: 0
+        'off': 0
         boot: 1
-        on: 2
+        'on': 2
         error: 3
         not_found: 4
         dead: 0xff

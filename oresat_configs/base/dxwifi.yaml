@@ -5,7 +5,7 @@ objects:
     description: the dxwifi status
     access_type: rw
     value_descriptions:
-      off: 0
+      'off': 0
       boot: 1
       standby: 2
       film: 3

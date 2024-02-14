@@ -31,7 +31,7 @@ class ConfigObject:
     """Description of object."""
     value_descriptions: Dict[str, int] = field(default_factory=dict)
     """Optional: Can be used to define enum values for an unsigned integer data types."""
-    bit_definitions: Dict[str, int] = field(default_factory=dict)
+    bit_definitions: Dict[str, Union[int, str]] = field(default_factory=dict)
     """Optional: Can be used to define bitfield of an unsigned integer data types."""
     unit: str = ""
     """Optional unit for the object."""
