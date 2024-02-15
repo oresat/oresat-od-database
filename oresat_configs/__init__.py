@@ -2,7 +2,7 @@
 
 import csv
 import os
-from dataclasses import dataclass
+from dataclasses import dataclass, fields
 from typing import Union
 
 from dataclasses_json import dataclass_json
@@ -43,6 +43,15 @@ def cards_from_csv(oresat: Consts) -> dict[str, Card]:
 
     file_path = f"{os.path.dirname(os.path.abspath(__file__))}/cards.csv"
     with open(file_path, "r") as f:
+        reader = csv.DictReader(f)
+        cols = set(reader.fieldnames) if reader.fieldnames else set()
+        expect = {f.name for f in fields(Card)}
+        expect.add("name")  # the 'name' column is the keys of the returned dict; not in Card
+        if cols - expect:
+            raise TypeError(f"cards.csv has excess columns: {cols-expect}. Update class Card?")
+        if expect - cols:
+            raise TypeError(f"class Card expects more columns than cards.csv has: {expect-cols}")
+
         return {
             row["name"]: Card(
                 row["nice_name"],
@@ -52,7 +61,7 @@ def cards_from_csv(oresat: Consts) -> dict[str, Card]:
                 row["opd_always_on"].lower() == "true",
                 row["child"],
             )
-            for row in csv.DictReader(f)
+            for row in reader
             if row["name"] in oresat.cards_path
         }
 
