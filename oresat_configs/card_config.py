@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 from dataclasses import dataclass, field
+from functools import cache
 from typing import Any, Optional, Union
 
 from yaml import load
@@ -238,6 +239,7 @@ class CardConfig:
     """C3 only. List of index and subindex for the c3 to save the values of to F-RAM."""
 
     @classmethod
+    @cache
     def from_yaml(cls, config_path: str) -> CardConfig:
         """Load a card YAML config file."""
 
