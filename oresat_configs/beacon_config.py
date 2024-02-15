@@ -13,10 +13,9 @@ try:
 except ImportError:
     from yaml import Loader
 
-from dataclasses_json import dataclass_json
+from dacite import from_dict
 
 
-@dataclass_json
 @dataclass
 class BeaconAx25Config:
     """
@@ -55,7 +54,6 @@ class BeaconAx25Config:
     """If set to True, the C-bit in source field."""
 
 
-@dataclass_json
 @dataclass
 class BeaconConfig:
     """
@@ -95,4 +93,4 @@ class BeaconConfig:
 
         with open(config_path, "r") as f:
             config_raw = load(f, Loader=Loader)
-        return cls.from_dict(config_raw)  # type: ignore  # pylint: disable=E1101
+        return from_dict(data_class=cls, data=config_raw)

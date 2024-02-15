@@ -4,12 +4,9 @@ import csv
 import os
 from dataclasses import dataclass
 
-from dataclasses_json import dataclass_json
-
 from .constants import Consts
 
 
-@dataclass_json
 @dataclass
 class Card:
     """Card info."""

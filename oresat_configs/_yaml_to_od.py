@@ -15,6 +15,8 @@ try:
 except ImportError:
     from yaml import Loader
 
+from dacite import from_dict
+
 from .base import ConfigPaths
 from .beacon_config import BeaconConfig
 from .card_config import CardConfig, ConfigObject, IndexObject, SubindexObject
@@ -478,7 +480,7 @@ def _load_std_objs(
 
     std_objs = {}
     for obj_raw in std_objs_raw:
-        obj = IndexObject.from_dict(obj_raw)  # pylint: disable=E1101
+        obj = from_dict(data_class=IndexObject, data=obj_raw)
         if obj.object_type == "variable":
             std_objs[obj.name] = _make_var(obj, obj.index)
         elif obj.object_type == "record":
