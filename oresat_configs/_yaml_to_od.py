@@ -564,7 +564,7 @@ def _load_configs(config_paths: dict) -> Dict[str, CardConfig]:
     return configs
 
 
-def _gen_od_db(oresat: Consts, cards: dict, beacon_def: BeaconConfig, configs: dict) -> dict:
+def _gen_od_db(mission: Consts, cards: dict, beacon_def: BeaconConfig, configs: dict) -> dict:
     od_db = {}
     node_ids = {name: cards[name].node_id for name in configs}
     node_ids["c3"] = 0x1
@@ -606,7 +606,7 @@ def _gen_od_db(oresat: Consts, cards: dict, beacon_def: BeaconConfig, configs: d
 
         # set specific obj defaults
         od["versions"]["configs_version"].default = __version__
-        od["satellite_id"].default = oresat.id
+        od["satellite_id"].default = mission.id
         for sat in Consts:
             od["satellite_id"].value_descriptions[sat.id] = sat.name.lower()
         if name == "c3":
@@ -672,7 +672,7 @@ def _gen_c3_beacon_defs(c3_od: canopen.ObjectDictionary, beacon_def: BeaconConfi
     return beacon_objs
 
 
-def _gen_fw_base_od(oresat: Consts, config_path: str) -> canopen.ObjectDictionary:
+def _gen_fw_base_od(mission: Consts, config_path: str) -> canopen.ObjectDictionary:
     """Generate all ODs for a OreSat mission."""
 
     od = canopen.ObjectDictionary()
@@ -709,6 +709,6 @@ def _gen_fw_base_od(oresat: Consts, config_path: str) -> canopen.ObjectDictionar
 
     # set specific obj defaults
     od["versions"]["configs_version"].default = __version__
-    od["satellite_id"].default = oresat.id
+    od["satellite_id"].default = mission.id
 
     return od
