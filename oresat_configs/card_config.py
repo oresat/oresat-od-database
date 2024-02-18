@@ -6,15 +6,8 @@ from dataclasses import dataclass, field
 from functools import cache
 from typing import Any, Optional, Union
 
-from yaml import load
-
-Loader: Any
-try:
-    from yaml import CLoader as Loader
-except ImportError:
-    from yaml import Loader
-
 from dacite import from_dict
+from yaml import CLoader, load
 
 
 @dataclass
@@ -244,5 +237,5 @@ class CardConfig:
         """Load a card YAML config file."""
 
         with open(config_path, "r") as f:
-            config_raw = load(f, Loader=Loader)
+            config_raw = load(f, Loader=CLoader)
         return from_dict(data_class=cls, data=config_raw)
