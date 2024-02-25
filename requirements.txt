@@ -8,6 +8,7 @@ pylama[all]
 pylama[toml]
 pyyaml
 setuptools
+setuptools-scm
 sphinx
 sphinx-rtd-theme
 wheel

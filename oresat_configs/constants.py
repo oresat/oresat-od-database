@@ -6,7 +6,17 @@ Seperate from __init__.py to avoid cirular imports.
 
 from enum import IntEnum
 
-__version__ = "0.3.1"
+__all__ = [
+    "__version__",
+    "OreSatId",
+    "ORESAT_NICE_NAMES",
+    "NodeId",
+]
+
+try:
+    from ._version import version as __version__  # type: ignore
+except ImportError:
+    __version__ = "0.0.0"  # package is not installed
 
 
 class OreSatId(IntEnum):
