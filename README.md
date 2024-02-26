@@ -60,7 +60,7 @@ Fixing an already installed pyyaml: (see here if you get "ImportError: pyyaml
 missing/installed without libyaml bindings.")
 ```bash
 $ sudo apt install libyaml-dev
-$ pip install --no-cache-dir --no-binary pyyaml pyyaml
+$ pip install --force-reinstall --no-cache-dir --no-binary pyyaml pyyaml
 ```
 
 ## Updating a Config
