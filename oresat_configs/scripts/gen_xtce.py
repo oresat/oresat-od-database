@@ -117,7 +117,7 @@ def write_xtce(config: OreSatConfig, dir_path: str = ".") -> None:
     root = ET.Element(
         "SpaceSystem",
         attrib={
-            "name": str(config.oresat),
+            "name": str(config.mission),
             "xmlns:xtce": "http://www.omg.org/space/xtce",
             "xmlns:xsi": "http://www.w3.org/2001/XMLSchema-instance",
             "xsi:schemaLocation": (
@@ -340,7 +340,7 @@ def write_xtce(config: OreSatConfig, dir_path: str = ".") -> None:
     # write
     tree = ET.ElementTree(root)
     ET.indent(tree, space="  ", level=0)
-    file_name = f"{config.oresat.name.lower()}.xtce"
+    file_name = f"{config.mission.name.lower()}.xtce"
     tree.write(f"{dir_path}/{file_name}", encoding="utf-8", xml_declaration=True)
 
 
