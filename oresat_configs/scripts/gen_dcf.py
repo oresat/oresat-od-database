@@ -1,15 +1,46 @@
 """Generate a DCF for from an OreSat card's object directory."""
 
-import sys
-from argparse import ArgumentParser
+from argparse import ArgumentParser, Namespace
 from datetime import datetime
+from typing import Optional
 
 import canopen
 
-from .. import OreSatConfig, OreSatId
+from .. import Consts, OreSatConfig
 
 GEN_DCF = "generate DCF file for OreSat node(s)"
-GEN_DCF_PROG = "oresat-gen-dcf"
+
+
+def build_parser(parser: ArgumentParser) -> ArgumentParser:
+    """Configures an ArgumentParser suitable for this script.
+
+    The given parser may be standalone or it may be used as a subcommand in another ArgumentParser.
+    """
+    parser.description = GEN_DCF
+    parser.add_argument(
+        "--oresat",
+        default=Consts.default().arg,
+        choices=[m.arg for m in Consts],
+        type=lambda x: x.lower().removeprefix("oresat"),
+        help="oresat mission, defaults to %(default)s",
+    )
+    parser.add_argument("card", help="card name; all, c3, gps, star_tracker_1, etc")
+    parser.add_argument("-d", "--dir-path", default=".", help='directory path; defautl "."')
+    return parser
+
+
+def register_subparser(subparsers):
+    """Registers an ArgumentParser as a subcommand of another parser.
+
+    Intended to be called by __main__.py for each script. Given the output of add_subparsers(),
+    (which I think is a subparser group, but is technically unspecified) this function should
+    create its own ArgumentParser via add_parser(). It must also set_default() the func argument
+    to designate the entry point into this script.
+    See https://docs.python.org/3/library/argparse.html#sub-commands, especially the end of that
+    section, for more.
+    """
+    parser = build_parser(subparsers.add_parser("dcf", help=GEN_DCF))
+    parser.set_defaults(func=gen_dcf)
 
 
 def write_od(od: canopen.ObjectDictionary, dir_path: str = "."):
@@ -208,32 +239,12 @@ def _record_lines(record: canopen.objectdictionary.Record, index: int) -> list:
     return lines
 
 
-def gen_dcf(sys_args=None):
+def gen_dcf(args: Optional[Namespace] = None):
     """Gen_dcf main."""
+    if args is None:
+        args = build_parser(ArgumentParser()).parse_args()
 
-    if sys_args is None:
-        sys_args = sys.argv[1:]
-
-    parser = ArgumentParser(description=GEN_DCF, prog=GEN_DCF_PROG)
-    parser.add_argument(
-        "oresat", default="oresat0", help="oresat mission; oresat0, oresat0.5, or oresat1"
-    )
-    parser.add_argument("card", help="card name; all, c3, gps, star_tracker_1, etc")
-    parser.add_argument("-d", "--dir-path", default=".", help='directory path; defautl "."')
-    args = parser.parse_args(sys_args)
-
-    arg_oresat = args.oresat.lower()
-    if arg_oresat in ["0", "oresat0"]:
-        oresat_id = OreSatId.ORESAT0
-    elif arg_oresat in ["0.5", "oresat0.5"]:
-        oresat_id = OreSatId.ORESAT0_5
-    elif arg_oresat in ["1", "oresat1"]:
-        oresat_id = OreSatId.ORESAT1
-    else:
-        print(f"invalid oresat mission: {args.oresat}")
-        sys.exit()
-
-    config = OreSatConfig(oresat_id)
+    config = OreSatConfig(args.oresat)
 
     if args.card.lower() == "all":
         for od in config.od_db.values():

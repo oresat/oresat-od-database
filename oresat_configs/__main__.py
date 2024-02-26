@@ -1,47 +1,52 @@
-"""oresat_configs main"""
+"""Entry point for for oresat_configs scripts. Invoke with either:
+- python -m oresat_configs
+- oresat-configs
+Some scripts may be installed and run as a standalone program. Consult
+pyproject.toml for names to invoke them with.
 
-import sys
+Process for adding a new script:
+- Add as a module to the adjacent scripts/ directory. The module must have the
+  function register_subparser() which takes the output of
+  ArgumentParser.add_subparsers().
+- Import the module here and add it to the _SCRIPTS list.
+- If the script can also be standalone then update the pyproject.toml
+  [project.scripts] section.
+- Test the new script out. Remember that the script may be invoked both through
+  oresat-configs and directly as a standalone.
+"""
+
+import argparse
 
 from .constants import __version__
-from .scripts.gen_dcf import GEN_DCF, GEN_DCF_PROG, gen_dcf
-from .scripts.gen_fw_files import GEN_FW_FILES, GEN_FW_FILES_PROG, gen_fw_files
-from .scripts.gen_xtce import GEN_XTCE, GEN_XTCE_PROG, gen_xtce
-from .scripts.print_od import PRINT_OD, PRINT_OD_PROG, print_od
-from .scripts.sdo_transfer import SDO_TRANSFER, SDO_TRANSFER_PROG, sdo_transfer
+from .scripts import gen_dcf, gen_fw_files, gen_xtce, list_cards, pdo, print_od, sdo_transfer
 
-SCRIPTS = {
-    GEN_DCF_PROG: GEN_DCF,
-    GEN_XTCE_PROG: GEN_XTCE,
-    GEN_FW_FILES_PROG: GEN_FW_FILES,
-    PRINT_OD_PROG: PRINT_OD,
-    SDO_TRANSFER_PROG: SDO_TRANSFER,
-}
+# TODO: Group by three categories in help:
+#   - info (card, od)
+#   - action (sdo, pdo)
+#   - generate (dcf, xtce, fw)
+# There can only be one subparsers group though, the other groupings
+# would have to be done through add_argument_group() but those can't
+# make subparser groups.
 
-
-def oresat_configs():
-    """oresat_configs main."""
-
-    print("oresat_configs v" + __version__)
-    print("")
-
-    print("command : description")
-    print("--------------------------")
-    for key in SCRIPTS:
-        print(f"{key} : {SCRIPTS[key]}")
+_SCRIPTS = [
+    list_cards,
+    print_od,
+    sdo_transfer,
+    pdo,
+    gen_dcf,
+    gen_xtce,
+    gen_fw_files,
+]
 
 
 if __name__ == "__main__":
-    if len(sys.argv) < 2:
-        oresat_configs()
-    elif sys.argv[1] == GEN_DCF_PROG:
-        gen_dcf(sys.argv[2:])
-    elif sys.argv[1] == GEN_FW_FILES_PROG:
-        gen_fw_files(sys.argv[2:])
-    elif sys.argv[1] == PRINT_OD_PROG:
-        print_od(sys.argv[2:])
-    elif sys.argv[1] == SDO_TRANSFER_PROG:
-        sdo_transfer(sys.argv[2:])
-    elif sys.argv[1] == GEN_XTCE_PROG:
-        gen_xtce(sys.argv[2:])
-    else:
-        oresat_configs()
+    parser = argparse.ArgumentParser(prog="oresat_configs")
+    parser.add_argument("--version", action="version", version="%(prog)s v" + __version__)
+    parser.set_defaults(func=lambda x: parser.print_help())
+    subparsers = parser.add_subparsers(title="subcommands")
+
+    for subcommand in _SCRIPTS:
+        subcommand.register_subparser(subparsers)
+
+    args = parser.parse_args()
+    args.func(args)

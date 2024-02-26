@@ -11,4 +11,6 @@ setuptools
 setuptools-scm
 sphinx
 sphinx-rtd-theme
+tabulate
+types-tabulate
 wheel
