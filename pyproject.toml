@@ -1,5 +1,5 @@
 [build-system]
-requires = ["setuptools"]
+requires = ["setuptools", "setuptools_scm"]
 build-backend = "setuptools.build_meta"
 
 [project]
@@ -33,14 +33,14 @@ oresat-print-od = "oresat_configs.scripts.print_od:print_od"
 oresat-sdo-transfer = "oresat_configs.scripts.sdo_transfer:sdo_transfer"
 oresat-gen-xtce = "oresat_configs.scripts.gen_xtce:gen_xtce"
 
-[tool.setuptools.dynamic]
-version = {attr = "oresat_configs.constants.__version__"}
-
 [tool.setuptools.packages.find]
-exclude = ["docs*", "tests*"] 
+exclude = ["docs*", "tests*"]
 
 [tool.setuptools.package-data]
 "*" = ["*.yaml", "*.csv"]
+
+[tool.setuptools_scm]
+write_to = "oresat_configs/_version.py"
 
 [tool.black]
 line_length = 100

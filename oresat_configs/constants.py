@@ -12,7 +12,18 @@ from enum import Enum, IntEnum, unique
 from . import oresat0, oresat0_5, oresat1
 from .base import ConfigPaths
 
-__version__ = "0.3.1"
+__all__ = [
+    "__version__",
+    "OreSatId",
+    "NodeId",
+    "Mission",
+    "Consts",
+]
+
+try:
+    from ._version import version as __version__  # type: ignore
+except ImportError:
+    __version__ = "0.0.0"  # package is not installed
 
 
 @dataclass

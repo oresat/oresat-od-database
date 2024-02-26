@@ -10,6 +10,7 @@ pylama[toml]
 pyyaml
 types-pyyaml
 setuptools
+setuptools-scm
 sphinx
 sphinx-rtd-theme
 tabulate

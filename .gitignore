@@ -176,3 +176,12 @@ OD.*
 
 # Beacon def formats
 *xtce.xml
+
+# MacOS
+.DS_Store
+
+# Vim
+*.swp
+
+# setuptools-scm
+*/_version.py
