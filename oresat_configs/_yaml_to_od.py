@@ -2,18 +2,13 @@
 
 import os
 from copy import deepcopy
-from typing import Any, Union
+from typing import Union
 
 import canopen
 from canopen import ObjectDictionary
 from canopen.objectdictionary import Array, Record, Variable
-from yaml import load
-
-Loader: Any
-try:
-    from yaml import CLoader as Loader
-except ImportError:
-    from yaml import Loader
+from dacite import from_dict
+from yaml import CLoader, load
 
 from .base import ConfigPaths
 from .beacon_config import BeaconConfig
@@ -474,11 +469,11 @@ def _load_std_objs(
     """Load the standard objects."""
 
     with open(file_path, "r") as f:
-        std_objs_raw = load(f, Loader=Loader)
+        std_objs_raw = load(f, Loader=CLoader)
 
     std_objs = {}
     for obj_raw in std_objs_raw:
-        obj = IndexObject.from_dict(obj_raw)  # pylint: disable=E1101
+        obj = from_dict(data_class=IndexObject, data=obj_raw)
         if obj.object_type == "variable":
             std_objs[obj.name] = _make_var(obj, obj.index)
         elif obj.object_type == "record":

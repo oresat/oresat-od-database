@@ -3,20 +3,11 @@
 from __future__ import annotations
 
 from dataclasses import dataclass, field
-from typing import Any
 
-from yaml import load
-
-Loader: Any
-try:
-    from yaml import CLoader as Loader
-except ImportError:
-    from yaml import Loader
-
-from dataclasses_json import dataclass_json
+from dacite import from_dict
+from yaml import CLoader, load
 
 
-@dataclass_json
 @dataclass
 class BeaconAx25Config:
     """
@@ -55,7 +46,6 @@ class BeaconAx25Config:
     """If set to True, the C-bit in source field."""
 
 
-@dataclass_json
 @dataclass
 class BeaconConfig:
     """
@@ -94,5 +84,5 @@ class BeaconConfig:
         """Load a beacon YAML config file."""
 
         with open(config_path, "r") as f:
-            config_raw = load(f, Loader=Loader)
-        return cls.from_dict(config_raw)  # type: ignore  # pylint: disable=E1101
+            config_raw = load(f, Loader=CLoader)
+        return from_dict(data_class=cls, data=config_raw)

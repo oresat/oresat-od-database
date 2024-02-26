@@ -3,20 +3,13 @@
 from __future__ import annotations
 
 from dataclasses import dataclass, field
+from functools import cache
 from typing import Any, Optional, Union
 
-from yaml import load
-
-Loader: Any
-try:
-    from yaml import CLoader as Loader
-except ImportError:
-    from yaml import Loader
-
-from dataclasses_json import dataclass_json
+from dacite import from_dict
+from yaml import CLoader, load
 
 
-@dataclass_json
 @dataclass
 class ConfigObject:
     """Object in config."""
@@ -52,7 +45,6 @@ class ConfigObject:
     """
 
 
-@dataclass_json
 @dataclass
 class GenerateSubindex(ConfigObject):
     """
@@ -81,7 +73,6 @@ class GenerateSubindex(ConfigObject):
     """Subindexes of objects to generate."""
 
 
-@dataclass_json
 @dataclass
 class SubindexObject(ConfigObject):
     """
@@ -107,7 +98,6 @@ class SubindexObject(ConfigObject):
     """
 
 
-@dataclass_json
 @dataclass
 class IndexObject(ConfigObject):
     """
@@ -137,7 +127,6 @@ class IndexObject(ConfigObject):
     """Used to generate subindexes for arrays."""
 
 
-@dataclass_json
 @dataclass
 class Tpdo:
     """
@@ -176,7 +165,6 @@ class Tpdo:
     """Index and subindexes of objects to map to the TPDO."""
 
 
-@dataclass_json
 @dataclass
 class Rpdo:
     """
@@ -200,7 +188,6 @@ class Rpdo:
     """TPDO number, 1-16."""
 
 
-@dataclass_json
 @dataclass
 class CardConfig:
     """
@@ -245,9 +232,10 @@ class CardConfig:
     """C3 only. List of index and subindex for the c3 to save the values of to F-RAM."""
 
     @classmethod
+    @cache
     def from_yaml(cls, config_path: str) -> CardConfig:
         """Load a card YAML config file."""
 
         with open(config_path, "r") as f:
-            config_raw = load(f, Loader=Loader)
-        return cls.from_dict(config_raw)  # type: ignore  # pylint: disable=E1101
+            config_raw = load(f, Loader=CLoader)
+        return from_dict(data_class=cls, data=config_raw)
