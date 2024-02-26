@@ -18,7 +18,16 @@ Process for adding a new script:
 import argparse
 
 from .constants import __version__
-from .scripts import gen_dcf, gen_fw_files, gen_xtce, list_cards, pdo, print_od, sdo_transfer
+from .scripts import (
+    gen_dbc,
+    gen_dcf,
+    gen_fw_files,
+    gen_xtce,
+    list_cards,
+    pdo,
+    print_od,
+    sdo_transfer,
+)
 
 # TODO: Group by three categories in help:
 #   - info (card, od)
@@ -36,6 +45,7 @@ _SCRIPTS = [
     gen_dcf,
     gen_xtce,
     gen_fw_files,
+    gen_dbc,
 ]
 
 
