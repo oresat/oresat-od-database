@@ -3,11 +3,12 @@
 from argparse import ArgumentParser, Namespace, RawDescriptionHelpFormatter
 from collections import defaultdict
 from dataclasses import asdict, fields
-from typing import Optional
+from typing import Any, Optional
 
 from tabulate import tabulate
 
-from .. import Card, Consts, cards_from_csv
+from ..card_info import Card, cards_from_csv
+from ..constants import Consts
 
 LIST_CARDS = "list oresat cards, suitable as arguments to other commands"
 
@@ -45,7 +46,7 @@ def build_parser(parser: ArgumentParser) -> ArgumentParser:
     return parser
 
 
-def register_subparser(subparsers):
+def register_subparser(subparsers: Any) -> None:
     """Registers an ArgumentParser as a subcommand of another parser.
 
     Intended to be called by __main__.py for each script. Given the output of add_subparsers(),
@@ -59,14 +60,14 @@ def register_subparser(subparsers):
     parser.set_defaults(func=list_cards)
 
 
-def list_cards(args: Optional[Namespace] = None):
+def list_cards(args: Optional[Namespace] = None) -> None:
     """Lists oresat cards and their configurations"""
     if args is None:
         args = build_parser(ArgumentParser()).parse_args()
 
     cards = cards_from_csv(Consts.from_string(args.oresat))
-    data = defaultdict(list)
-    data["name"] = cards.keys()
+    data: dict[str, list[str]] = defaultdict(list)
+    data["name"] = list(cards)
     for card in cards.values():
         for key, value in asdict(card).items():
             if key == "node_id":

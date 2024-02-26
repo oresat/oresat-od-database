@@ -2,9 +2,10 @@
 
 from argparse import ArgumentParser, Namespace
 from datetime import datetime
-from typing import Optional
+from typing import Any, Optional
 
 import canopen
+from canopen.objectdictionary import Variable
 
 from .. import Consts, OreSatConfig
 
@@ -29,7 +30,7 @@ def build_parser(parser: ArgumentParser) -> ArgumentParser:
     return parser
 
 
-def register_subparser(subparsers):
+def register_subparser(subparsers: Any) -> None:
     """Registers an ArgumentParser as a subcommand of another parser.
 
     Intended to be called by __main__.py for each script. Given the output of add_subparsers(),
@@ -43,7 +44,7 @@ def register_subparser(subparsers):
     parser.set_defaults(func=gen_dcf)
 
 
-def write_od(od: canopen.ObjectDictionary, dir_path: str = "."):
+def write_od(od: canopen.ObjectDictionary, dir_path: str = ".") -> None:
     """Save an od/dcf file
 
     Parameters
@@ -167,7 +168,7 @@ def write_od(od: canopen.ObjectDictionary, dir_path: str = "."):
             f.write(line + "\n")
 
 
-def _objects_lines(od: canopen.ObjectDictionary, indexes: list) -> list:
+def _objects_lines(od: canopen.ObjectDictionary, indexes: list[int]) -> list[str]:
     lines = []
 
     for i in indexes:
@@ -182,7 +183,7 @@ def _objects_lines(od: canopen.ObjectDictionary, indexes: list) -> list:
     return lines
 
 
-def _variable_lines(variable: canopen.objectdictionary.Variable, index: int, subindex=None) -> list:
+def _variable_lines(variable: Variable, index: int, subindex: Optional[int] = None) -> list[str]:
     lines = []
 
     if subindex is None:
@@ -207,7 +208,7 @@ def _variable_lines(variable: canopen.objectdictionary.Variable, index: int, sub
     return lines
 
 
-def _array_lines(array: canopen.objectdictionary.Array, index: int) -> list:
+def _array_lines(array: canopen.objectdictionary.Array, index: int) -> list[str]:
     lines = []
 
     lines.append(f"[{index:X}]")
@@ -223,7 +224,7 @@ def _array_lines(array: canopen.objectdictionary.Array, index: int) -> list:
     return lines
 
 
-def _record_lines(record: canopen.objectdictionary.Record, index: int) -> list:
+def _record_lines(record: canopen.objectdictionary.Record, index: int) -> list[str]:
     lines = []
 
     lines.append(f"[{index:X}]")
@@ -239,7 +240,7 @@ def _record_lines(record: canopen.objectdictionary.Record, index: int) -> list:
     return lines
 
 
-def gen_dcf(args: Optional[Namespace] = None):
+def gen_dcf(args: Optional[Namespace] = None) -> None:
     """Gen_dcf main."""
     if args is None:
         args = build_parser(ArgumentParser()).parse_args()

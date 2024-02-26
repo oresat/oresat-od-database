@@ -2,11 +2,13 @@ bitstring
 black
 build
 canopen
+dacite
 dataclasses-json
 isort
 pylama[all]
 pylama[toml]
 pyyaml
+types-pyyaml
 setuptools
 setuptools-scm
 sphinx

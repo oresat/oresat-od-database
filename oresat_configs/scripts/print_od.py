@@ -28,7 +28,7 @@ def build_parser(parser: ArgumentParser) -> ArgumentParser:
     return parser
 
 
-def register_subparser(subparsers):
+def register_subparser(subparsers: Any) -> None:
     """Registers an ArgumentParser as a subcommand of another parser.
 
     Intended to be called by __main__.py for each script. Given the output of add_subparsers(),
@@ -45,13 +45,13 @@ def register_subparser(subparsers):
 def format_default(value: Any) -> str:
     """Format default value based off of python data type."""
     if isinstance(value, int) and not isinstance(value, bool):
-        value = hex(value)
-    elif isinstance(value, str):
-        value = f'"{value}"'
-    return value
+        return hex(value)
+    if isinstance(value, str):
+        return f'"{value}"'
+    return str(value)
 
 
-def print_od(args: Optional[Namespace] = None):
+def print_od(args: Optional[Namespace] = None) -> None:
     """The print-od main"""
     if args is None:
         args = build_parser(ArgumentParser()).parse_args()

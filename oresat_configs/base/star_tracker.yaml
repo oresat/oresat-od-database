@@ -3,7 +3,7 @@ objects:
     name: status
     data_type: uint8
     value_descriptions:
-      off: 0
+      'off': 0
       boot: 1
       standby: 2
       low_power: 3

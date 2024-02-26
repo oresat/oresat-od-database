@@ -3,7 +3,7 @@ objects:
     name: status
     data_type: uint8
     value_descriptions:
-      off: 0
+      'off': 0
       searching: 1
       locked: 2
       error: 3

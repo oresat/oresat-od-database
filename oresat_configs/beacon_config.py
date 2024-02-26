@@ -1,14 +1,18 @@
 """Load a beacon config file."""
 
+from __future__ import annotations
+
 from dataclasses import dataclass, field
-from typing import List
+from typing import Any
 
 from yaml import load
 
+Loader: Any
 try:
     from yaml import CLoader as Loader
 except ImportError:
     from yaml import Loader
+
 from dataclasses_json import dataclass_json
 
 
@@ -79,14 +83,14 @@ class BeaconConfig:
     """Beacon revision number."""
     ax25: BeaconAx25Config
     """AX.25 configs section."""
-    fields: List[List[str]] = field(default_factory=list)
+    fields: list[list[str]] = field(default_factory=list)
     """
     List of index and subindexes of objects from the C3's object dictionary to be added to the
     beacon.
     """
 
     @classmethod
-    def from_yaml(cls, config_path: str):
+    def from_yaml(cls, config_path: str) -> BeaconConfig:
         """Load a beacon YAML config file."""
 
         with open(config_path, "r") as f:

@@ -8,7 +8,7 @@ node's Object Dictionaries.
 import os
 import sys
 from argparse import ArgumentParser, Namespace
-from typing import Optional, Union
+from typing import Any, Optional, Union
 
 import canopen
 
@@ -46,7 +46,7 @@ def build_parser(parser: ArgumentParser) -> ArgumentParser:
     return parser
 
 
-def register_subparser(subparsers):
+def register_subparser(subparsers: Any) -> None:
     """Registers an ArgumentParser as a subcommand of another parser.
 
     Intended to be called by __main__.py for each script. Given the output of add_subparsers(),
@@ -60,7 +60,7 @@ def register_subparser(subparsers):
     parser.set_defaults(func=sdo_transfer)
 
 
-def sdo_transfer(args: Optional[Namespace] = None):
+def sdo_transfer(args: Optional[Namespace] = None) -> None:
     """Read or write data to a node using a SDO."""
     if args is None:
         args = build_parser(ArgumentParser()).parse_args()

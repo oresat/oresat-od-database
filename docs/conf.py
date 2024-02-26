@@ -27,12 +27,12 @@ release = __version__
 # -- General configuration ---------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#general-configuration
 
-extensions: list = [
+extensions: list[str] = [
     "sphinx.ext.autodoc",
     "sphinx.ext.intersphinx",
 ]
-templates_path: list = []
-exclude_patterns: list = []
+templates_path: list[str] = []
+exclude_patterns: list[str] = []
 add_module_names = False
 
 # -- Options for HTML output -------------------------------------------------
