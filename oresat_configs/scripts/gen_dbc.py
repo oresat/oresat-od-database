@@ -22,41 +22,95 @@ CANOPEN_STATES = {
 }
 
 EMCY_ERROR_CODES = {
-    0x0000: "Error reset or no error",
-    0x1000: "Generic error",
-    0x2000: "Current error",
-    0x2100: "Current, CANopen device input side error",
-    0x2200: "Current inside the CANopen device error",
-    0x2300: "Current, CANopen device output side error",
-    0x3000: "Voltage error",
-    0x3100: "Mains voltage error",
-    0x3200: "Voltage inside the CANopen device error",
-    0x3300: "Output voltage error",
-    0x4000: "Temperature error",
-    0x4100: "Ambient temperature error",
-    0x4200: "Device temperature error",
-    0x5000: "CANopen device hardware error",
-    0x6000: "CANopen device software error",
-    0x6100: "Internal software error",
-    0x6200: "User software error",
-    0x6300: "Data set error",
-    0x7000: "Additional modules error",
-    0x8000: "Monitoring error",
-    0x8100: "Communication error",
-    0x8110: "CAN overrun (objects lost) error",
-    0x8120: "CAN in error passive mode error",
-    0x8130: "Life guard error or heartbeat error",
-    0x8140: "recovered from bus off error",
-    0x8150: "CAN-ID collision error",
-    0x8200: "Protocol error",
-    0x8210: "PDO not processed due to length error",
-    0x8220: "PDO length exceeded error",
-    0x8230: "DAM MPDO not processed, destination object not available error",
-    0x8240: "Unexpected SYNC data length error",
-    0x8250: "RPDO timeout error",
-    0x9000: "External error error",
-    0xF000: "Additional function error",
-    0xFF00: "Device specific error",
+    0x0000: "no_error",
+    0x1000: "generic_error",
+    0x2000: "current_error",
+    0x2100: "current_device_input_error",
+    0x2200: "current_inside_device_error",
+    0x2300: "current_device output_error",
+    0x3000: "voltage_error",
+    0x3100: "mains_voltage_error",
+    0x3200: "voltage_inside_device_error",
+    0x3300: "output_voltage_error",
+    0x4000: "temperature_error",
+    0x4100: "ambient_temperature_error",
+    0x4200: "device_temperature_error",
+    0x5000: "device_hardware_error",
+    0x6000: "device_software_error",
+    0x6100: "internal_software_error",
+    0x6200: "user_software_error",
+    0x6300: "data_set_error",
+    0x7000: "additional_modules_error",
+    0x8000: "monitoring_error",
+    0x8100: "communication_error",
+    0x8110: "can_overrun_error",
+    0x8120: "passive_mode_error",
+    0x8130: "heartbeat_error",
+    0x8140: "recovered_bus_error",
+    0x8150: "can_id_collision_error",
+    0x8200: "protocol_error",
+    0x8210: "PDO not processed due to length_error",
+    0x8220: "pdo_length_exceeded_error",
+    0x8230: "mpdo_not_processed_error",
+    0x8240: "sync_data_length_error",
+    0x8250: "rpdo_timeout_error",
+    0x9000: "external_error",
+    0xF000: "additional_function_error",
+    0xFF00: "device_specific_error",
+}
+
+SDO_CSS = {
+    0: "download_segment_request",
+    1: "initiate_download_request",
+    2: "initiate_upload_request",
+    3: "upload_segment_request",
+    4: "abort_transfer",
+    5: "block_upload",
+    6: "block_download",
+}
+
+SDO_SCS = {
+    0: "upload_segment_response",
+    1: "download_segment_respone",
+    2: "initiate_upload_response",
+    3: "initiate_download_response",
+    4: "abort_transfer",
+    5: "block_download",
+    6: "block_upload",
+}
+
+SDO_ABORT_CODES = {
+    0x0503_0000: "toggle_bit_not_alternated",
+    0x0504_0000: "timed_out",
+    0x0504_0001: "invalid_command_specifier",
+    0x0504_0002: "invalid_block_size",
+    0x0504_0003: "invalid_sequence_number",
+    0x0504_0004: "crc_error",
+    0x0504_0005: "out_of_memory",
+    0x0601_0000: "unsupported_access_to_object",
+    0x0601_0001: "write_only_object",
+    0x0601_0002: "read_only_object",
+    0x0602_0000: "object_does_not_exist",
+    0x0604_0041: "object_cannot_be_mapped",
+    0x0604_0042: "exceed_pdo_length",
+    0x0604_0043: "general_parameter_incompatibility",
+    0x0604_0047: "general_internal_incompatibility_in_device",
+    0x0606_0000: "hardware_error",
+    0x0607_0010: "parameter_type_does_not_match",
+    0x0607_0012: "parameter_too_high",
+    0x0607_0013: "parameter_too_low",
+    0x0609_0011: "subindex_does_not_exist",
+    0x0609_0030: "invalid_parameter_value",
+    0x0609_0031: "write_value_too_high",
+    0x0609_0032: "write_value_too_low",
+    0x0609_0036: "maximum_less_than_minimum",
+    0x060A_0023: "resource_not_available",
+    0x0800_0000: "general_error",
+    0x0800_0020: "data_cannot_be_transferred",
+    0x0800_0021: "data_cannot_be_transferred_local_control",
+    0x0800_0022: "data_cannot_be_transferred_device_state",
+    0x0800_0023: "no_object_dictionary",
+    0x0800_0024: "no_data_available",
 }
 
 
@@ -226,17 +280,65 @@ def write_dbc(config: OreSatConfig, dir_path: str = "."):
             lines += tpdo_lines
             lines.append("")
 
-        # SDOs
+        # SDOs (useless for block SDO transfers)
         if name != "c3":
+            # client / tx
             cob_id = 0x580 + od.node_id
             lines.append(f"BO_ {cob_id} {name}_sdo_tx: 8 c3")
-            lines.append(f'{INDENT3}SG_ sdo_tx_data : 0|64@1+ (1,0) [0|0] "" {name}')
+            lines.append(f'{INDENT3}SG_ ccs M : 5|3@1+ (1,0) [0|0] "" {name}')  # multiplexor
+            # 0
+            lines.append(f'{INDENT3}SG_ more_segments m0 : 0|1@1+ (1,0) [0|0] "" {name}')
+            lines.append(f'{INDENT3}SG_ data_padding m0 : 1|3@1+ (1,0) [0|0] "" {name}')
+            lines.append(f'{INDENT3}SG_ toggle_bit m0 : 4|1@1+ (1,0) [0|0] "" {name}')
+            lines.append(f'{INDENT3}SG_ segment_data m0 : 8|56@1+ (1,0) [0|0] "" {name}')
+            # 1
+            lines.append(f'{INDENT3}SG_ size_indicated m1 : 0|1@1+ (1,0) [0|0] "" {name}')
+            lines.append(f'{INDENT3}SG_ expedited m1 : 1|1@1+ (1,0) [0|0] "" {name}')
+            lines.append(f'{INDENT3}SG_ data_padding m1 : 2|2@1+ (1,0) [0|0] "" {name}')
+            lines.append(f'{INDENT3}SG_ index m1 : 8|16@1+ (1,0) [0|0] "" {name}')
+            lines.append(f'{INDENT3}SG_ subindex m1 : 24|8@1+ (1,0) [0|0] "" {name}')
+            lines.append(f'{INDENT3}SG_ data m1 : 32|32@1+ (1,0) [0|0] "" {name}')
+            # 2
+            lines.append(f'{INDENT3}SG_ index m2 : 8|16@1+ (1,0) [0|0] "" {name}')
+            lines.append(f'{INDENT3}SG_ subindex m2 : 24|8@1+ (1,0) [0|0] "" {name}')
+            # 3
+            lines.append(f'{INDENT3}SG_ toggle_bit m3 : 4|1@1+ (1,0) [0|0] "" {name}')
+            # 4
+            lines.append(f'{INDENT3}SG_ index m4 : 8|16@1+ (1,0) [0|0] "" {name}')
+            lines.append(f'{INDENT3}SG_ subindex m4 : 24|8@1+ (1,0) [0|0] "" {name}')
+            lines.append(f'{INDENT3}SG_ aboort_code m4 : 32|32@1+ (1,0) [0|0] "" {name}')
+            # 5 & 6 have sub commands...
             lines.append("")
+            enums.append((cob_id, "ccs", SDO_CSS))
 
+            # server / rx
             cob_id = 0x600 + od.node_id
             lines.append(f"BO_ {cob_id} {name}_sdo_rx: 8 {name}")
-            lines.append(f'{INDENT3}SG_ sdo_rx_data : 0|64@1+ (1,0) [0|0] "" c3')
+            lines.append(f'{INDENT3}SG_ scs M : 5|3@1+ (1,0) [0|0] "" c3')  # multiplexor
+            # 0
+            lines.append(f'{INDENT3}SG_ toggle_bit m0 : 4|1@1+ (1,0) [0|0] "" c3')
+            lines.append(f'{INDENT3}SG_ data_padding m0 : 1|3@1+ (1,0) [0|0] "" c3')
+            lines.append(f'{INDENT3}SG_ last_segment m0 : 0|1@1+ (1,0) [0|0] "" c3')
+            lines.append(f'{INDENT3}SG_ segment_data m0 : 8|56@1+ (1,0) [0|0] "" c3')
+            # 1
+            lines.append(f'{INDENT3}SG_ toggle_bit m1 : 4|1@1+ (1,0) [0|0] "" c3')
+            # 2
+            lines.append(f'{INDENT3}SG_ size_indicated m2 : 0|1@1+ (1,0) [0|0] "" c3')
+            lines.append(f'{INDENT3}SG_ expedited m2 : 1|1@1+ (1,0) [0|0] "" c3')
+            lines.append(f'{INDENT3}SG_ data_padding m2 : 2|2@1+ (1,0) [0|0] "" c3')
+            lines.append(f'{INDENT3}SG_ index m2 : 8|16@1+ (1,0) [0|0] "" c3')
+            lines.append(f'{INDENT3}SG_ subindex m2 : 24|8@1+ (1,0) [0|0] "" c3')
+            lines.append(f'{INDENT3}SG_ data m2 : 32|32@1+ (1,0) [0|0] "" c3')
+            # 3
+            lines.append(f'{INDENT3}SG_ index m3 : 8|16@1+ (1,0) [0|0] "" c3')
+            lines.append(f'{INDENT3}SG_ subindex m3 : 24|8@1+ (1,0) [0|0] "" c3')
+            # 4
+            lines.append(f'{INDENT3}SG_ index m4 : 8|16@1+ (1,0) [0|0] "" c3')
+            lines.append(f'{INDENT3}SG_ subindex m4 : 24|8@1+ (1,0) [0|0] "" c3')
+            lines.append(f'{INDENT3}SG_ aboort_code m4 : 32|32@1+ (1,0) [0|0] "" c3')
+            # 5 & 6 have sub commands...
             lines.append("")
+            enums.append((cob_id, "scs", SDO_SCS))
 
         # heartbeats
         cob_id = 0x700 + od.node_id
