@@ -1,11 +1,11 @@
 """Generate a DBC file for SavvyCAN."""
 
 from argparse import ArgumentParser, Namespace
-from typing import Optional
+from typing import Dict, List, Optional, Tuple
 
-from canopen.objectdictionary import UNSIGNED_TYPES, Variable
+from canopen.objectdictionary import REAL32, REAL64, UNSIGNED_TYPES, Variable
 
-from .. import Consts, OreSatConfig, __version__
+from .. import Consts, OreSatConfig
 
 GEN_DBC = "generate dbc file for SavvyCAN"
 
@@ -49,7 +49,7 @@ EMCY_ERROR_CODES = {
     0x8140: "recovered_bus_error",
     0x8150: "can_id_collision_error",
     0x8200: "protocol_error",
-    0x8210: "PDO not processed due to length_error",
+    0x8210: "pdo_not_processed_due_to_length_error",
     0x8220: "pdo_length_exceeded_error",
     0x8230: "mpdo_not_processed_error",
     0x8240: "sync_data_length_error",
@@ -155,8 +155,8 @@ def write_dbc(config: OreSatConfig, dir_path: str = "."):
     else:
         file_path = file_name
 
-    lines = [
-        f'VERSION "{mission}-{__version__}"',
+    lines: List[str] = [
+        'VERSION ""',
         "",
         "",
         "NS_ :",
@@ -167,7 +167,7 @@ def write_dbc(config: OreSatConfig, dir_path: str = "."):
         f"{INDENT4}VAL_",
         f"{INDENT4}CAT_DEF_",
         f"{INDENT4}CAT_",
-        f"{INDENT4}FILTER_",
+        f"{INDENT4}FILTER",
         f"{INDENT4}BA_DEF_DEF_",
         f"{INDENT4}EV_DATA_",
         f"{INDENT4}ENVVAR_DATA_",
@@ -175,7 +175,7 @@ def write_dbc(config: OreSatConfig, dir_path: str = "."):
         f"{INDENT4}SGTYPE_VAL_",
         f"{INDENT4}BA_DEF_SGTYPE_",
         f"{INDENT4}BA_SGTYPE_",
-        f"{INDENT4}SIG_TYPE_REG_",
+        f"{INDENT4}SIG_TYPE_REF_",
         f"{INDENT4}VAL_TABLE_",
         f"{INDENT4}SIG_GROUP_",
         f"{INDENT4}SIG_VALTYPE_",
@@ -189,18 +189,20 @@ def write_dbc(config: OreSatConfig, dir_path: str = "."):
         f"{INDENT4}BU_BO_REL_",
         f"{INDENT4}SG_MUL_VAL_",
         "",
-        "BS_:",
+        "BS_: ",
     ]
 
     # list of cards
     cards = config.cards
-    lines.append("BU_:" + " ".join(cards))
+    lines.append("BU_: " + " ".join(cards) + " ")
 
     # SYNC
     lines.append(f"BO_ {0x80} sync: 0 c3")
     lines.append("")
 
-    enums: list[tuple[int, str, dict[int, str]]] = []
+    enums: List[Tuple[int, str, Dict[int, str]]] = []
+    comments: List[Tuple[int, str, str]] = []
+    floats: List[Tuple[int, str, int]] = []
     for name, od in config.od_db.items():
         if name not in cards:
             continue
@@ -262,6 +264,14 @@ def write_dbc(config: OreSatConfig, dir_path: str = "."):
                         f'[{low}|{high}] "{obj.unit}" {VECTOR}'
                     )
 
+                    if obj.description:
+                        comments.append((cob_id, signal, obj.description))
+
+                    if obj.data_type == REAL32:
+                        floats.append((cob_id, signal, 1))
+                    elif obj.data_type == REAL64:
+                        floats.append((cob_id, signal, 2))
+
                 # bit fields
                 for n, bits in obj.bit_definitions.items():
                     n_signal = f"{signal}_{n.lower()}"
@@ -286,59 +296,61 @@ def write_dbc(config: OreSatConfig, dir_path: str = "."):
             cob_id = 0x580 + od.node_id
             lines.append(f"BO_ {cob_id} {name}_sdo_tx: 8 c3")
             lines.append(f'{INDENT3}SG_ ccs M : 5|3@1+ (1,0) [0|0] "" {name}')  # multiplexor
-            # 0
+            # ccs = 0
             lines.append(f'{INDENT3}SG_ more_segments m0 : 0|1@1+ (1,0) [0|0] "" {name}')
             lines.append(f'{INDENT3}SG_ data_padding m0 : 1|3@1+ (1,0) [0|0] "" {name}')
             lines.append(f'{INDENT3}SG_ toggle_bit m0 : 4|1@1+ (1,0) [0|0] "" {name}')
             lines.append(f'{INDENT3}SG_ segment_data m0 : 8|56@1+ (1,0) [0|0] "" {name}')
-            # 1
+            # ccs = 1
             lines.append(f'{INDENT3}SG_ size_indicated m1 : 0|1@1+ (1,0) [0|0] "" {name}')
             lines.append(f'{INDENT3}SG_ expedited m1 : 1|1@1+ (1,0) [0|0] "" {name}')
             lines.append(f'{INDENT3}SG_ data_padding m1 : 2|2@1+ (1,0) [0|0] "" {name}')
             lines.append(f'{INDENT3}SG_ index m1 : 8|16@1+ (1,0) [0|0] "" {name}')
             lines.append(f'{INDENT3}SG_ subindex m1 : 24|8@1+ (1,0) [0|0] "" {name}')
             lines.append(f'{INDENT3}SG_ data m1 : 32|32@1+ (1,0) [0|0] "" {name}')
-            # 2
+            # ccs = 2
             lines.append(f'{INDENT3}SG_ index m2 : 8|16@1+ (1,0) [0|0] "" {name}')
             lines.append(f'{INDENT3}SG_ subindex m2 : 24|8@1+ (1,0) [0|0] "" {name}')
-            # 3
+            # css = 3
             lines.append(f'{INDENT3}SG_ toggle_bit m3 : 4|1@1+ (1,0) [0|0] "" {name}')
-            # 4
+            # ccs = 4
             lines.append(f'{INDENT3}SG_ index m4 : 8|16@1+ (1,0) [0|0] "" {name}')
             lines.append(f'{INDENT3}SG_ subindex m4 : 24|8@1+ (1,0) [0|0] "" {name}')
             lines.append(f'{INDENT3}SG_ aboort_code m4 : 32|32@1+ (1,0) [0|0] "" {name}')
-            # 5 & 6 have sub commands...
+            # css = 5 & 6 have sub commands/multiplexor...
             lines.append("")
             enums.append((cob_id, "ccs", SDO_CSS))
+            enums.append((cob_id, "aboort_code", SDO_ABORT_CODES))
 
             # server / rx
             cob_id = 0x600 + od.node_id
             lines.append(f"BO_ {cob_id} {name}_sdo_rx: 8 {name}")
             lines.append(f'{INDENT3}SG_ scs M : 5|3@1+ (1,0) [0|0] "" c3')  # multiplexor
-            # 0
+            # scs = 0
             lines.append(f'{INDENT3}SG_ toggle_bit m0 : 4|1@1+ (1,0) [0|0] "" c3')
             lines.append(f'{INDENT3}SG_ data_padding m0 : 1|3@1+ (1,0) [0|0] "" c3')
             lines.append(f'{INDENT3}SG_ last_segment m0 : 0|1@1+ (1,0) [0|0] "" c3')
             lines.append(f'{INDENT3}SG_ segment_data m0 : 8|56@1+ (1,0) [0|0] "" c3')
-            # 1
+            # scs = 1
             lines.append(f'{INDENT3}SG_ toggle_bit m1 : 4|1@1+ (1,0) [0|0] "" c3')
-            # 2
+            # scs =2
             lines.append(f'{INDENT3}SG_ size_indicated m2 : 0|1@1+ (1,0) [0|0] "" c3')
             lines.append(f'{INDENT3}SG_ expedited m2 : 1|1@1+ (1,0) [0|0] "" c3')
             lines.append(f'{INDENT3}SG_ data_padding m2 : 2|2@1+ (1,0) [0|0] "" c3')
             lines.append(f'{INDENT3}SG_ index m2 : 8|16@1+ (1,0) [0|0] "" c3')
             lines.append(f'{INDENT3}SG_ subindex m2 : 24|8@1+ (1,0) [0|0] "" c3')
             lines.append(f'{INDENT3}SG_ data m2 : 32|32@1+ (1,0) [0|0] "" c3')
-            # 3
+            # scs = 3
             lines.append(f'{INDENT3}SG_ index m3 : 8|16@1+ (1,0) [0|0] "" c3')
             lines.append(f'{INDENT3}SG_ subindex m3 : 24|8@1+ (1,0) [0|0] "" c3')
-            # 4
+            # scs = 4
             lines.append(f'{INDENT3}SG_ index m4 : 8|16@1+ (1,0) [0|0] "" c3')
             lines.append(f'{INDENT3}SG_ subindex m4 : 24|8@1+ (1,0) [0|0] "" c3')
             lines.append(f'{INDENT3}SG_ aboort_code m4 : 32|32@1+ (1,0) [0|0] "" c3')
-            # 5 & 6 have sub commands...
+            # scs = 5 & 6 have sub commands/multiplexor...
             lines.append("")
             enums.append((cob_id, "scs", SDO_SCS))
+            enums.append((cob_id, "aboort_code", SDO_ABORT_CODES))
 
         # heartbeats
         cob_id = 0x700 + od.node_id
@@ -347,13 +359,21 @@ def write_dbc(config: OreSatConfig, dir_path: str = "."):
         enums.append((cob_id, "hearbeat", CANOPEN_STATES))
         lines.append("")
 
-    # custom enums
-    for i in enums:
-        line = f"VAL_ {i[0]} {i[1]}"
-        for key, value in i[2].items():
+    # signal comments
+    for c in comments:
+        lines.append(f'CM_ SG_ {c[0]} {c[1]} "{c[2]}";')
+
+    # signal enums
+    for e in enums:
+        line = f"VAL_ {e[0]} {e[1]}"
+        for key, value in e[2].items():
             line += f' {key} "{value}"'
         line += ";"
         lines.append(line)
+
+    # signal floats
+    for x in floats:
+        lines.append(f"SIG_VALTYPE_ {x[0]} {x[1]} : {x[2]};")
 
     with open(file_path, "w") as f:
         for line in lines:
