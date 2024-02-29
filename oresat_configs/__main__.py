@@ -49,7 +49,11 @@ _SCRIPTS = [
 ]
 
 
-if __name__ == "__main__":
+def oresat_configs():
+    """Entry point for the top level script
+
+    Used in pyproject.toml, for generating the oresat-configs installed script
+    """
     parser = argparse.ArgumentParser(prog="oresat_configs")
     parser.add_argument("--version", action="version", version="%(prog)s v" + __version__)
     parser.set_defaults(func=lambda x: parser.print_help())
@@ -60,3 +64,7 @@ if __name__ == "__main__":
 
     args = parser.parse_args()
     args.func(args)
+
+
+if __name__ == "__main__":
+    oresat_configs()
