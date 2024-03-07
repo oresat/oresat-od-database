@@ -1,7 +1,7 @@
 """Generate a DBC file for SavvyCAN."""
 
 from argparse import ArgumentParser, Namespace
-from typing import Dict, List, Optional, Tuple
+from typing import Optional
 
 from canopen.objectdictionary import REAL32, REAL64, UNSIGNED_TYPES, Variable
 
@@ -127,7 +127,7 @@ def build_parser(parser: ArgumentParser) -> ArgumentParser:
         type=lambda x: x.lower().removeprefix("oresat"),
         help="oresat mission, defaults to %(default)s",
     )
-    parser.add_argument("-d", "--dir-path", default=".", help='directory path; defautl "."')
+    parser.add_argument("-d", "--dir-path", default=".", help='directory path; default "."')
     return parser
 
 
@@ -146,16 +146,16 @@ def register_subparser(subparsers):
 
 
 def write_dbc(config: OreSatConfig, dir_path: str = "."):
-    """Write beacon configs to a xtce file."""
+    """Write beacon configs to a dbc file."""
 
-    mission = config.mission.name.lower().replace(".", "_")
+    mission = config.mission.name.lower()
     file_name = mission + ".dbc"
     if dir_path:
         file_path = f"{dir_path}/{file_name}"
     else:
         file_path = file_name
 
-    lines: List[str] = [
+    lines: list[str] = [
         'VERSION ""',
         "",
         "",
@@ -200,9 +200,9 @@ def write_dbc(config: OreSatConfig, dir_path: str = "."):
     lines.append(f"BO_ {0x80} sync: 0 c3")
     lines.append("")
 
-    enums: List[Tuple[int, str, Dict[int, str]]] = []
-    comments: List[Tuple[int, str, str]] = []
-    floats: List[Tuple[int, str, int]] = []
+    enums: list[tuple[int, str, dict[int, str]]] = []
+    comments: list[tuple[int, str, str]] = []
+    floats: list[tuple[int, str, int]] = []
     for name, od in config.od_db.items():
         if name not in cards:
             continue
@@ -226,7 +226,7 @@ def write_dbc(config: OreSatConfig, dir_path: str = "."):
 
         # TPDOs
         for param_index in od:
-            if param_index < 0x1800 or param_index >= 0x1A00 or param_index not in od:
+            if param_index < 0x1800 or param_index >= 0x1A00:
                 continue
 
             tpdo_lines = []
@@ -360,20 +360,17 @@ def write_dbc(config: OreSatConfig, dir_path: str = "."):
         lines.append("")
 
     # signal comments
-    for c in comments:
-        lines.append(f'CM_ SG_ {c[0]} {c[1]} "{c[2]}";')
+    for cob_id, signal, desc in comments:
+        lines.append(f'CM_ SG_ {cob_id} {signal} "{desc}";')
 
     # signal enums
-    for e in enums:
-        line = f"VAL_ {e[0]} {e[1]}"
-        for key, value in e[2].items():
-            line += f' {key} "{value}"'
-        line += ";"
-        lines.append(line)
+    for cob_id, signal, value_defs in enums:
+        values = " ".join(f'{v} "{n}"' for v, n in value_defs.items())
+        lines.append(f"VAL_ {cob_id} {signal} {values};")
 
     # signal floats
-    for x in floats:
-        lines.append(f"SIG_VALTYPE_ {x[0]} {x[1]} : {x[2]};")
+    for cob_id, signal, value in floats:
+        lines.append(f"SIG_VALTYPE_ {cob_id} {signal} : {value};")
 
     with open(file_path, "w") as f:
         for line in lines:
