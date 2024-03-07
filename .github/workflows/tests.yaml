@@ -46,3 +46,15 @@ jobs:
 
     - name: Test building sphinx docs
       run: make -C docs html
+
+    - name: Test installed scripts
+      run: |
+        pip install dist/*.whl
+        oresat-configs > /dev/null
+        oresat-gen-fw-files c3
+        oresat-gen-dcf c3
+        oresat-print-od c3 > /dev/null
+        oresat-gen-xtce
+        oresat-configs cards > /dev/null
+        oresat-configs pdo c3 --list > /dev/null
+        pip uninstall -y oresat-configs
