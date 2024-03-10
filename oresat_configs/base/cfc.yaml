@@ -7,7 +7,7 @@ objects:
         name: status
         data_type: uint8
         value_descriptions:
-          off: 1
+          'off': 1
           standby: 2
           capture: 3
           error: 4

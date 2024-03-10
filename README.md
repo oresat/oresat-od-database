@@ -38,10 +38,29 @@ transfers.
 
 ## Setup
 
-Install project dev dependencies.
+Install project dev dependencies. `libyaml` should be installed by default on
+reasonable systems, but it never hurts to make sure.
 
 ```bash
+$ sudo apt install libyaml-0-2
 $ pip install -r requirements.txt
+```
+
+If installing on ARM (e.g. Octavo cards like the C3) special work is needed to
+ensure that `pyyaml` uses the `libyaml` C bindings. The binary wheels from PyPI
+aren't built with them so we need to install from the source package:
+
+Installing the first time:
+```bash
+$ sudo apt install libyaml-dev
+$ pip install --no-binary pyyaml -r requirements.txt
+```
+
+Fixing an already installed pyyaml: (see here if you get "ImportError: pyyaml
+missing/installed without libyaml bindings.")
+```bash
+$ sudo apt install libyaml-dev
+$ pip install --force-reinstall --no-cache-dir --no-binary pyyaml pyyaml
 ```
 
 ## Updating a Config

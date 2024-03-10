@@ -1,18 +1,15 @@
 """Load a card config file."""
 
+from __future__ import annotations
+
 from dataclasses import dataclass, field
-from typing import Any, Dict, List, Optional, Union
+from functools import cache
+from typing import Any, Optional, Union
 
-from yaml import load
-
-try:
-    from yaml import CLoader as Loader
-except ImportError:
-    from yaml import Loader
-from dataclasses_json import dataclass_json
+from dacite import from_dict
+from yaml import CLoader, load
 
 
-@dataclass_json
 @dataclass
 class ConfigObject:
     """Object in config."""
@@ -29,17 +26,25 @@ class ConfigObject:
     """Default value of object."""
     description: str = ""
     """Description of object."""
-    value_descriptions: Dict[str, int] = field(default_factory=dict)
+    value_descriptions: dict[str, int] = field(default_factory=dict)
     """Optional: Can be used to define enum values for an unsigned integer data types."""
-    bit_definitions: Dict[str, int] = field(default_factory=dict)
+    bit_definitions: dict[str, Union[int, str]] = field(default_factory=dict)
     """Optional: Can be used to define bitfield of an unsigned integer data types."""
     unit: str = ""
     """Optional unit for the object."""
     scale_factor: float = 1
     """Can be used to scale a integer value to a float."""
+    low_limit: Optional[int] = None
+    """
+    The lower limit for value. No need to set this if it limit is the lower limit of the data type.
+    """
+    high_limit: Optional[int] = None
+    """
+    The higher limit for value. No need to set this if it limit is the higher limit of the data
+    type.
+    """
 
 
-@dataclass_json
 @dataclass
 class GenerateSubindex(ConfigObject):
     """
@@ -68,7 +73,6 @@ class GenerateSubindex(ConfigObject):
     """Subindexes of objects to generate."""
 
 
-@dataclass_json
 @dataclass
 class SubindexObject(ConfigObject):
     """
@@ -94,7 +98,6 @@ class SubindexObject(ConfigObject):
     """
 
 
-@dataclass_json
 @dataclass
 class IndexObject(ConfigObject):
     """
@@ -118,13 +121,12 @@ class IndexObject(ConfigObject):
     """Index of object, fw/sw common object are in 0x3000, card objects are in 0x4000."""
     object_type: str = "variable"
     """Object type; must be ``"variable"``, ``"array"``, or ``"record"``."""
-    subindexes: List[SubindexObject] = field(default_factory=list)
+    subindexes: list[SubindexObject] = field(default_factory=list)
     """Defines subindexes for records and arrays."""
     generate_subindexes: Optional[GenerateSubindex] = None
     """Used to generate subindexes for arrays."""
 
 
-@dataclass_json
 @dataclass
 class Tpdo:
     """
@@ -159,11 +161,10 @@ class Tpdo:
     """Send the TPDO periodicly in milliseconds."""
     inhibit_time_ms: int = 0
     """Delay after boot before the event timer starts in milliseconds."""
-    fields: List[List[str]] = field(default_factory=list)
+    fields: list[list[str]] = field(default_factory=list)
     """Index and subindexes of objects to map to the TPDO."""
 
 
-@dataclass_json
 @dataclass
 class Rpdo:
     """
@@ -187,7 +188,6 @@ class Rpdo:
     """TPDO number, 1-16."""
 
 
-@dataclass_json
 @dataclass
 class CardConfig:
     """
@@ -220,21 +220,22 @@ class CardConfig:
           ...
     """
 
-    std_objects: List[str] = field(default_factory=list)
+    std_objects: list[str] = field(default_factory=list)
     """Standard object to include in OD."""
-    objects: List[IndexObject] = field(default_factory=list)
+    objects: list[IndexObject] = field(default_factory=list)
     """Unique card objects."""
-    tpdos: List[Tpdo] = field(default_factory=list)
+    tpdos: list[Tpdo] = field(default_factory=list)
     """TPDOs for the card."""
-    rpdos: List[Rpdo] = field(default_factory=list)
+    rpdos: list[Rpdo] = field(default_factory=list)
     """RPDOs for the card."""
-    fram: List[List[str]] = field(default_factory=list)
+    fram: list[list[str]] = field(default_factory=list)
     """C3 only. List of index and subindex for the c3 to save the values of to F-RAM."""
 
     @classmethod
-    def from_yaml(cls, config_path: str):
+    @cache
+    def from_yaml(cls, config_path: str) -> CardConfig:
         """Load a card YAML config file."""
 
         with open(config_path, "r") as f:
-            config_raw = load(f, Loader=Loader)
-        return cls.from_dict(config_raw)  # type: ignore  # pylint: disable=E1101
+            config_raw = load(f, Loader=CLoader)
+        return from_dict(data_class=cls, data=config_raw)

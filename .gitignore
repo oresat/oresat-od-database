@@ -164,9 +164,10 @@ cython_debug/
 #  option (not recommended) you can uncomment the following to ignore the entire idea folder.
 #.idea/
 
-# CANopen
+# CAN/CANopen
 *.eds
 *.dcf
+*.dbc
 
 # CANopenNode
 OD.*
@@ -176,3 +177,12 @@ OD.*
 
 # Beacon def formats
 *xtce.xml
+
+# MacOS
+.DS_Store
+
+# Vim
+*.swp
+
+# setuptools-scm
+*/_version.py

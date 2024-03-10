@@ -14,13 +14,14 @@ from ..base import (
     SOLAR_CONFIG_PATH,
     ST_CONFIG_PATH,
     SW_COMMON_CONFIG_PATH,
+    ConfigPaths,
 )
 
 _CONFIGS_DIR = os.path.dirname(os.path.abspath(__file__))
 
-ORESAT0_5_BEACON_CONFIG_PATH = f"{_CONFIGS_DIR}/beacon.yaml"
+BEACON_CONFIG_PATH: str = f"{_CONFIGS_DIR}/beacon.yaml"
 
-ORESAT0_5_CARD_CONFIGS_PATH = {
+CARD_CONFIGS_PATH: ConfigPaths = {
     "c3": (C3_CONFIG_PATH, SW_COMMON_CONFIG_PATH),
     "battery_1": (BAT_CONFIG_PATH, FW_COMMON_CONFIG_PATH),
     "solar_1": (SOLAR_CONFIG_PATH, FW_COMMON_CONFIG_PATH),
