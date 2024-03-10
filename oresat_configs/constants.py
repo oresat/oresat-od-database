@@ -105,7 +105,7 @@ class NodeId(IntEnum):
     STAR_TRACKER_1 = 0x2C
     STAR_TRACKER_2 = 0x30
     GPS = 0x34
-    IMU = 0x38
+    ADCS = 0x38
     REACTION_WHEEL_1 = 0x3C
     REACTION_WHEEL_2 = 0x40
     REACTION_WHEEL_3 = 0x44
