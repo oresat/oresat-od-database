@@ -26,7 +26,7 @@ def build_parser(parser: ArgumentParser) -> ArgumentParser:
         type=lambda x: x.lower().removeprefix("oresat"),
         help="oresat mission, defaults to %(default)s",
     )
-    parser.add_argument("card", help="card name; c3, battery, solar, imu, or reaction_wheel")
+    parser.add_argument("card", help="card name; c3, battery, solar, adcs, or reaction_wheel")
     parser.add_argument("-d", "--dir-path", default=".", help='output directory path, default: "."')
     return parser
 

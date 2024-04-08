@@ -51,21 +51,24 @@ objects:
         data_type: int16
         description: x acceleration
         access_type: ro
-        unit: milli-g
+        unit: g
+        scale_factor: 0.001
 
       - subindex: 0x2
         name: y
         data_type: int16
         description: y acceleration
         access_type: ro
-        unit: milli-g
+        unit: g
+        scale_factor: 0.001
 
       - subindex: 0x3
         name: z
         data_type: int16
         description: z acceleration
-        unit: milli-g
+        unit: g
         access_type: ro
+        scale_factor: 0.001
 
       - subindex: 0x4
         name: x_raw
@@ -104,7 +107,8 @@ objects:
         access_type: ro
         low_limit: -8192
         high_limit: 8192
-        unit: milligauss
+        unit: gauss
+        scale_factor: 0.001
 
       - subindex: 0x2
         name: y
@@ -113,7 +117,8 @@ objects:
         access_type: ro
         low_limit: -8192
         high_limit: 8192
-        unit: milligauss
+        unit: gauss
+        scale_factor: 0.001
 
       - subindex: 0x3
         name: z
@@ -122,7 +127,8 @@ objects:
         access_type: ro
         low_limit: -8192
         high_limit: 8192
-        unit: milligauss
+        unit: gauss
+        scale_factor: 0.001
 
   - index: 0x4004
     name: pos_z_magnetometer_2
@@ -136,7 +142,8 @@ objects:
         access_type: ro
         low_limit: -8192
         high_limit: 8192
-        unit: milligauss
+        unit: gauss
+        scale_factor: 0.001
 
       - subindex: 0x2
         name: y
@@ -145,7 +152,8 @@ objects:
         access_type: ro
         low_limit: -8192
         high_limit: 8192
-        unit: milligauss
+        unit: gauss
+        scale_factor: 0.001
 
       - subindex: 0x3
         name: z
@@ -154,7 +162,8 @@ objects:
         access_type: ro
         low_limit: -8192
         high_limit: 8192
-        unit: milligauss
+        unit: gauss
+        scale_factor: 0.001
 
   - index: 0x4005
     name: min_z_magnetometer_1
@@ -168,7 +177,8 @@ objects:
         access_type: ro
         low_limit: -8192
         high_limit: 8192
-        unit: milligauss
+        unit: gauss
+        scale_factor: 0.001
 
       - subindex: 0x2
         name: y
@@ -177,7 +187,8 @@ objects:
         access_type: ro
         low_limit: -8192
         high_limit: 8192
-        unit: milligauss
+        unit: gauss
+        scale_factor: 0.001
 
       - subindex: 0x3
         name: z
@@ -186,7 +197,8 @@ objects:
         access_type: ro
         low_limit: -8192
         high_limit: 8192
-        unit: milligauss
+        unit: gauss
+        scale_factor: 0.001
 
   - index: 0x4006
     name: min_z_magnetometer_2
@@ -200,7 +212,8 @@ objects:
         access_type: ro
         low_limit: -8192
         high_limit: 8192
-        unit: milligauss
+        unit: gauss
+        scale_factor: 0.001
 
       - subindex: 0x2
         name: y
@@ -209,7 +222,8 @@ objects:
         access_type: ro
         low_limit: -8192
         high_limit: 8192
-        unit: milligauss
+        unit: gauss
+        scale_factor: 0.001
 
       - subindex: 0x3
         name: z
@@ -218,7 +232,8 @@ objects:
         access_type: ro
         low_limit: -8192
         high_limit: 8192
-        unit: milligauss
+        unit: gauss
+        scale_factor: 0.001
 
   - index: 0x4007
     name: magnetorquer
@@ -230,14 +245,14 @@ objects:
         description: current feedback in the x-axis
         access_type: ro
         unit: uA
-        
+
       - subindex: 0x2
         name: current_y
         data_type: int32
         description: current feedback in the y-axis
         access_type: ro
         unit: uA
-        
+
       - subindex: 0x3
         name: current_z
         data_type: int32
@@ -251,14 +266,14 @@ objects:
         description: Setpoint for current in thex x-axis
         access_type: rw
         unit: uA
-        
+
       - subindex: 0x5
         name: current_y_setpoint
         data_type: int32
         description: Setpoint for current in the y-axis
         access_type: rw
         unit: uA
-        
+
       - subindex: 0x6
         name: current_z_setpoint
         data_type: int32
@@ -349,11 +364,11 @@ tpdos:
       - [magnetorquer, current_x]
       - [magnetorquer, pwm_x]
     event_timer_ms: 1000
-    
+
   - num: 9
     fields:
       - [magnetorquer, current_y]
-      - [magnetorquer, pwm_z]
+      - [magnetorquer, pwm_y]
     event_timer_ms: 1000
 
   - num: 10

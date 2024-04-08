@@ -55,7 +55,7 @@ class ConfigTypes(unittest.TestCase):
             base.C3_CONFIG_PATH,
             base.BAT_CONFIG_PATH,
             base.SOLAR_CONFIG_PATH,
-            base.IMU_CONFIG_PATH,
+            base.ADCS_CONFIG_PATH,
             base.RW_CONFIG_PATH,
             base.GPS_CONFIG_PATH,
             base.ST_CONFIG_PATH,
