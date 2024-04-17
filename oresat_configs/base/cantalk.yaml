@@ -8,7 +8,7 @@ objects:
         name: blinkcount
         data_type: uint16
         description: blink count
-        access_type: ro
+        access_type: rw
 tpdos:
   - num: 1
     fields:
