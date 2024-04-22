@@ -195,6 +195,8 @@ def attr_lines(od: canopen.ObjectDictionary, index: int) -> list[str]:
             line += f"0x{obj.default:X},"
         elif obj.data_type == canopen.objectdictionary.datatypes.BOOLEAN:
             line += f"{int(obj.default)},"
+        elif obj.data_type in canopen.objectdictionary.datatypes.FLOAT_TYPES:
+            line += f"{obj.default},"
         else:
             line += f"{remove_node_id(obj.default)},"
 
@@ -282,6 +284,8 @@ def attr_lines(od: canopen.ObjectDictionary, index: int) -> list[str]:
                 lines.append(f"{INDENT8}.{name} = 0x{obj[i].default:X},")
             elif obj[i].data_type == canopen.objectdictionary.datatypes.BOOLEAN:
                 lines.append(f"{INDENT8}.{name} = {int(obj[i].default)},")
+            elif obj[i].data_type in canopen.objectdictionary.datatypes.FLOAT_TYPES:
+                lines.append(f"{INDENT8}.{name} = {obj[i].default},")
             else:
                 lines.append(f"{INDENT8}.{name} = {remove_node_id(obj[i].default)},")
 
