@@ -1,10 +1,18 @@
 """OreSat OD database"""
 
-import csv
-import os
-from dataclasses import dataclass
+# Checks that pyyaml is installed correctly. For performance reasons it must use the libyaml C
+# bindings. To use them both libyaml must be installed on the local system, and pyyaml must have
+# been built to use them. This works correctly on x86 systems, but on arm pyyaml is built by
+# default to not include the bindings.
+try:
+    from yaml import CLoader
+except ImportError as e:
+    raise ImportError(
+        "pyyaml missing/installed without libyaml bindings. See oresat-configs README.md for more"
+    ) from e
 
-from dataclasses_json import dataclass_json
+from dataclasses import dataclass
+from typing import Union
 
 from ._yaml_to_od import (
     _gen_c3_beacon_defs,
@@ -15,72 +23,37 @@ from ._yaml_to_od import (
 )
 from .base import FW_COMMON_CONFIG_PATH
 from .beacon_config import BeaconConfig
-from .constants import ORESAT_NICE_NAMES, NodeId, OreSatId, __version__
-from .oresat0 import ORESAT0_BEACON_CONFIG_PATH, ORESAT0_CARD_CONFIGS_PATH
-from .oresat0_5 import ORESAT0_5_BEACON_CONFIG_PATH, ORESAT0_5_CARD_CONFIGS_PATH
-from .oresat1 import ORESAT1_BEACON_CONFIG_PATH, ORESAT1_CARD_CONFIGS_PATH
+from .card_info import Card, cards_from_csv
+from .constants import Consts, NodeId, OreSatId, __version__
 
-
-@dataclass_json
-@dataclass
-class Card:
-    """Card info."""
-
-    nice_name: str
-    """A nice name for the card."""
-    node_id: int
-    """CANopen node id."""
-    processor: str
-    """Processor type; e.g.: "octavo", "stm32", or "none"."""
-    opd_address: int
-    """OPD address."""
-    opd_always_on: bool
-    """Keep the card on all the time. Only for battery cards."""
-    child: str = ""
-    """Optional child node name. Useful for CFC cards."""
+__all__ = ["Card", "Consts", "NodeId", "OreSatId", "__version__"]
 
 
 class OreSatConfig:
     """All the configs for an OreSat mission."""
 
-    CARD_CONFIG_PATHS = {
-        OreSatId.ORESAT0: ORESAT0_CARD_CONFIGS_PATH,
-        OreSatId.ORESAT0_5: ORESAT0_5_CARD_CONFIGS_PATH,
-        OreSatId.ORESAT1: ORESAT1_CARD_CONFIGS_PATH,
-    }
+    def __init__(self, mission: Union[OreSatId, Consts, str]):
+        """The parameter mission may be:
+        - a string, either short or long mission name ('0', 'OreSat0.5', ...)
+        - an OreSatId (ORESAT0, ...)
+        - a Consts (ORESAT0, ...)
 
-    BEACON_CONFIG_PATHS = {
-        OreSatId.ORESAT0: ORESAT0_BEACON_CONFIG_PATH,
-        OreSatId.ORESAT0_5: ORESAT0_5_BEACON_CONFIG_PATH,
-        OreSatId.ORESAT1: ORESAT1_BEACON_CONFIG_PATH,
-    }
+        It will be used to derive the appropriate Consts, the collection of
+        constants associated with a specific oresat mission.
+        """
+        if isinstance(mission, str):
+            mission = Consts.from_string(mission)
+        elif isinstance(mission, OreSatId):
+            mission = Consts.from_id(mission)
+        elif not isinstance(mission, Consts):
+            raise TypeError(f"Unsupported mission type: '{type(mission)}'")
 
-    def __init__(self, oresat_id: OreSatId):
-        self.oresat_id = oresat_id
-        beacon_config_path = self.BEACON_CONFIG_PATHS[oresat_id]
-        beacon_config = BeaconConfig.from_yaml(beacon_config_path)
-        card_configs_path = self.CARD_CONFIG_PATHS[oresat_id]
-
-        self.cards = {}
-        file_path = f"{os.path.dirname(os.path.abspath(__file__))}/cards.csv"
-        with open(file_path, "r") as f:
-            reader = csv.DictReader(f)
-            for row in reader:
-                name = row["name"]
-                if name in card_configs_path:
-                    del row["name"]
-                    self.cards[name] = Card(
-                        row["nice_name"],
-                        int(row["node_id"], 16),
-                        row["processor"],
-                        int(row["opd_address"], 16),
-                        row["opd_always_on"].lower() == "true",
-                        row["child"],
-                    )
-
-        self.configs = _load_configs(card_configs_path)
-        self.od_db = _gen_od_db(oresat_id, self.cards, beacon_config, self.configs)
+        self.mission = mission
+        beacon_config = BeaconConfig.from_yaml(mission.beacon_path)
+        self.cards = cards_from_csv(mission)
+        self.configs = _load_configs(mission.cards_path)
+        self.od_db = _gen_od_db(mission, self.cards, beacon_config, self.configs)
         c3_od = self.od_db["c3"]
         self.beacon_def = _gen_c3_beacon_defs(c3_od, beacon_config)
         self.fram_def = _gen_c3_fram_defs(c3_od, self.configs["c3"])
-        self.fw_base_od = _gen_fw_base_od(oresat_id, FW_COMMON_CONFIG_PATH)
+        self.fw_base_od = _gen_fw_base_od(mission, FW_COMMON_CONFIG_PATH)

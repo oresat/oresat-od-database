@@ -10,7 +10,7 @@ sys.path.insert(0, _FILE_PATH)
 import bitstring
 import canopen
 
-from oresat_configs import OreSatConfig, OreSatId
+from oresat_configs import Consts, OreSatConfig
 
 OD_DATA_TYPES = {
     canopen.objectdictionary.BOOLEAN: "bool",
@@ -31,7 +31,7 @@ OD_DATA_TYPES = {
 """Nice names for CANopen data types."""
 
 
-def gen_beacon_rst(config: OreSatConfig, file_path: str, url: str):
+def gen_beacon_rst(config: OreSatConfig, file_path: str, url: str) -> None:
     """Genetate a rst file for a beacon definition."""
 
     title = "Beacon Definition"
@@ -170,8 +170,8 @@ def gen_beacon_rst(config: OreSatConfig, file_path: str, url: str):
         if obj.name in ["start_chars", "revision"]:
             desc += f": {obj.value}\n"
         if obj.name == "satellite_id":
-            sat_id = OreSatId(obj.value)
-            desc += f": {sat_id.value}\n"
+            sat = Consts.from_id(obj.value)
+            desc += f": {sat.id}\n"
         if obj.value_descriptions:
             desc += "\n\nValue Descriptions:\n"
             for value, descr in obj.value_descriptions.items():
@@ -202,11 +202,11 @@ def gen_beacon_rst(config: OreSatConfig, file_path: str, url: str):
         f.writelines(lines)
 
 
-def gen_beacon_rst_files():
+def gen_beacon_rst_files() -> None:
     """Generate all beacon rst files."""
 
     parent_dir = os.path.dirname(os.path.abspath(__file__ + "/.."))
-    for mission in list(OreSatId):
+    for mission in Consts:
         mission_name = mission.name.lower()
         url = (
             f"https://github.com/oresat/oresat-configs/blob/master/oresat_configs/{mission_name}"

@@ -115,6 +115,13 @@
       data_type: uint32
       access_type: ro
 
+- index: 0x1019
+  name: synchronous_counter_overflow_value
+  object_type: variable
+  description: highest supported value of the synchronous counter
+  data_type: uint8
+  access_type: rw
+
 - index: 0x1200
   name: sdo_server_parameter
   object_type: record

@@ -2,14 +2,19 @@
 
 import os
 from copy import deepcopy
-from typing import Dict
+from typing import Union
 
 import canopen
-import yaml
+from canopen import ObjectDictionary
+from canopen.objectdictionary import Array, Record, Variable
+from dacite import from_dict
+from yaml import CLoader, load
 
+from .base import ConfigPaths
 from .beacon_config import BeaconConfig
-from .card_config import CardConfig, IndexObject
-from .constants import OreSatId, __version__
+from .card_config import CardConfig, ConfigObject, IndexObject, SubindexObject
+from .card_info import Card
+from .constants import Consts, __version__
 
 STD_OBJS_FILE_NAME = f"{os.path.dirname(os.path.abspath(__file__))}/standard_objects.yaml"
 
@@ -76,7 +81,7 @@ DYNAMIC_LEN_DATA_TYPES = [
 ]
 
 
-def _set_var_default(obj, var: canopen.objectdictionary.Variable):
+def _set_var_default(obj: ConfigObject, var: Variable) -> None:
     """Set the variables default value based off of configs."""
 
     default = obj.default
@@ -99,7 +104,7 @@ def _set_var_default(obj, var: canopen.objectdictionary.Variable):
     var.default = default
 
 
-def _make_var(obj, index: int, subindex: int = 0) -> canopen.objectdictionary.Variable:
+def _make_var(obj: Union[IndexObject, SubindexObject], index: int, subindex: int = 0) -> Variable:
     var = canopen.objectdictionary.Variable(obj.name, index, subindex)
     var.access_type = obj.access_type
     var.description = obj.description
@@ -114,10 +119,12 @@ def _make_var(obj, index: int, subindex: int = 0) -> canopen.objectdictionary.Va
     _set_var_default(obj, var)
     if var.data_type not in DYNAMIC_LEN_DATA_TYPES:
         var.pdo_mappable = True
+    var.high_limit = obj.high_limit
+    var.low_limit = obj.low_limit
     return var
 
 
-def _make_rec(obj) -> canopen.objectdictionary.Record:
+def _make_rec(obj: IndexObject) -> Record:
     index = obj.index
     rec = canopen.objectdictionary.Record(obj.name, index)
 
@@ -127,6 +134,10 @@ def _make_rec(obj) -> canopen.objectdictionary.Record:
     rec.add_member(var0)
 
     for sub_obj in obj.subindexes:
+        if sub_obj.subindex in rec.subindices:
+            raise ValueError(
+                f"subindex 0x{sub_obj.subindex:X} aleady in record at record 0x{index:X}"
+            )
         var = _make_var(sub_obj, index, sub_obj.subindex)
         rec.add_member(var)
         var0.default = sub_obj.subindex
@@ -134,7 +145,7 @@ def _make_rec(obj) -> canopen.objectdictionary.Record:
     return rec
 
 
-def _make_arr(obj, node_ids: dict) -> canopen.objectdictionary.Array:
+def _make_arr(obj: IndexObject, node_ids: dict[str, int]) -> Array:
     index = obj.index
     arr = canopen.objectdictionary.Array(obj.name, index)
 
@@ -146,8 +157,11 @@ def _make_arr(obj, node_ids: dict) -> canopen.objectdictionary.Array:
     subindexes = []
     names = []
     generate_subindexes = obj.generate_subindexes
+    if generate_subindexes is None:
+        raise ValueError("IndexObject for array missing generate_subindexes: {obj}")
+
     if generate_subindexes.subindexes == "fixed_length":
-        subindexes = list(range(1, obj.generate_subindexes.length + 1))
+        subindexes = list(range(1, generate_subindexes.length + 1))
         names = [obj.name + f"_{subindex}" for subindex in subindexes]
     elif generate_subindexes.subindexes == "node_ids":
         for name, sub in node_ids.items():
@@ -157,6 +171,8 @@ def _make_arr(obj, node_ids: dict) -> canopen.objectdictionary.Array:
             subindexes.append(sub)
 
     for subindex, name in zip(subindexes, names):
+        if subindex in arr.subindices:
+            raise ValueError(f"subindex 0x{subindex:X} aleady in record at array 0x{index:X}")
         var = canopen.objectdictionary.Variable(name, index, subindex)
         var.access_type = generate_subindexes.access_type
         var.data_type = OD_DATA_TYPES[generate_subindexes.data_type]
@@ -175,10 +191,15 @@ def _make_arr(obj, node_ids: dict) -> canopen.objectdictionary.Array:
     return arr
 
 
-def _add_objects(od: canopen.ObjectDictionary, objects: list, node_ids: dict):
+def _add_objects(
+    od: ObjectDictionary, objects: list[IndexObject], node_ids: dict[str, int]
+) -> None:
     """File a objectdictionary with all the objects."""
 
     for obj in objects:
+        if obj.index in od.indices:
+            raise ValueError(f"index 0x{obj.index:X} aleady in OD")
+
         if obj.object_type == "variable":
             var = _make_var(obj, obj.index)
             od.add_object(var)
@@ -190,7 +211,7 @@ def _add_objects(od: canopen.ObjectDictionary, objects: list, node_ids: dict):
             od.add_object(arr)
 
 
-def _add_tpdo_data(od: canopen.ObjectDictionary, config: CardConfig):
+def _add_tpdo_data(od: ObjectDictionary, config: CardConfig) -> None:
     """Add tpdo objects to OD."""
 
     tpdos = config.tpdos
@@ -285,10 +306,10 @@ def _add_tpdo_data(od: canopen.ObjectDictionary, config: CardConfig):
 
 def _add_rpdo_data(
     tpdo_num: int,
-    rpdo_node_od: canopen.ObjectDictionary,
-    tpdo_node_od: canopen.ObjectDictionary,
+    rpdo_node_od: ObjectDictionary,
+    tpdo_node_od: ObjectDictionary,
     tpdo_node_name: str,
-):
+) -> None:
     tpdo_comm_index = TPDO_COMM_START + tpdo_num - 1
     tpdo_mapping_index = TPDO_PARA_START + tpdo_num - 1
 
@@ -416,7 +437,9 @@ def _add_rpdo_data(
         rpdo_mapping_rec[0].default += 1
 
 
-def _add_node_rpdo_data(config, od: canopen.ObjectDictionary, od_db: dict):
+def _add_node_rpdo_data(
+    config: CardConfig, od: ObjectDictionary, od_db: dict[str, ObjectDictionary]
+) -> None:
     """Add all configured RPDO object to OD based off of TPDO objects from another OD."""
 
     for rpdo in config.rpdos:
@@ -424,10 +447,10 @@ def _add_node_rpdo_data(config, od: canopen.ObjectDictionary, od_db: dict):
 
 
 def _add_all_rpdo_data(
-    master_node_od: canopen.ObjectDictionary,
-    node_od: canopen.ObjectDictionary,
+    master_node_od: ObjectDictionary,
+    node_od: ObjectDictionary,
     node_name: str,
-):
+) -> None:
     """Add all RPDO object to OD based off of TPDO objects from another OD."""
 
     if not node_od.device_information.nr_of_TXPDO:
@@ -440,15 +463,17 @@ def _add_all_rpdo_data(
         _add_rpdo_data(i, master_node_od, node_od, node_name)
 
 
-def _load_std_objs(file_path: str, node_ids: dict) -> dict:
+def _load_std_objs(
+    file_path: str, node_ids: dict[str, int]
+) -> dict[str, Union[Variable, Record, Array]]:
     """Load the standard objects."""
 
     with open(file_path, "r") as f:
-        std_objs_raw = yaml.safe_load(f)
+        std_objs_raw = load(f, Loader=CLoader)
 
     std_objs = {}
     for obj_raw in std_objs_raw:
-        obj = IndexObject.from_dict(obj_raw)  # pylint: disable=E1101
+        obj = from_dict(data_class=IndexObject, data=obj_raw)
         if obj.object_type == "variable":
             std_objs[obj.name] = _make_var(obj, obj.index)
         elif obj.object_type == "record":
@@ -458,7 +483,7 @@ def _load_std_objs(file_path: str, node_ids: dict) -> dict:
     return std_objs
 
 
-def overlay_configs(card_config, overlay_config):
+def overlay_configs(card_config: CardConfig, overlay_config: CardConfig) -> None:
     """deal with overlays"""
 
     # overlay object
@@ -517,10 +542,10 @@ def overlay_configs(card_config, overlay_config):
             card_config.rpdos.append(deepcopy(overlay_rpdo))
 
 
-def _load_configs(config_paths: dict) -> Dict[str, CardConfig]:
+def _load_configs(config_paths: ConfigPaths) -> dict[str, CardConfig]:
     """Generate all ODs for a OreSat mission."""
 
-    configs: Dict[str, CardConfig] = {}
+    configs: dict[str, CardConfig] = {}
 
     for name, paths in config_paths.items():
         if paths is None:
@@ -548,7 +573,12 @@ def _load_configs(config_paths: dict) -> Dict[str, CardConfig]:
     return configs
 
 
-def _gen_od_db(oresat_id: OreSatId, cards: dict, beacon_def: BeaconConfig, configs: dict) -> dict:
+def _gen_od_db(
+    mission: Consts,
+    cards: dict[str, Card],
+    beacon_def: BeaconConfig,
+    configs: dict[str, CardConfig],
+) -> dict[str, ObjectDictionary]:
     od_db = {}
     node_ids = {name: cards[name].node_id for name in configs}
     node_ids["c3"] = 0x1
@@ -590,9 +620,9 @@ def _gen_od_db(oresat_id: OreSatId, cards: dict, beacon_def: BeaconConfig, confi
 
         # set specific obj defaults
         od["versions"]["configs_version"].default = __version__
-        od["satellite_id"].default = oresat_id.value
-        for oid in list(OreSatId):
-            od["satellite_id"].value_descriptions[oid.value] = oid.name.lower()
+        od["satellite_id"].default = mission.id
+        for sat in Consts:
+            od["satellite_id"].value_descriptions[sat.id] = sat.name.lower()
         if name == "c3":
             od["beacon"]["revision"].default = beacon_def.revision
             od["beacon"]["dest_callsign"].default = beacon_def.ax25.dest_callsign
@@ -626,7 +656,7 @@ def _gen_od_db(oresat_id: OreSatId, cards: dict, beacon_def: BeaconConfig, confi
     return od_db
 
 
-def _gen_c3_fram_defs(c3_od: canopen.ObjectDictionary, config: CardConfig) -> list:
+def _gen_c3_fram_defs(c3_od: ObjectDictionary, config: CardConfig) -> list[Variable]:
     """Get the list of objects in saved to fram."""
 
     fram_objs = []
@@ -641,7 +671,7 @@ def _gen_c3_fram_defs(c3_od: canopen.ObjectDictionary, config: CardConfig) -> li
     return fram_objs
 
 
-def _gen_c3_beacon_defs(c3_od: canopen.ObjectDictionary, beacon_def: BeaconConfig) -> list:
+def _gen_c3_beacon_defs(c3_od: ObjectDictionary, beacon_def: BeaconConfig) -> list[Variable]:
     """Get the list of objects in the beacon from OD."""
 
     beacon_objs = []
@@ -656,7 +686,7 @@ def _gen_c3_beacon_defs(c3_od: canopen.ObjectDictionary, beacon_def: BeaconConfi
     return beacon_objs
 
 
-def _gen_fw_base_od(oresat_id: OreSatId, config_path: str) -> canopen.ObjectDictionary:
+def _gen_fw_base_od(mission: Consts, config_path: str) -> canopen.ObjectDictionary:
     """Generate all ODs for a OreSat mission."""
 
     od = canopen.ObjectDictionary()
@@ -693,6 +723,6 @@ def _gen_fw_base_od(oresat_id: OreSatId, config_path: str) -> canopen.ObjectDict
 
     # set specific obj defaults
     od["versions"]["configs_version"].default = __version__
-    od["satellite_id"].default = oresat_id.value
+    od["satellite_id"].default = mission.id
 
     return od

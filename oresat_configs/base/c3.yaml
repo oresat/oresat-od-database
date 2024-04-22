@@ -181,6 +181,18 @@ objects:
         access_type: ro
         unit: dB
 
+      - subindex: 0x4
+        name: synth_lock
+        data_type: bool
+        description: lband si41xx synthesizer lock indicator
+        access_type: ro
+
+      - subindex: 0x5
+        name: synth_relock_count
+        data_type: uint8
+        description: lband si41xx synthesizer relock count since boot
+        access_type: ro
+
   - index: 0x4007
     name: uhf
     object_type: record
@@ -524,31 +536,31 @@ objects:
         description: number of OreSat nodes in off state
         access_type: ro
 
-      - subindex: 0x3
+      - subindex: 0x4
         name: nodes_booting
         data_type: uint8
         description: number of OreSat nodes in boot state
         access_type: ro
 
-      - subindex: 0x4
+      - subindex: 0x5
         name: nodes_on
         data_type: uint8
         description: number of OreSat nodes in on state
         access_type: ro
 
-      - subindex: 0x5
+      - subindex: 0x6
         name: nodes_with_errors
         data_type: uint8
         description: number of OreSat nodes in error state
         access_type: ro
 
-      - subindex: 0x6
+      - subindex: 0x7
         name: nodes_not_found
         data_type: uint8
         description: number of OreSat nodes in not_found state
         access_type: ro
 
-      - subindex: 0x7
+      - subindex: 0x8
         name: nodes_dead
         data_type: uint8
         description: number of OreSat nodes in dead state
@@ -564,12 +576,23 @@ objects:
       data_type: uint8
       access_type: ro
       value_descriptions:
-        off: 0
+        'off': 0
         boot: 1
-        on: 2
+        'on': 2
         error: 3
         not_found: 4
         dead: 0xff
+
+  - index: 0x400e
+    name: adcs_manager
+    object_type: record
+    subindexes:
+      - subindex: 0x1
+        name: mode
+        data_type: uint8
+        description: current adcs mode
+        access_type: ro
+
 
 tpdos:
   - num: 1 # time sync TPDO

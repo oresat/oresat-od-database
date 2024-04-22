@@ -5,18 +5,18 @@ import unittest
 
 import canopen
 
-from oresat_configs import OreSatConfig, OreSatId
+from oresat_configs import Consts, OreSatConfig
 from oresat_configs._yaml_to_od import OD_DATA_TYPE_SIZE, TPDO_COMM_START, TPDO_PARA_START
 
 
 class TestConfig(unittest.TestCase):
     """Base class to test a OreSat OD databases."""
 
-    def setUp(self):
-        self.id = OreSatId.ORESAT0
-        self.config = OreSatConfig(self.id)
+    def setUp(self) -> None:
+        self.oresatid = Consts.ORESAT0
+        self.config = OreSatConfig(self.oresatid)
 
-    def test_tpdo_sizes(self):
+    def test_tpdo_sizes(self) -> None:
         """Validate TPDO sizes."""
 
         for name in self.config.od_db:
@@ -43,11 +43,11 @@ class TestConfig(unittest.TestCase):
                         mapped_obj = mapped_obj[mapped_subindex]
                     self.assertTrue(
                         mapped_obj.pdo_mappable,
-                        f"{self.id.name} {name} {mapped_obj.name} is not pdo mappable",
+                        f"{self.oresatid.name} {name} {mapped_obj.name} is not pdo mappable",
                     )
                     size += OD_DATA_TYPE_SIZE[mapped_obj.data_type]
                 self.assertLessEqual(
-                    size, 64, f"{self.id.name} {name} TPDO{i + 1} is more than 64 bits"
+                    size, 64, f"{self.oresatid.name} {name} TPDO{i + 1} is more than 64 bits"
                 )
                 tpdos += 1
 
@@ -57,7 +57,7 @@ class TestConfig(unittest.TestCase):
             else:
                 self.assertLessEqual(tpdos, 16)
 
-    def test_beacon(self):
+    def test_beacon(self) -> None:
         """Test all objects reference in the beacon definition exist in the C3's OD."""
 
         length = 0
@@ -75,15 +75,15 @@ class TestConfig(unittest.TestCase):
                 self.assertNotIn(
                     obj.data_type,
                     dynamic_len_data_types,
-                    f"{self.id.name} {obj.name} is a dynamic length data type",
+                    f"{self.oresatid.name} {obj.name} is a dynamic length data type",
                 )
                 length += OD_DATA_TYPE_SIZE[obj.data_type] // 8  # bits to bytes
 
         # AX.25 payload max length = 255
         # CRC32 length = 4
-        self.assertLessEqual(length, 255 - 4, f"{self.id.name} beacon length too long")
+        self.assertLessEqual(length, 255 - 4, f"{self.oresatid.name} beacon length too long")
 
-    def test_record_array_length(self):
+    def test_record_array_length(self) -> None:
         """Test that array/record have is less than 255 objects in it."""
 
         for od in self.config.od_db.values():
@@ -91,13 +91,13 @@ class TestConfig(unittest.TestCase):
                 if not isinstance(od[index], canopen.objectdictionary.Variable):
                     self.assertLessEqual(len(od[index].subindices), 255)
 
-    def _test_snake_case(self, string: str):
+    def _test_snake_case(self, string: str) -> None:
         """Test that a string is snake_case."""
 
         regex_str = r"^[a-z][a-z0-9_]*[a-z0-9]*$"  # snake_case with no leading/trailing num or "_"
         self.assertIsNotNone(re.match(regex_str, string), f'"{string}" is not snake_case')
 
-    def _test_variable(self, obj: canopen.objectdictionary.Variable):
+    def _test_variable(self, obj: canopen.objectdictionary.Variable) -> None:
         """Test that a variable is valid."""
 
         self.assertIsInstance(obj, canopen.objectdictionary.Variable)
@@ -151,7 +151,7 @@ class TestConfig(unittest.TestCase):
 
         self.assertEqual(obj.default, obj.value)
 
-    def test_objects(self):
+    def test_objects(self) -> None:
         """Test that all objects are valid."""
 
         for name, od in self.config.od_db.items():

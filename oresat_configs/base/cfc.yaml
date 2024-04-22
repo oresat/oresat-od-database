@@ -7,7 +7,7 @@ objects:
         name: status
         data_type: uint8
         value_descriptions:
-          off: 1
+          'off': 1
           standby: 2
           capture: 3
           error: 4
@@ -61,7 +61,8 @@ objects:
         name: integration_time
         data_type: uint32
         description: camera integration time
-        unit: ms
+        unit: us
+        high_limit: 80000
 
       - subindex: 0xa
         name: temperature

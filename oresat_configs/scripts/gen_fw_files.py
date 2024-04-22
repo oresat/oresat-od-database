@@ -3,14 +3,47 @@
 import math as m
 import os
 import sys
-from argparse import ArgumentParser
+from argparse import ArgumentParser, Namespace
+from typing import Any, Optional
 
 import canopen
 
-from .. import OreSatConfig, OreSatId
+from .. import Consts, OreSatConfig
 
 GEN_FW_FILES = "generate CANopenNode OD.[c/h] files for a OreSat firmware card"
-GEN_FW_FILES_PROG = "oresat-gen-fw-files"
+
+
+def build_parser(parser: ArgumentParser) -> ArgumentParser:
+    """Configures an ArgumentParser suitable for this script.
+
+    The given parser may be standalone or it may be used as a subcommand in another ArgumentParser.
+    """
+    parser.description = GEN_FW_FILES
+    parser.add_argument(
+        "--oresat",
+        default=Consts.default().arg,
+        choices=[m.arg for m in Consts],
+        type=lambda x: x.lower().removeprefix("oresat"),
+        help="oresat mission, defaults to %(default)s",
+    )
+    parser.add_argument("card", help="card name; c3, battery, solar, adcs, or reaction_wheel")
+    parser.add_argument("-d", "--dir-path", default=".", help='output directory path, default: "."')
+    return parser
+
+
+def register_subparser(subparsers: Any) -> None:
+    """Registers an ArgumentParser as a subcommand of another parser.
+
+    Intended to be called by __main__.py for each script. Given the output of add_subparsers(),
+    (which I think is a subparser group, but is technically unspecified) this function should
+    create its own ArgumentParser via add_parser(). It must also set_default() the func argument
+    to designate the entry point into this script.
+    See https://docs.python.org/3/library/argparse.html#sub-commands, especially the end of that
+    section, for more.
+    """
+    parser = build_parser(subparsers.add_parser("fw-files", help=GEN_FW_FILES))
+    parser.set_defaults(func=gen_fw_files)
+
 
 INDENT4 = " " * 4
 INDENT8 = " " * 8
@@ -91,7 +124,7 @@ def format_name(string: str) -> str:
     return name
 
 
-def write_canopennode(od: canopen.ObjectDictionary, dir_path: str = "."):
+def write_canopennode(od: canopen.ObjectDictionary, dir_path: str = ".") -> None:
     """Save an od/dcf as CANopenNode OD.[c/h] files
 
     Parameters
@@ -113,13 +146,8 @@ def write_canopennode(od: canopen.ObjectDictionary, dir_path: str = "."):
     write_canopennode_h(od, dir_path)
 
 
-def remove_node_id(default: str):
+def remove_node_id(default: str) -> str:
     """Remove "+$NODEID" or "$NODEID+" from the default value"""
-
-    if isinstance(default, bool):
-        default = int(default)
-    if not isinstance(default, str):
-        return default
 
     if default == "":
         return "0"
@@ -136,14 +164,13 @@ def remove_node_id(default: str):
     return default  # does not include $NODEID
 
 
-def attr_lines(od: canopen.ObjectDictionary, index: int) -> list:
+def attr_lines(od: canopen.ObjectDictionary, index: int) -> list[str]:
     """Generate attr lines for OD.c for a sepecific index"""
 
     lines = []
 
     obj = od[index]
     if isinstance(obj, canopen.objectdictionary.Variable):
-        default = remove_node_id(obj.default)
         line = f"{INDENT4}.x{index:X}_{format_name(obj.name)} = "
 
         if obj.data_type == canopen.objectdictionary.datatypes.VISIBLE_STRING:
@@ -165,11 +192,11 @@ def attr_lines(od: canopen.ObjectDictionary, index: int) -> list:
             line += f"0x{0:04X}"  # add the '\0'
             line += "},"
         elif obj.data_type in canopen.objectdictionary.datatypes.INTEGER_TYPES:
-            line += f"0x{default:X},"
+            line += f"0x{obj.default:X},"
         elif obj.data_type == canopen.objectdictionary.datatypes.BOOLEAN:
-            line += f"{int(default)},"
+            line += f"{int(obj.default)},"
         else:
-            line += f"{default},"
+            line += f"{remove_node_id(obj.default)},"
 
         if index not in _SKIP_INDEXES:
             lines.append(line)
@@ -182,8 +209,6 @@ def attr_lines(od: canopen.ObjectDictionary, index: int) -> list:
             return lines  # skip domains
 
         for i in list(obj.subindices)[1:]:
-            default = remove_node_id(obj[i].default)
-
             if obj[i].data_type == canopen.objectdictionary.datatypes.VISIBLE_STRING:
                 line += "{"
                 for i in obj[i].default:
@@ -203,11 +228,11 @@ def attr_lines(od: canopen.ObjectDictionary, index: int) -> list:
                 line += f"0x{0:04X}"  # add the '\0'
                 line += "}, "
             elif obj[i].data_type in canopen.objectdictionary.datatypes.INTEGER_TYPES:
-                line += f"0x{default:X}, "
+                line += f"0x{obj[i].default:X}, "
             elif obj[i].data_type == canopen.objectdictionary.datatypes.BOOLEAN:
-                line += f"{int(default)}, "
+                line += f"{int(obj[i].default)}, "
             else:
-                line += f"{default}, "
+                line += f"{remove_node_id(obj[i].default)}, "
 
         line = line[:-2]  # remove trailing ', '
         line += "},"
@@ -219,17 +244,13 @@ def attr_lines(od: canopen.ObjectDictionary, index: int) -> list:
 
         for i in obj:
             name = format_name(obj[i].name)
-            if isinstance(obj[i].default, str):
-                default = remove_node_id(obj[i].default)
-            else:
-                default = obj[i].default
-
             if obj[i].data_type == canopen.objectdictionary.datatypes.DOMAIN:
                 continue  # skip domains
 
             if obj[i].name == "cob_id":
                 # oresat firmware only wants 0x180, 0x280, 0x380, 0x480
                 # no +node_id or +1, +2, +3 for TPDO nums > 4
+                default = obj[i].default
                 if default & 0xFFC not in [0x180, 0x280, 0x380, 0x480, 0x200, 0x300, 0x400, 0x500]:
                     cob_id = (default - od.node_id) & 0xFFC
                     cob_id += default & 0xC0_00_00_00  # add back pdo flags (2 MSBs)
@@ -258,11 +279,11 @@ def attr_lines(od: canopen.ObjectDictionary, index: int) -> list:
                 line += "},"
                 lines.append(line)
             elif obj[i].data_type in canopen.objectdictionary.datatypes.INTEGER_TYPES:
-                lines.append(f"{INDENT8}.{name} = 0x{default:X},")
+                lines.append(f"{INDENT8}.{name} = 0x{obj[i].default:X},")
             elif obj[i].data_type == canopen.objectdictionary.datatypes.BOOLEAN:
-                lines.append(f"{INDENT8}.{name} = {int(default)},")
+                lines.append(f"{INDENT8}.{name} = {int(obj[i].default)},")
             else:
-                lines.append(f"{INDENT8}.{name} = {default},")
+                lines.append(f"{INDENT8}.{name} = {remove_node_id(obj[i].default)},")
 
         lines.append(INDENT4 + "},")
 
@@ -317,7 +338,7 @@ def _var_attr_flags(var: canopen.objectdictionary.Variable) -> str:
     return attr_str
 
 
-def obj_lines(od: canopen.ObjectDictionary, index) -> list:
+def obj_lines(od: canopen.ObjectDictionary, index: int) -> list[str]:
     """Generate  lines for OD.c for a sepecific index"""
 
     lines = []
@@ -400,7 +421,7 @@ def obj_lines(od: canopen.ObjectDictionary, index) -> list:
     return lines
 
 
-def write_canopennode_c(od: canopen.ObjectDictionary, dir_path: str = "."):
+def write_canopennode_c(od: canopen.ObjectDictionary, dir_path: str = ".") -> None:
     """Save an od/dcf as a CANopenNode OD.c file
 
     Parameters
@@ -485,7 +506,7 @@ def write_canopennode_c(od: canopen.ObjectDictionary, dir_path: str = "."):
             f.write(i + "\n")
 
 
-def _canopennode_h_lines(od: canopen.ObjectDictionary, index: int) -> list:
+def _canopennode_h_lines(od: canopen.ObjectDictionary, index: int) -> list[str]:
     """Generate struct lines for OD.h for a sepecific index"""
 
     lines = []
@@ -548,7 +569,7 @@ def _canopennode_h_lines(od: canopen.ObjectDictionary, index: int) -> list:
     return lines
 
 
-def write_canopennode_h(od: canopen.ObjectDictionary, dir_path: str = "."):
+def write_canopennode_h(od: canopen.ObjectDictionary, dir_path: str = ".") -> None:
     """Save an od/dcf as a CANopenNode OD.h file
 
     Parameters
@@ -645,30 +666,12 @@ def write_canopennode_h(od: canopen.ObjectDictionary, dir_path: str = "."):
             f.write(i + "\n")
 
 
-def gen_fw_files(sys_args=None):
+def gen_fw_files(args: Optional[Namespace] = None) -> None:
     """generate CANopenNode firmware files main"""
+    if args is None:
+        args = build_parser(ArgumentParser()).parse_args()
 
-    if sys_args is None:
-        sys_args = sys.argv[1:]
-
-    parser = ArgumentParser(description=GEN_FW_FILES, prog=GEN_FW_FILES_PROG)
-    parser.add_argument("oresat", help="oresat mission; oresat0 or oresat0.5")
-    parser.add_argument("card", help="card name; c3, battery, solar, imu, or reaction_wheel")
-    parser.add_argument("-d", "--dir-path", default=".", help='output directory path, default: "."')
-    args = parser.parse_args(sys_args)
-
-    arg_oresat = args.oresat.lower()
-    if arg_oresat in ["0", "oresat0"]:
-        oresat_id = OreSatId.ORESAT0
-    elif arg_oresat in ["0.5", "oresat0.5"]:
-        oresat_id = OreSatId.ORESAT0_5
-    elif arg_oresat in ["1", "oresat1"]:
-        oresat_id = OreSatId.ORESAT1
-    else:
-        print(f"invalid oresat mission: {args.oresat}")
-        sys.exit()
-
-    config = OreSatConfig(oresat_id)
+    config = OreSatConfig(args.oresat)
 
     arg_card = args.card.lower().replace("-", "_")
     if arg_card == "c3":

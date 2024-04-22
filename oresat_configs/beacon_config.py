@@ -1,13 +1,13 @@
 """Load a beacon config file."""
 
+from __future__ import annotations
+
 from dataclasses import dataclass, field
-from typing import List
 
-import yaml
-from dataclasses_json import dataclass_json
+from dacite import from_dict
+from yaml import CLoader, load
 
 
-@dataclass_json
 @dataclass
 class BeaconAx25Config:
     """
@@ -46,7 +46,6 @@ class BeaconAx25Config:
     """If set to True, the C-bit in source field."""
 
 
-@dataclass_json
 @dataclass
 class BeaconConfig:
     """
@@ -74,16 +73,16 @@ class BeaconConfig:
     """Beacon revision number."""
     ax25: BeaconAx25Config
     """AX.25 configs section."""
-    fields: List[List[str]] = field(default_factory=list)
+    fields: list[list[str]] = field(default_factory=list)
     """
     List of index and subindexes of objects from the C3's object dictionary to be added to the
     beacon.
     """
 
     @classmethod
-    def from_yaml(cls, config_path: str):
+    def from_yaml(cls, config_path: str) -> BeaconConfig:
         """Load a beacon YAML config file."""
 
         with open(config_path, "r") as f:
-            config_raw = yaml.safe_load(f)
-        return cls.from_dict(config_raw)  # type: ignore  # pylint: disable=E1101
+            config_raw = load(f, Loader=CLoader)
+        return from_dict(data_class=cls, data=config_raw)

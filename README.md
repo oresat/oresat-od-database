@@ -4,7 +4,7 @@ Firmware/software configurations for OreSat missions.
 
 Includes:
 
-- A centeralize "database" for all OreSat card object dictionaries (OD)
+- A centralize "database" for all OreSat card object dictionaries (OD)
 - Beacon definition for each OreSat mission
 - The C3 F-RAM data definition (object values to be saved to the F-RAM chip)
 
@@ -22,7 +22,7 @@ transfers.
     `oresat_configs/oresat<mission_num>/`
 - All card specific configs are are named `<card_name>.yaml` format.
   They contain all card specific objects and PDOs.
-  - **NOTE:** The cards YAML are simular to CANopen's `.eds` files; they are
+  - **NOTE:** The cards YAML are similar to CANopen's `.eds` files; they are
     for a device type, not a unique device on a CAN network (if you add an
     object to `solar.yaml`, all solar cards will have that object).
 - The `sw_common.yaml` defines all CANopen standard objects, common objects,
@@ -32,16 +32,35 @@ transfers.
 - A `standard_object.yaml` contains some CANopen standard objects that any
   `<card_name>.yaml` or `*_common.yaml` can flag to include.
 - The `beacon.yaml` file defines the beacon definition as all the data is
-  pulled strait out the the C3's OD, which is mostly build from all other ODs.
+  pulled strait out the C3's OD, which is mostly build from all other ODs.
 - The `c3.yaml` file also defines what objects have their values periodically
   saved to the C3's F-RAM chip.
 
 ## Setup
 
-Install project dev dependencies.
+Install project dev dependencies. `libyaml` should be installed by default on
+reasonable systems, but it never hurts to make sure.
 
 ```bash
+$ sudo apt install libyaml-0-2
 $ pip install -r requirements.txt
+```
+
+If installing on ARM (e.g. Octavo cards like the C3) special work is needed to
+ensure that `pyyaml` uses the `libyaml` C bindings. The binary wheels from PyPI
+aren't built with them so we need to install from the source package:
+
+Installing the first time:
+```bash
+$ sudo apt install libyaml-dev
+$ pip install --no-binary pyyaml -r requirements.txt
+```
+
+Fixing an already installed pyyaml: (see here if you get "ImportError: pyyaml
+missing/installed without libyaml bindings.")
+```bash
+$ sudo apt install libyaml-dev
+$ pip install --force-reinstall --no-cache-dir --no-binary pyyaml pyyaml
 ```
 
 ## Updating a Config
