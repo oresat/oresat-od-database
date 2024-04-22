@@ -1,6 +1,6 @@
 objects:
   - index: 0x4000
-    name:  rxw_ctrl_stat
+    name:  ctrl_stat
     description: reaction wheel controller status
     object_type: record
     subindexes:
@@ -9,20 +9,21 @@ objects:
         data_type: uint8
         description: controller state
         access_type: ro
+
       - subindex: 0x2
         name: procedure_result
         data_type: uint8
         description: last state return code
         access_type: ro
+
       - subindex: 0x3
         name: errors
         data_type: uint32
         description: system error bitmask
         access_type: ro
 
-
   - index: 0x4001
-    name:  rxw_motor_vel_current
+    name:  motor_vel_current
     description: reaction wheel motor vel/current
     object_type: record
     subindexes:
@@ -32,14 +33,16 @@ objects:
         description: motor velocity
         access_type: ro
         unit: rev/s
+
       - subindex: 0x2
         name: motor_current
         data_type: float32
         description: motor current
         access_type: ro
         unit: A
+
   - index: 0x4002
-    name:  rxw_bus_volt_current
+    name:  bus_volt_current
     description: reaction wheel DC bus voltage/current
     object_type: record
     subindexes:
@@ -49,14 +52,16 @@ objects:
         description: bus voltage
         access_type: ro
         unit: V
+
       - subindex: 0x2
         name: bus_current
         data_type: float32
         description: bus current
         access_type: ro
         unit: A
+
   - index: 0x4003
-    name:  rxw_temp
+    name:  temp
     description: reaction wheel controller temperatures
     object_type: record
     subindexes:
@@ -66,20 +71,23 @@ objects:
         description: temperature sensor 1 temp
         access_type: ro
         unit: cC
+
       - subindex: 0x2
         name: temp_2
         data_type: int16
         description: temperature sensor 2 temp
         access_type: ro
         unit: cC
+
       - subindex: 0x3
         name: temp_3
         data_type: int16
         description: temperature sensor 3 temp
         access_type: ro
         unit: cC
+
   - index: 0x4004
-    name: rxw_requested_state
+    name: requested_state
     description: reaction wheel requested state
     object_type: record
     subindexes:
@@ -88,8 +96,9 @@ objects:
         data_type: uint8
         description: requested state
         access_type: rw
+
   - index: 0x4005
-    name: rxw_setpoint
+    name: setpoint
     description: reaction wheel setpoints
     object_type: record
     subindexes:
@@ -98,13 +107,15 @@ objects:
         data_type: float32
         description: setpoint 1
         access_type: rw
+
       - subindex: 0x2
         name: setpoint_2
         data_type: float32
         description: setpoint 2 (e.g. feedforward)
         access_type: rw
+
   - index: 0x4006
-    name: rxw_reserved
+    name: reserved
     description: reaction wheel config params - reserved
     object_type: record
     subindexes:
@@ -113,13 +124,15 @@ objects:
         data_type: float32
         description: reserved 1
         access_type: rw
+
       - subindex: 0x2
         name: reserved_2
         data_type: float32
         description: reserved 2
         access_type: rw
+
   - index: 0x4007
-    name: rxw_reboot
+    name: reboot
     description: reaction wheel reboot request
     object_type: record
     subindexes:
@@ -132,42 +145,26 @@ objects:
 tpdos:
   - num: 1
     fields: 
-      - [rxw_ctrl_stat, current_state]
-      - [rxw_ctrl_stat, procedure_result]
-      - [rxw_ctrl_stat, errors]
+      - [ctrl_stat, current_state]
+      - [ctrl_stat, procedure_result]
+      - [ctrl_stat, errors]
     event_timer_ms: 100
 
   - num: 2
     fields: 
-      - [rxw_motor_vel_current, motor_vel]
-      - [rxw_motor_vel_current, motor_current]
+      - [motor_vel_current, motor_vel]
+      - [motor_vel_current, motor_current]
     event_timer_ms: 100
 
   - num: 3
     fields: 
-      - [rxw_bus_volt_current, bus_voltage]
-      - [rxw_bus_volt_current, bus_current]
+      - [bus_volt_current, bus_voltage]
+      - [bus_volt_current, bus_current]
     event_timer_ms: 100
       
   - num: 4
     fields: 
-      - [rxw_temp, temp_1]
-      - [rxw_temp, temp_2]
-      - [rxw_temp, temp_3]
+      - [temp, temp_1]
+      - [temp, temp_2]
+      - [temp, temp_3]
     event_timer_ms: 100
-
-      #rpdos:
-      #  - num: 1
-      #    fields:
-      #      - [rxw_requested_state, req_state]
-      #  - num: 2
-      #    fields:
-      #      - [rxw_setpoint, setpoint_1]
-      #      - [rxw_setpoint, setpoint_2]
-      #  - num: 3
-      #    fields:
-      #      - [rxw_reserved, reserved_1]
-      #      - [rxw_reserved, reserved_2]
-      #  - num: 4
-      #    fields:
-      #      - [rxw_reboot, reboot_request]
