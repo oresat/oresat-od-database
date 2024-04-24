@@ -141,4 +141,4 @@ fields:
   - [cfc_processor, camera_temperature]
   - [cfc_processor, tec_status]
   # cantalk
-  - [blinks, blinkcount]
+  - [cantalk, blinks_blinkcount]
