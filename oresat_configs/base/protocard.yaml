@@ -1,0 +1,17 @@
+objects:
+  - index: 0x4000
+    name: blinks
+    description: blink counter
+    object_type: record
+    subindexes:
+      - subindex: 0x1
+        name: blinkcount
+        data_type: uint16
+        description: blink count
+        access_type: rw
+tpdos:
+  - num: 1
+    fields:
+      - [blinks, blinkcount]
+    event_timer_ms: 10000
+

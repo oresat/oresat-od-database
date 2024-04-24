@@ -112,3 +112,4 @@ class NodeId(IntEnum):
     REACTION_WHEEL_4 = 0x48
     DXWIFI = 0x4C
     CFC = 0x50
+    PROTOCARD_0 = 0x54

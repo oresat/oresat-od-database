@@ -140,3 +140,5 @@ fields:
   - [cfc_processor, camera_status]
   - [cfc_processor, camera_temperature]
   - [cfc_processor, tec_status]
+  # protocard_0
+  - [protocard_0, blinks_blinkcount]
