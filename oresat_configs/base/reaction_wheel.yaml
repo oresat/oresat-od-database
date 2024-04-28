@@ -23,93 +23,96 @@ objects:
         access_type: ro
 
   - index: 0x4001
-    name:  motor_vel_current
+    name: motor
     description: reaction wheel motor vel/current
     object_type: record
     subindexes:
       - subindex: 0x1
-        name: motor_vel
+        name: velocity
         data_type: float32
         description: motor velocity
         access_type: ro
         unit: rev/s
 
       - subindex: 0x2
-        name: motor_current
+        name: current
         data_type: float32
         description: motor current
         access_type: ro
         unit: A
 
   - index: 0x4002
-    name:  bus_volt_current
+    name: bus
     description: reaction wheel DC bus voltage/current
     object_type: record
     subindexes:
       - subindex: 0x1
-        name: bus_voltage
+        name: voltage
         data_type: float32
         description: bus voltage
         access_type: ro
         unit: V
 
       - subindex: 0x2
-        name: bus_current
+        name: current
         data_type: float32
         description: bus current
         access_type: ro
         unit: A
 
   - index: 0x4003
-    name:  temp
+    name: temperature
     description: reaction wheel controller temperatures
     object_type: record
     subindexes:
       - subindex: 0x1
-        name: temp_1
+        name: sensor_1
         data_type: int16
         description: temperature sensor 1 temp
         access_type: ro
-        unit: cC
+        unit: C
+        scale_factor: 0.01
 
       - subindex: 0x2
-        name: temp_2
+        name: sensor_2
         data_type: int16
         description: temperature sensor 2 temp
         access_type: ro
-        unit: cC
+        unit: C
+        scale_factor: 0.01
 
       - subindex: 0x3
-        name: temp_3
+        name: sensor_3
         data_type: int16
         description: temperature sensor 3 temp
         access_type: ro
-        unit: cC
+        unit: C
+        scale_factor: 0.01
 
   - index: 0x4004
-    name: requested_state
+    name: requested
     description: reaction wheel requested state
     object_type: record
     subindexes:
       - subindex: 0x1
-        name: req_state
+        name: state
         data_type: uint8
         description: requested state
         access_type: rw
 
   - index: 0x4005
-    name: setpoint
+    name: signals
     description: reaction wheel setpoints
     object_type: record
     subindexes:
       - subindex: 0x1
-        name: setpoint_1
+        name: setpoint
         data_type: float32
         description: setpoint 1
         access_type: rw
 
       - subindex: 0x2
-        name: setpoint_2
+        name: reserved_feedforward
         data_type: float32
         description: setpoint 2 (e.g. feedforward)
         access_type: rw
@@ -120,13 +123,13 @@ objects:
     object_type: record
     subindexes:
       - subindex: 0x1
-        name: reserved_1
+        name: subindex_1
         data_type: float32
         description: reserved 1
         access_type: rw
 
       - subindex: 0x2
-        name: reserved_2
+        name: subindex_2
         data_type: float32
         description: reserved 2
         access_type: rw
@@ -137,7 +140,7 @@ objects:
     object_type: record
     subindexes:
       - subindex: 0x1
-        name: reboot_request
+        name: request
         data_type: uint8
         description: write 1 to reboot
         access_type: rw
@@ -152,19 +155,19 @@ tpdos:
 
   - num: 2
     fields: 
-      - [motor_vel_current, motor_vel]
-      - [motor_vel_current, motor_current]
+      - [motor, velocity]
+      - [motor, current]
     event_timer_ms: 100
 
   - num: 3
     fields: 
-      - [bus_volt_current, bus_voltage]
-      - [bus_volt_current, bus_current]
+      - [bus, voltage]
+      - [bus, current]
     event_timer_ms: 100
       
   - num: 4
     fields: 
-      - [temp, temp_1]
-      - [temp, temp_2]
-      - [temp, temp_3]
+      - [temperature, sensor_1]
+      - [temperature, sensor_2]
+      - [temperature, sensor_3]
     event_timer_ms: 100
