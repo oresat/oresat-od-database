@@ -599,6 +599,49 @@ tpdos:
     fields:
       - [scet]
 
+  - num: 2
+    fields:
+    - [status]
+    - [tx_control, enable]
+    - [mode]
+    event_timer_ms: 5000
+
+  - num: 3
+    fields:
+    - [edl, sequence_count]
+    - [edl, rejected_count]
+    event_timer_ms: 5000
+
+  - num: 4
+    fields:
+      - [opd, status]
+      - [opd, has_fault]
+    event_timer_ms: 5000
+
+  - num: 5
+    fields:
+      - [node_manager, total_nodes]
+      - [node_manager, nodes_off]
+      - [node_manager, nodes_booting]
+      - [node_manager, nodes_on]
+      - [node_manager, nodes_with_errors]
+      - [node_manager, nodes_not_found]
+      - [node_manager, nodes_dead]
+    event_timer_ms: 5000
+
+  - num: 6
+    fields:
+      - [uhf, rx_packets]
+      - [uhf, rssi]
+    event_timer_ms: 5000
+
+  - num: 7
+    fields:
+      - [lband, rx_packets]
+      - [lband, rssi]
+      - [lband, synth_relock_count]
+    event_timer_ms: 5000
+
 fram:
   # DO NOT change this order, only append!
   - [status]
