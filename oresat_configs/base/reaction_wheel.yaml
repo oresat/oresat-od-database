@@ -70,21 +70,21 @@ objects:
         data_type: int16
         description: temperature sensor 1 temp
         access_type: ro
-        unit: C
+        unit: cC
 
       - subindex: 0x2
         name: sensor_2
         data_type: int16
         description: temperature sensor 2 temp
         access_type: ro
-        unit: C
+        unit: cC
 
       - subindex: 0x3
         name: sensor_3
         data_type: int16
         description: temperature sensor 3 temp
         access_type: ro
-        unit: C
+        unit: cC
 
 
   - index: 0x4004
