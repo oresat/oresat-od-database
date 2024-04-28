@@ -30,6 +30,12 @@ def build_parser(parser: ArgumentParser) -> ArgumentParser:
         "card", help="card name; c3, battery, solar, adcs, reaction_wheel, or diode_test"
     )
     parser.add_argument("-d", "--dir-path", default=".", help='output directory path, default: "."')
+    parser.add_argument(
+        "-hw", "--hardware-version", help="hardware board version string, usually defined in make"
+    )
+    parser.add_argument(
+        "-fw", "--firmware-version", help="firmware version string, usually git describe output"
+    )
     return parser
 
 
@@ -697,5 +703,10 @@ def gen_fw_files(args: Optional[Namespace] = None) -> None:
     else:
         print(f"invalid oresat card: {args.card}")
         sys.exit()
+
+    if args.hardware_version is not None:
+        od["versions"]["hw_version"].default = args.hardware_version
+    if args.firmware_version is not None:
+        od["versions"]["fw_version"].default = args.firmware_version
 
     write_canopennode(od, args.dir_path)
