@@ -22,7 +22,6 @@ objects:
         description: system error bitmask
         access_type: ro
 
-
   - index: 0x4001
     name: motor
     description: reaction wheel motor vel/current
@@ -42,7 +41,6 @@ objects:
         access_type: ro
         unit: A
 
-
   - index: 0x4002
     name: bus
     description: reaction wheel DC bus voltage/current
@@ -61,7 +59,6 @@ objects:
         description: bus current
         access_type: ro
         unit: A
-
 
   - index: 0x4003
     name: temperature
@@ -101,7 +98,6 @@ objects:
         description: requested state
         access_type: rw
 
-
   - index: 0x4005
     name: signals
     description: reaction wheel setpoints
@@ -119,7 +115,6 @@ objects:
         description: setpoint 2 (e.g. feedforward)
         access_type: rw
 
-
   - index: 0x4006
     name: reserved
     description: reaction wheel config params - reserved
@@ -136,7 +131,6 @@ objects:
         data_type: float32
         description: reserved 2
         access_type: rw
-
 
   - index: 0x4007
     name: reboot
@@ -175,4 +169,3 @@ tpdos:
       - [temperature, sensor_2]
       - [temperature, sensor_3]
     event_timer_ms: 100
-
