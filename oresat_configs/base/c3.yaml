@@ -642,6 +642,8 @@ tpdos:
     - [status]
     - [tx_control, enable]
     - [mode]
+    - [adcs_manager, mode]
+    - [adcs_manager, status]
     event_timer_ms: 5000
 
   - num: 3
