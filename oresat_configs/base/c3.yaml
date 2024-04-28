@@ -592,12 +592,31 @@ objects:
         data_type: uint8
         description: requested adcs mission mode to follow
         access_type: rw
+        value_descriptions:
+          none: 0
+          standby: 1
+          hold: 2
+          calibrate: 3
+          spindown: 4
+          detumble: 5
+          bbq: 6
+          point: 7 
+          manual: 8
       
       - subindex: 0x2
-        name: status_code
+        name: status
         data_type: uint8
         description: adcs service status 
-        access_type: rw
+        access_type: ro
+        value_descriptions:
+          none: 0
+          idle: 1
+          starting: 2
+          mission: 3
+          degraded: 4
+          unsafe: 5
+          error: 6
+          done: 7
 
       - subindex: 0x3
         name: signals
@@ -610,7 +629,7 @@ objects:
         name: feedback
         data_type: str
         description: json string of feedback signals
-        access_type: rw
+        access_type: ro
         default: "{}"
 
 tpdos:
