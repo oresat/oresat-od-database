@@ -590,29 +590,28 @@ objects:
       - subindex: 0x1
         name: mode
         data_type: uint8
-        description: current adcs mode
-        access_type: ro
-
+        description: requested adcs mission mode to follow
+        access_type: rw
+      
       - subindex: 0x2
+        name: status_code
+        data_type: uint8
+        description: adcs service status 
+        access_type: rw
+
+      - subindex: 0x3
         name: signals
         data_type: str
         description: json string of requested control signals
         access_type: rw
         default: "{}"
 
-      - subindex: 0x3
+      - subindex: 0x4
         name: feedback
         data_type: str
         description: json string of feedback signals
         access_type: rw
         default: "{}"
-
-      - subindex: 0x4
-        name: calibrate
-        data_type: str
-        description: temporary for calibrating via adcs manager
-        access_type: rw
-        default: "no"
 
 tpdos:
   - num: 1 # time sync TPDO
