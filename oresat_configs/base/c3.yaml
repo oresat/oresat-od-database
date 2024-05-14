@@ -393,6 +393,13 @@ objects:
         access_type: rw
         default: 3
 
+      - subindex: 0xd
+        name: uart_node_select
+        data_type: uint8
+        description: select a node to connect to UART or 0 for no node
+        access_type: rw
+        default: 0
+
   - index: 0x400a
     name: beacon
     object_type: record
@@ -600,13 +607,13 @@ objects:
           spindown: 4
           detumble: 5
           bbq: 6
-          point: 7 
+          point: 7
           manual: 8
-      
+
       - subindex: 0x2
         name: status
         data_type: uint8
-        description: adcs service status 
+        description: adcs service status
         access_type: ro
         value_descriptions:
           none: 0
