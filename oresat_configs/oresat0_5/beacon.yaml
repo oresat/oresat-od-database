@@ -142,3 +142,12 @@ fields:
   - [cfc_processor, tec_status]
   # protocard_0
   - [protocard_0, blinks_blinkcount]
+  # dtc_0
+  - [dtc_0, adcsample_buf0]
+  - [dtc_0, adcsample_buf1]
+  - [dtc_0, adcsample_buf2]
+  - [dtc_0, adcsample_buf3]
+  - [dtc_0, adcsample_buf4]
+  - [dtc_0, adcsample_buf5]
+  - [dtc_0, adcsample_buf6]
+  - [dtc_0, adcsample_buf7]

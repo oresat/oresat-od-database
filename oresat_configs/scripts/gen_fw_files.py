@@ -26,7 +26,7 @@ def build_parser(parser: ArgumentParser) -> ArgumentParser:
         type=lambda x: x.lower().removeprefix("oresat"),
         help="oresat mission, defaults to %(default)s",
     )
-    parser.add_argument("card", help="card name; c3, battery, protocard, solar, adcs, or reaction_wheel")
+    parser.add_argument("card", help="card name; c3, battery, diode, protocard, solar, adcs, or reaction_wheel")
     parser.add_argument("-d", "--dir-path", default=".", help='output directory path, default: "."')
     return parser
 
@@ -682,6 +682,8 @@ def gen_fw_files(args: Optional[Namespace] = None) -> None:
         od = config.od_db["battery_1"]
     elif arg_card in ["protocard", "pc"]:
         od = config.od_db["protocard_0"]
+    elif arg_card in ["diode", "dtc"]:
+        od = config.od_db["dtc_0"]
     elif arg_card in ["imu", "adcs"]:
         od = config.od_db["adcs"]
     elif arg_card in ["rw", "reaction_wheel"]:

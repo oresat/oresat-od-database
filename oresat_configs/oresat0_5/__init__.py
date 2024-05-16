@@ -15,6 +15,7 @@ from ..base import (
     ST_CONFIG_PATH,
     SW_COMMON_CONFIG_PATH,
     PC_CONFIG_PATH,
+    DTC_CONFIG_PATH,
     ConfigPaths,
 )
 
@@ -42,4 +43,5 @@ CARD_CONFIGS_PATH: ConfigPaths = {
     "cfc_processor": (CFC_CONFIG_PATH, SW_COMMON_CONFIG_PATH),
     "cfc_sensor": None,
     "protocard_0": (PC_CONFIG_PATH, FW_COMMON_CONFIG_PATH),
+    "dtc_0": (DTC_CONFIG_PATH, FW_COMMON_CONFIG_PATH),
 }

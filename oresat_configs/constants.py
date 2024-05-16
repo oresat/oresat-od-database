@@ -113,3 +113,4 @@ class NodeId(IntEnum):
     DXWIFI = 0x4C
     CFC = 0x50
     PROTOCARD_0 = 0x54
+    DTC_0 = 0x64
