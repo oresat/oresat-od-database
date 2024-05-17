@@ -80,7 +80,7 @@ objects:
         data_type: uint8
         description: the current storage percent used
         access_type: ro
-        high_level: 100
+        high_limit: 100
         unit: "%"
 
       - subindex: 0x3
@@ -88,7 +88,7 @@ objects:
         data_type: uint8
         description: the current ram percent used
         access_type: ro
-        high_level: 100
+        high_limit: 100
         unit: "%"
 
       - subindex: 0x4
@@ -113,7 +113,7 @@ objects:
 
       # subindex 0x7 reserved for temperature
       # subindex 0x8 reserved for vrefint
-      
+
       - subindex: 0x9
         name: boot_select
         data_type: uint8

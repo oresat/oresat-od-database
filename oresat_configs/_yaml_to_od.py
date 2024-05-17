@@ -119,8 +119,8 @@ def _make_var(obj: Union[IndexObject, SubindexObject], index: int, subindex: int
     _set_var_default(obj, var)
     if var.data_type not in DYNAMIC_LEN_DATA_TYPES:
         var.pdo_mappable = True
-    var.high_limit = obj.high_limit
-    var.low_limit = obj.low_limit
+    var.max = obj.high_limit
+    var.min = obj.low_limit
     return var
 
 
@@ -182,6 +182,8 @@ def _make_arr(obj: IndexObject, node_ids: dict[str, int]) -> Array:
             var.add_value_description(value, name)
         var.unit = generate_subindexes.unit
         var.factor = generate_subindexes.scale_factor
+        var.max = generate_subindexes.high_limit
+        var.min = generate_subindexes.low_limit
         _set_var_default(generate_subindexes, var)
         if var.data_type not in DYNAMIC_LEN_DATA_TYPES:
             var.pdo_mappable = True
@@ -409,6 +411,8 @@ def _add_rpdo_data(
             var.factor = tpdo_mapped_obj.factor
             var.bit_definitions = deepcopy(tpdo_mapped_obj.bit_definitions)
             var.value_descriptions = deepcopy(tpdo_mapped_obj.value_descriptions)
+            var.max = tpdo_mapped_obj.max
+            var.min = tpdo_mapped_obj.min
             var.pdo_mappable = True
             rpdo_mapped_rec.add_member(var)
 
@@ -497,6 +501,8 @@ def overlay_configs(card_config: CardConfig, overlay_config: CardConfig) -> None
             if obj.object_type == "variable":
                 obj2.data_type = obj.data_type
                 obj2.access_type = obj.access_type
+                obj2.max = obj.max
+                obj2.min = obj.min
             else:
                 for sub_obj in obj.subindexes:
                     sub_overlayed = False
@@ -505,6 +511,8 @@ def overlay_configs(card_config: CardConfig, overlay_config: CardConfig) -> None
                             sub_obj2.name = sub_obj.name
                             sub_obj2.data_type = sub_obj.data_type
                             sub_obj2.access_type = sub_obj.access_type
+                            sub_obj2.max = sub_obj.max
+                            sub_obj2.min = sub_obj.min
                             overlayed = True
                             sub_overlayed = True
                             break  # obj was found, search for next one

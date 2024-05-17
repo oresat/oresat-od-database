@@ -254,7 +254,7 @@ objects:
         data_type: uint8
         description: selected edl crypto key
         access_type: ro
-        high_level: 3
+        high_limit: 3
 
       - subindex: 0x6
         name: sequence_count
