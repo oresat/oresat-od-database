@@ -3,6 +3,7 @@
 import os
 from copy import deepcopy
 from typing import Union
+from collections import namedtuple
 
 import canopen
 from canopen import ObjectDictionary
@@ -23,7 +24,7 @@ RPDO_PARA_START = 0x1600
 TPDO_COMM_START = 0x1800
 TPDO_PARA_START = 0x1A00
 
-OD_DATA_TYPES = {
+STR_2_OD_DATA_TYPE = {
     "bool": canopen.objectdictionary.BOOLEAN,
     "int8": canopen.objectdictionary.INTEGER8,
     "int16": canopen.objectdictionary.INTEGER16,
@@ -40,38 +41,23 @@ OD_DATA_TYPES = {
     "domain": canopen.objectdictionary.DOMAIN,
 }
 
-OD_DATA_TYPE_SIZE = {
-    canopen.objectdictionary.BOOLEAN: 8,
-    canopen.objectdictionary.INTEGER8: 8,
-    canopen.objectdictionary.INTEGER16: 16,
-    canopen.objectdictionary.INTEGER32: 32,
-    canopen.objectdictionary.INTEGER64: 64,
-    canopen.objectdictionary.UNSIGNED8: 8,
-    canopen.objectdictionary.UNSIGNED16: 16,
-    canopen.objectdictionary.UNSIGNED32: 32,
-    canopen.objectdictionary.UNSIGNED64: 64,
-    canopen.objectdictionary.REAL32: 32,
-    canopen.objectdictionary.REAL64: 64,
-    canopen.objectdictionary.VISIBLE_STRING: 0,
-    canopen.objectdictionary.OCTET_STRING: 0,
-    canopen.objectdictionary.DOMAIN: 0,
-}
+OdDataTypeInfo = namedtuple("OdDataTypeInfo", ("default", "size", "low_limit", "high_limit"))
 
-OD_DEFAULTS = {
-    canopen.objectdictionary.BOOLEAN: False,
-    canopen.objectdictionary.INTEGER8: 0,
-    canopen.objectdictionary.INTEGER16: 0,
-    canopen.objectdictionary.INTEGER32: 0,
-    canopen.objectdictionary.INTEGER64: 0,
-    canopen.objectdictionary.UNSIGNED8: 0,
-    canopen.objectdictionary.UNSIGNED16: 0,
-    canopen.objectdictionary.UNSIGNED32: 0,
-    canopen.objectdictionary.UNSIGNED64: 0,
-    canopen.objectdictionary.REAL32: 0.0,
-    canopen.objectdictionary.REAL64: 0.0,
-    canopen.objectdictionary.VISIBLE_STRING: "",
-    canopen.objectdictionary.OCTET_STRING: b"",
-    canopen.objectdictionary.DOMAIN: None,
+OD_DATA_TYPES = {
+    canopen.objectdictionary.BOOLEAN: OdDataTypeInfo(False, 8, None, None),
+    canopen.objectdictionary.INTEGER8: OdDataTypeInfo(0, 8, -(2**8) // 2, 2**8 // 2 - 1),
+    canopen.objectdictionary.INTEGER16: OdDataTypeInfo(0, 16, -(2**16) // 2, 2**16 // 2 - 1),
+    canopen.objectdictionary.INTEGER32: OdDataTypeInfo(0, 16, -(2**32) // 2, 2**32 // 2 - 1),
+    canopen.objectdictionary.INTEGER64: OdDataTypeInfo(0, 16, -(2**64) // 2, 2**64 // 2 - 1),
+    canopen.objectdictionary.UNSIGNED8: OdDataTypeInfo(0, 8, 0, 2**8 - 1),
+    canopen.objectdictionary.UNSIGNED16: OdDataTypeInfo(0, 16, 0, 2**16 - 1),
+    canopen.objectdictionary.UNSIGNED32: OdDataTypeInfo(0, 32, 0, 2**32 - 1),
+    canopen.objectdictionary.UNSIGNED64: OdDataTypeInfo(0, 64, 0, 2**64 - 1),
+    canopen.objectdictionary.REAL32: OdDataTypeInfo(0.0, 32, None, None),
+    canopen.objectdictionary.REAL64: OdDataTypeInfo(0.0, 64, None, None),
+    canopen.objectdictionary.VISIBLE_STRING: OdDataTypeInfo("", 0, None, None),
+    canopen.objectdictionary.OCTET_STRING: OdDataTypeInfo(b"", 0, None, None),
+    canopen.objectdictionary.DOMAIN: OdDataTypeInfo(None, 0, None, None),
 }
 
 DYNAMIC_LEN_DATA_TYPES = [
@@ -88,7 +74,7 @@ def _set_var_default(obj: ConfigObject, var: Variable) -> None:
     if obj.data_type == "octet_str":
         default = b"\x00" * obj.length
     elif default is None:
-        default = OD_DEFAULTS[var.data_type]
+        default = OD_DATA_TYPES[var.data_type].default
     elif var.data_type in canopen.objectdictionary.INTEGER_TYPES and isinstance(default, str):
         # remove node id
         if "+$NODE_ID" in default:
@@ -115,12 +101,16 @@ def _make_var(obj: Union[IndexObject, SubindexObject], index: int, subindex: int
     var.unit = obj.unit
     if obj.scale_factor != 1:
         var.factor = obj.scale_factor
-    var.data_type = OD_DATA_TYPES[obj.data_type]
+    var.data_type = STR_2_OD_DATA_TYPE[obj.data_type]
     _set_var_default(obj, var)
     if var.data_type not in DYNAMIC_LEN_DATA_TYPES:
         var.pdo_mappable = True
-    var.max = obj.high_limit
-    var.min = obj.low_limit
+    if obj.value_descriptions:
+        var.max = obj.high_limit or max(obj.value_descriptions.values())
+        var.min = obj.low_limit or min(obj.value_descriptions.values())
+    else:
+        var.max = obj.high_limit or OD_DATA_TYPES[var.data_type].high_limit
+        var.min = obj.low_limit or OD_DATA_TYPES[var.data_type].low_limit
     return var
 
 
@@ -156,14 +146,14 @@ def _make_arr(obj: IndexObject, node_ids: dict[str, int]) -> Array:
 
     subindexes = []
     names = []
-    generate_subindexes = obj.generate_subindexes
-    if generate_subindexes is None:
+    gen_sub = obj.generate_subindexes
+    if gen_sub is None:
         raise ValueError("IndexObject for array missing generate_subindexes: {obj}")
 
-    if generate_subindexes.subindexes == "fixed_length":
-        subindexes = list(range(1, generate_subindexes.length + 1))
+    if gen_sub.subindexes == "fixed_length":
+        subindexes = list(range(1, gen_sub.length + 1))
         names = [obj.name + f"_{subindex}" for subindex in subindexes]
-    elif generate_subindexes.subindexes == "node_ids":
+    elif gen_sub.subindexes == "node_ids":
         for name, sub in node_ids.items():
             if sub == 0:
                 continue  # a node_id of 0 is flag for not on can bus
@@ -174,17 +164,21 @@ def _make_arr(obj: IndexObject, node_ids: dict[str, int]) -> Array:
         if subindex in arr.subindices:
             raise ValueError(f"subindex 0x{subindex:X} aleady in record at array 0x{index:X}")
         var = canopen.objectdictionary.Variable(name, index, subindex)
-        var.access_type = generate_subindexes.access_type
-        var.data_type = OD_DATA_TYPES[generate_subindexes.data_type]
-        for name, bits in generate_subindexes.bit_definitions.items():
+        var.access_type = gen_sub.access_type
+        var.data_type = STR_2_OD_DATA_TYPE[gen_sub.data_type]
+        for name, bits in gen_sub.bit_definitions.items():
             var.add_bit_definition(name, bits)
-        for name, value in generate_subindexes.value_descriptions.items():
+        for name, value in gen_sub.value_descriptions.items():
             var.add_value_description(value, name)
-        var.unit = generate_subindexes.unit
-        var.factor = generate_subindexes.scale_factor
-        var.max = generate_subindexes.high_limit
-        var.min = generate_subindexes.low_limit
-        _set_var_default(generate_subindexes, var)
+        var.unit = gen_sub.unit
+        var.factor = gen_sub.scale_factor
+        if obj.value_descriptions:
+            var.max = gen_sub.high_limit or max(gen_sub.value_descriptions.values())
+            var.min = gen_sub.low_limit or min(gen_sub.value_descriptions.values())
+        else:
+            var.max = gen_sub.high_limit or OD_DATA_TYPES[var.data_type].high_limit
+            var.min = gen_sub.low_limit or OD_DATA_TYPES[var.data_type].low_limit
+        _set_var_default(gen_sub, var)
         if var.data_type not in DYNAMIC_LEN_DATA_TYPES:
             var.pdo_mappable = True
         arr.add_member(var)
@@ -252,7 +246,7 @@ def _add_tpdo_data(od: ObjectDictionary, config: CardConfig) -> None:
             mapped_subindex = mapped_obj.subindex
             value = mapped_obj.index << 16
             value += mapped_subindex << 8
-            value += OD_DATA_TYPE_SIZE[mapped_obj.data_type]
+            value += OD_DATA_TYPES[mapped_obj.data_type].size
             var.default = value
             map_rec.add_member(var)
 
@@ -431,7 +425,7 @@ def _add_rpdo_data(
             rpdo_mapped_obj = rpdo_node_od[rpdo_mapped_index]
         else:
             rpdo_mapped_obj = rpdo_node_od[rpdo_mapped_index][rpdo_mapped_subindex]
-        value += OD_DATA_TYPE_SIZE[rpdo_mapped_obj.data_type]
+        value += OD_DATA_TYPES[rpdo_mapped_obj.data_type].size
         var.default = value
         rpdo_mapping_rec.add_member(var)
 

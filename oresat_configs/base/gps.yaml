@@ -41,6 +41,7 @@ objects:
         data_type: uint16
         description: gps week number
         access_type: ro
+        high_limit: 1023
 
       - subindex: 0x4
         name: tow
@@ -49,6 +50,7 @@ objects:
         access_type: ro
         scale_factor: 0.01
         unit: s
+        high_limit: 60480000
 
       - subindex: 0x5
         name: latitude
@@ -57,6 +59,8 @@ objects:
         access_type: ro
         scale_factor: 0.0000001 # 1e-7
         unit: deg
+        low_limit: -900000000
+        high_limit: 900000000
 
       - subindex: 0x6
         name: longitude
@@ -65,6 +69,8 @@ objects:
         access_type: ro
         scale_factor: 0.0000001 # 1e-7
         unit: deg
+        low_limit: -1800000000
+        high_limit: 1800000000
 
       - subindex: 0x7
         name: ellipsoid_alt

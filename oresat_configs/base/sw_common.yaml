@@ -69,6 +69,7 @@ objects:
         data_type: uint8
         description: reset the app
         value_descriptions:
+          no_stop: 0
           soft_reset: 1
           hard_reset: 2
           factory_reset: 3
