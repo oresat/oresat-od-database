@@ -664,11 +664,13 @@ def _gen_c3_fram_defs(c3_od: ObjectDictionary, config: CardConfig) -> list[Varia
     fram_objs = []
 
     for fields in config.fram:
+        obj = None
         if len(fields) == 1:
             obj = c3_od[fields[0]]
         elif len(fields) == 2:
             obj = c3_od[fields[0]][fields[1]]
-        fram_objs.append(obj)
+        if obj is not None:
+            fram_objs.append(obj)
 
     return fram_objs
 
@@ -679,11 +681,13 @@ def _gen_c3_beacon_defs(c3_od: ObjectDictionary, beacon_def: BeaconConfig) -> li
     beacon_objs = []
 
     for fields in beacon_def.fields:
+        obj = None
         if len(fields) == 1:
             obj = c3_od[fields[0]]
         elif len(fields) == 2:
             obj = c3_od[fields[0]][fields[1]]
-        beacon_objs.append(obj)
+        if obj is not None:
+            beacon_objs.append(obj)
 
     return beacon_objs
 
