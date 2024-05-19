@@ -1,7 +1,7 @@
 objects:
   - index: 0x4000
     name: adcsample 
-    description: diode test card
+    description: diode feedback
     object_type: record
     subindexes:
       - subindex: 0x1
@@ -52,6 +52,23 @@ objects:
         description: adc sample buffer
         access_type: rw 
 
+  - index: 0x4001
+    name: dtc
+    description: diode test card
+    object_type: record
+    subindexes:
+      - subindex: 0x1
+        name: select
+        data_type: uint16
+        description: diode select
+        access_type: rw 
+
+      - subindex: 0x2
+        name: errors
+        data_type: uint16
+        description: error count
+        access_type: rw 
+
 tpdos:
   - num: 1
     fields:
@@ -59,7 +76,7 @@ tpdos:
       - [adcsample, buf1]
       - [adcsample, buf2]
       - [adcsample, buf3]
-    event_timer_ms: 10000
+    event_timer_ms: 1000
 
   - num: 2
     fields:
@@ -67,5 +84,16 @@ tpdos:
       - [adcsample, buf5]
       - [adcsample, buf6]
       - [adcsample, buf7]
-    event_timer_ms: 10000
+    event_timer_ms: 1000
+
+  - num: 3
+    fields:
+      - [dtc, select]
+      - [dtc, errors]
+    event_timer_ms: 1000
+
+
+
+
+
 

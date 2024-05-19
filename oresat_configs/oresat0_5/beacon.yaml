@@ -151,3 +151,5 @@ fields:
   - [dtc_0, adcsample_buf5]
   - [dtc_0, adcsample_buf6]
   - [dtc_0, adcsample_buf7]
+  - [dtc_0, dtc_select]
+  - [dtc_0, dtc_errors]
