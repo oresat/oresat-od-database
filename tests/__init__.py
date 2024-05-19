@@ -6,7 +6,7 @@ import unittest
 import canopen
 
 from oresat_configs import Consts, OreSatConfig
-from oresat_configs._yaml_to_od import OD_DATA_TYPE_SIZE, TPDO_COMM_START, TPDO_PARA_START
+from oresat_configs._yaml_to_od import OD_DATA_TYPES, TPDO_COMM_START, TPDO_PARA_START
 
 
 class TestConfig(unittest.TestCase):
@@ -45,7 +45,7 @@ class TestConfig(unittest.TestCase):
                         mapped_obj.pdo_mappable,
                         f"{self.oresatid.name} {name} {mapped_obj.name} is not pdo mappable",
                     )
-                    size += OD_DATA_TYPE_SIZE[mapped_obj.data_type]
+                    size += OD_DATA_TYPES[mapped_obj.data_type].size
                 self.assertLessEqual(
                     size, 64, f"{self.oresatid.name} {name} TPDO{i + 1} is more than 64 bits"
                 )
@@ -77,7 +77,7 @@ class TestConfig(unittest.TestCase):
                     dynamic_len_data_types,
                     f"{self.oresatid.name} {obj.name} is a dynamic length data type",
                 )
-                length += OD_DATA_TYPE_SIZE[obj.data_type] // 8  # bits to bytes
+                length += OD_DATA_TYPES[obj.data_type].size // 8  # bits to bytes
 
         # AX.25 payload max length = 255
         # CRC32 length = 4
@@ -101,7 +101,7 @@ class TestConfig(unittest.TestCase):
         """Test that a variable is valid."""
 
         self.assertIsInstance(obj, canopen.objectdictionary.Variable)
-        self.assertIn(obj.data_type, OD_DATA_TYPE_SIZE.keys())
+        self.assertIn(obj.data_type, OD_DATA_TYPES.keys())
         self.assertIn(obj.access_type, ["ro", "wo", "rw", "rwr", "rww", "const"])
         self.assertIsInstance(obj.data_type, int)
         self._test_snake_case(obj.name)

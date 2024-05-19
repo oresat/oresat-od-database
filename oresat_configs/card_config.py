@@ -36,7 +36,8 @@ class ConfigObject:
     """Can be used to scale a integer value to a engineering (float) value."""
     low_limit: Optional[int] = None
     """
-    The lower raw limit for value. No need to set this if it limit is the lower limit of the data type.
+    The lower raw limit for value. No need to set this if it limit is the lower limit of the data
+    type.
     """
     high_limit: Optional[int] = None
     """

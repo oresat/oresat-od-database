@@ -35,9 +35,9 @@ def cards_from_csv(mission: Consts) -> dict[str, Card]:
         expect = {f.name for f in fields(Card)}
         expect.add("name")  # the 'name' column is the keys of the returned dict; not in Card
         if cols - expect:
-            raise TypeError(f"cards.csv has excess columns: {cols-expect}. Update class Card?")
+            raise TypeError(f"cards.csv has excess columns: {cols - expect}. Update class Card?")
         if expect - cols:
-            raise TypeError(f"class Card expects more columns than cards.csv has: {expect-cols}")
+            raise TypeError(f"class Card expects more columns than cards.csv has: {expect - cols}")
 
         return {
             row["name"]: Card(

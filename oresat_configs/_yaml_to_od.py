@@ -495,8 +495,8 @@ def overlay_configs(card_config: CardConfig, overlay_config: CardConfig) -> None
             if obj.object_type == "variable":
                 obj2.data_type = obj.data_type
                 obj2.access_type = obj.access_type
-                obj2.max = obj.max
-                obj2.min = obj.min
+                obj2.high_limit = obj.high_limit
+                obj2.low_limit = obj.low_limit
             else:
                 for sub_obj in obj.subindexes:
                     sub_overlayed = False
@@ -505,8 +505,8 @@ def overlay_configs(card_config: CardConfig, overlay_config: CardConfig) -> None
                             sub_obj2.name = sub_obj.name
                             sub_obj2.data_type = sub_obj.data_type
                             sub_obj2.access_type = sub_obj.access_type
-                            sub_obj2.max = sub_obj.max
-                            sub_obj2.min = sub_obj.min
+                            sub_obj2.high_limit = sub_obj.high_limit
+                            sub_obj2.low_limit = sub_obj.low_limit
                             overlayed = True
                             sub_overlayed = True
                             break  # obj was found, search for next one
