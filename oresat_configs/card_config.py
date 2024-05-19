@@ -31,16 +31,16 @@ class ConfigObject:
     bit_definitions: dict[str, Union[int, str]] = field(default_factory=dict)
     """Optional: Can be used to define bitfield of an unsigned integer data types."""
     unit: str = ""
-    """Optional unit for the object."""
+    """Optional engineering unit for the object."""
     scale_factor: float = 1
-    """Can be used to scale a integer value to a float."""
+    """Can be used to scale a integer value to a engineering (float) value."""
     low_limit: Optional[int] = None
     """
-    The lower limit for value. No need to set this if it limit is the lower limit of the data type.
+    The lower raw limit for value. No need to set this if it limit is the lower limit of the data type.
     """
     high_limit: Optional[int] = None
     """
-    The higher limit for value. No need to set this if it limit is the higher limit of the data
+    The higher raw limit for value. No need to set this if it limit is the higher limit of the data
     type.
     """
 

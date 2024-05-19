@@ -1,9 +1,9 @@
 """Convert OreSat configs to ODs."""
 
 import os
+from collections import namedtuple
 from copy import deepcopy
 from typing import Union
-from collections import namedtuple
 
 import canopen
 from canopen import ObjectDictionary
