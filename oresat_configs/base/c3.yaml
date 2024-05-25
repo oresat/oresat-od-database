@@ -52,7 +52,7 @@ objects:
         data_type: uint32
         description: tx enable timeout
         access_type: const
-        default: 1209600 # 2 weeks
+        default: 2592000 # 30 days
         unit: s
 
       - subindex: 0x3
