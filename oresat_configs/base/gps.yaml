@@ -178,6 +178,18 @@ objects:
         access_type: ro
         unit: ms
 
+      - subindex: 0x15
+        name: packet_count
+        data_type: uint32
+        description: number of packet received since boot
+        access_type: ro
+
+      - subindex: 0x16
+        name: last_packet
+        data_type: octet_str
+        description: last packet received
+        access_type: ro
+
 tpdos:
   - num: 3
     fields:
@@ -204,6 +216,7 @@ tpdos:
       - [skytraq, number_of_sv]
       - [skytraq, fix_mode]
       - [time_syncd]
+    event_timer_ms: 1000
 
   - num: 16 # the time sync TPDO
     fields:
