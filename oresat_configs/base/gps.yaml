@@ -6,7 +6,7 @@ objects:
       'off': 0
       searching: 1
       locked: 2
-      error: 3
+      error: 0xFF
     access_type: ro
 
   - index: 0x4001
