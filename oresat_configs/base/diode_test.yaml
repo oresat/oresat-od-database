@@ -51,6 +51,12 @@ objects:
         description: error bits
         access_type: rw 
 
+      - subindex: 0x4
+        name: ctrl
+        data_type: uint16
+        description: control bits
+        access_type: rw 
+
 tpdos:
   - num: 1
     fields:
@@ -65,6 +71,7 @@ tpdos:
       - [diode, select]
       - [diode, dac]
       - [diode, error]
+      - [diode, ctrl]
     event_timer_ms: 1000
 
 
