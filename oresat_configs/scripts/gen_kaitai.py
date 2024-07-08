@@ -22,9 +22,11 @@ def build_parser(parser: ArgumentParser) -> ArgumentParser:
         default=Consts.default().arg,
         choices=[m.arg for m in Consts],
         type=lambda x: x.lower().removeprefix("oresat"),
-        help="oresat mission, defaults to %(default)s",
+        help="Oresat Mission. (Default: %(default)s)",
     )
-    parser.add_argument("-d", "--dir-path", default=".", help='directory path; defautl "."')
+    parser.add_argument(
+        "-d", "--dir-path", default=".", help="Output directory path. (Default: %(default)s)"
+    )
     return parser
 
 
@@ -57,26 +59,14 @@ CANOPEN_TO_KAITAI_DT = {
     canopen.objectdictionary.REAL64: "double",
 }
 
-DT_LEN = {
-    canopen.objectdictionary.BOOLEAN: 8,
-    canopen.objectdictionary.INTEGER8: 8,
-    canopen.objectdictionary.INTEGER16: 16,
-    canopen.objectdictionary.INTEGER32: 32,
-    canopen.objectdictionary.INTEGER64: 64,
-    canopen.objectdictionary.UNSIGNED8: 8,
-    canopen.objectdictionary.UNSIGNED16: 16,
-    canopen.objectdictionary.UNSIGNED32: 32,
-    canopen.objectdictionary.UNSIGNED64: 64,
-    canopen.objectdictionary.VISIBLE_STRING: 0,
-    canopen.objectdictionary.REAL32: 32,
-    canopen.objectdictionary.REAL64: 64,
-}
-
 
 def write_kaitai(config: OreSatConfig, dir_path: str = ".") -> None:
     """Write beacon configs to a kaitai file."""
+
+    # Grab and format mission name
     name = config.mission.name.lower().replace("_", ".")
 
+    #  Setup pre-determined canned types
     kaitai_data = {
         "meta": {
             "id": name,
@@ -204,7 +194,7 @@ def write_kaitai(config: OreSatConfig, dir_path: str = ".") -> None:
         },
     }
 
-    # Hard-code the 128b type for the AX.25 parameter
+    # Append field types for each field
     for obj in config.beacon_def:
         new_var = {
             "id": obj.name,
@@ -218,17 +208,17 @@ def write_kaitai(config: OreSatConfig, dir_path: str = ".") -> None:
 
         cast(
             Any, cast(Any, cast(Any, kaitai_data.get("types")).get("ax25_info_data")).get("seq")
-        ).append(new_var)
+        ).append(
+            new_var
+        )  # Same as: `kaitai_data["types"]["ax25_info_data"]["seq"].append(new_var)`D
 
-        # kaitai_data["types"]["ax25_info_data"]["seq"].append(new_var)
-
-    # write
+    # Write kaitai to output file
     with open(f"{dir_path}/{name}.ksy", "w+") as file:
         dump(kaitai_data, file)
 
 
 def gen_kaitai(args: Optional[Namespace] = None) -> None:
-    """Gen_dcf main."""
+    """Gen_kaitai main."""
     if args is None:
         args = build_parser(ArgumentParser()).parse_args()
 
