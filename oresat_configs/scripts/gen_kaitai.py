@@ -1,11 +1,10 @@
 """Generate KaiTai for the beacon."""
 
 from argparse import ArgumentParser, Namespace
-from yaml import dump
-from datetime import datetime
-from typing import Any, Optional
+from typing import Any, Optional, cast
 
 import canopen
+from yaml import dump
 
 from .. import Consts, OreSatConfig
 
@@ -72,43 +71,6 @@ DT_LEN = {
     canopen.objectdictionary.REAL32: 32,
     canopen.objectdictionary.REAL64: 64,
 }
-
-
-def make_obj_name(obj: canopen.objectdictionary.Variable) -> str:
-    """get obj name."""
-
-    name = ""
-    if obj.index < 0x5000:
-        name += "c3_"
-
-    if isinstance(obj.parent, canopen.ObjectDictionary):
-        name += obj.name
-    else:
-        name += f"{obj.parent.name}_{obj.name}"
-
-    return name
-
-
-def make_dt_name(obj: canopen.objectdictionary.Variable) -> str:
-    """Make xtce data type name."""
-
-    type_name = CANOPEN_TO_XTCE_DT[obj.data_type]
-    if obj.name in ["unix_time", "updater_status"]:
-        type_name = obj.name
-    elif obj.value_descriptions:
-        if isinstance(obj.parent, canopen.ObjectDictionary):
-            type_name += f"_c3_{obj.name}"
-        else:
-            type_name += f"_{obj.parent.name}_{obj.name}"
-    elif obj.data_type == canopen.objectdictionary.VISIBLE_STRING:
-        type_name += f"{len(obj.default) * 8}"
-    elif obj.unit:
-        type_name += f"_{obj.unit}"
-    type_name = type_name.replace("/", "p").replace("%", "percent")
-
-    type_name += "_type"
-
-    return type_name
 
 
 def write_kaitai(config: OreSatConfig, dir_path: str = ".") -> None:
@@ -253,10 +215,15 @@ def write_kaitai(config: OreSatConfig, dir_path: str = ".") -> None:
             new_var["encoding"] = "ASCII"
             if obj.access_type == "const":
                 new_var["size"] = len(obj.default)
-        kaitai_data["types"]["ax25_info_data"]["seq"].append(new_var)
+
+        cast(
+            Any, cast(Any, cast(Any, kaitai_data.get("types")).get("ax25_info_data")).get("seq")
+        ).append(new_var)
+
+        # kaitai_data["types"]["ax25_info_data"]["seq"].append(new_var)
 
     # write
-    with open(f"{name}.ksy", "w+") as file:
+    with open(f"{dir_path}/{name}.ksy", "w+") as file:
         dump(kaitai_data, file)
 
 

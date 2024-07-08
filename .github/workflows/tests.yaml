@@ -54,6 +54,7 @@ jobs:
         oresat-gen-fw-files c3
         oresat-gen-dcf c3
         oresat-print-od c3 > /dev/null
+        oresat-gen-kaitai
         oresat-gen-xtce
         oresat-configs cards > /dev/null
         oresat-configs pdo c3 --list > /dev/null
