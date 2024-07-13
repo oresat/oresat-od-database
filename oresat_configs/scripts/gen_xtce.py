@@ -262,14 +262,11 @@ def write_xtce(config: OreSatConfig, dir_path: str = ".") -> None:
 
             para_unit_set = ET.SubElement(para_type, "UnitSet")
             if obj.unit:
-                ET.SubElement(
+                unit = ET.SubElement(
                     para_unit_set,
                     "Unit",
-                    attrib={
-                        "description": obj.unit,
-                    },
-                    text=obj.unit,
                 )
+                unit.text = obj.unit
 
             data_enc = ET.SubElement(
                 para_type,
@@ -434,17 +431,6 @@ def write_xtce(config: OreSatConfig, dir_path: str = ".") -> None:
     meta_cmd_set = ET.SubElement(cmd_meta_data, "MetaCommandSet")
     for cmd in config.edl_commands.values():
 
-        dynamic_len_type = False
-        for cmd_field in cmd.request:
-            if cmd_field.data_type in ["bytes", "str"]:
-                dynamic_len_type = True
-                break
-        if dynamic_len_type:
-            print(
-                f"WARNING: skiping command {cmd.name} (0x{cmd.uid:X}) due to dynamic length data type"
-            )
-            continue
-
         meta_cmd = ET.SubElement(
             meta_cmd_set,
             "MetaCommand",
@@ -479,16 +465,21 @@ def write_xtce(config: OreSatConfig, dir_path: str = ".") -> None:
                 para_types.append(type_name)
 
                 attrib = {"shortDescription": cmd_field.description.replace("\n", " ").strip()}
-                if (
-                    cmd_field.data_type.startswith("int")
-                    or cmd_field.data_type.startswith("uint")
-                    or cmd_field.data_type == "bool"
-                ):
+                if cmd_field.data_type.startswith("int") or cmd_field.data_type.startswith("uint"):
                     if cmd_field.enums:
                         name = "EnumeratedArgumentType"
                     else:
                         name = "IntegerArgumentType"
                     attrib["name"] = type_name
+                elif cmd_field.data_type == "bool":
+                    name = "BooleanArgumentType"
+                    if cmd_field.enums:
+                        attrib["zeroStringValue"] = list(cmd_field.enums.keys())[
+                            list(cmd_field.enums.values()).index(0)
+                        ]
+                        attrib["oneStringValue"] = list(cmd_field.enums.keys())[
+                            list(cmd_field.enums.values()).index(1)
+                        ]
                 elif cmd_field.data_type in ["float", "double"]:
                     name = "FloatArgumentType"
                 elif cmd_field.data_type == "str":
@@ -498,17 +489,15 @@ def write_xtce(config: OreSatConfig, dir_path: str = ".") -> None:
 
                 data_type = ET.SubElement(arg_type_set, name, attrib=attrib)
                 ET.SubElement(data_type, "UnitSet")
-
-                if (
-                    cmd_field.data_type.startswith("int")
-                    or cmd_field.data_type.startswith("uint")
-                    or cmd_field.data_type == "bool"
-                ):
-                    size = (
-                        "8"
-                        if cmd_field.data_type == "bool"
-                        else cmd_field.data_type.split("int")[-1]
+                if obj.unit:
+                    unit = ET.SubElement(
+                        para_unit_set,
+                        "Unit",
                     )
+                    unit.text = obj.unit
+
+                if cmd_field.data_type.startswith("int") or cmd_field.data_type.startswith("uint"):
+                    size = cmd_field.data_type.split("int")[-1]
                     encoding = (
                         "twosComplement" if cmd_field.data_type.startswith("int") else "unsigned"
                     )
@@ -519,7 +508,7 @@ def write_xtce(config: OreSatConfig, dir_path: str = ".") -> None:
                         attrib={"sizeInBits": size, "encoding": encoding},
                     )
 
-                    if cmd_field.enums:
+                    if cmd_field.enums and cmd_field.data_type != "bool":
                         enum_list = ET.SubElement(data_type, "EnumerationList")
                         for name, value in cmd_field.enums.items():
                             ET.SubElement(
@@ -527,8 +516,58 @@ def write_xtce(config: OreSatConfig, dir_path: str = ".") -> None:
                                 "Enumeration",
                                 attrib={"value": str(value), "label": name},
                             )
+                elif cmd_field.data_type == "bool":
+                    ET.SubElement(
+                        data_type,
+                        "IntegerDataEncoding",
+                        attrib={"sizeInBits": "8", "encoding": "unsigned"},
+                    )
                 elif cmd_field.data_type in ["float", "double"]:
                     ET.SubElement(data_type, "FloatDataEncoding")
+                elif cmd_field.data_type == "str":
+                    str_data = ET.SubElement(
+                        data_type,
+                        "StringDataEncoding",
+                        attrib={"encoding": "US-ASCII", "bitOrder": "mostSignificantBitFirst"},
+                    )
+                    if cmd_field.max_size > 0:
+                        var = ET.SubElement(
+                            str_data,
+                            "Variable",
+                            attrib={"maxSizeInBits": f"{cmd_field.max_size * 8}"},
+                        )
+                        dyn_val = ET.SubElement(var, "DynamicValue")
+                        ET.SubElement(
+                            dyn_val,
+                            "ArgumentInstanceRef",
+                            attrib={"argumentRef": f"vstr_{cmd.uid}_length_{cmd_field.name}"},
+                        )
+                    elif cmd_field.fixed_size > 0:
+                        size_bits = ET.SubElement(str_data, "SizeInBits")
+                        fixed_value = ET.SubElement(size_bits, "FixedValue")
+                        fixed_value.text = f"{cmd_field.fixed_size * 8}"
+                elif cmd_field.data_type == "bytes":
+                    bytes_data = ET.SubElement(
+                        data_type,
+                        "BinaryDataEncoding",
+                        attrib={"bitOrder": "mostSignificantBitFirst"},
+                    )
+                    if cmd_field.max_size > 0:
+                        var = ET.SubElement(
+                            bytes_data,
+                            "Variable",
+                            attrib={"maxSizeInBits": f"{cmd_field.max_size * 8}"},
+                        )
+                        dyn_val = ET.SubElement(var, "DynamicValue")
+                        ET.SubElement(
+                            dyn_val,
+                            "ArgumentInstanceRef",
+                            attrib={"argumentRef": f"vstr_{cmd.uid}_length_{cmd_field.name}"},
+                        )
+                    elif cmd_field.fixed_size > 0:
+                        size_bits = ET.SubElement(bytes_data, "SizeInBits")
+                        fixed_value = ET.SubElement(size_bits, "FixedValue")
+                        fixed_value.text = f"{cmd_field.fixed_size * 8}"
 
             ET.SubElement(
                 arg_list,

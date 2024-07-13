@@ -34,22 +34,51 @@ __all__ = ["Card", "Consts", "NodeId", "OreSatId", "__version__"]
 
 @dataclass
 class EdlCommandField:
+    """A field in EDL command request or response packet."""
+
     name: str
+    """
+    str: Unique name (scope of the fields in the command, not all fields in all commands) for the
+    EDL command field.
+    """
     data_type: str
+    """
+    str: Data type of field. Can be "intX", "uintX", "bool", "str", "bytes", or "bool" where X is
+    a size in bits.
+    """
     description: str = ""
+    """str: A short description of the EDL command field."""
     enums: dict[str, int] = field(default_factory=dict)
+    """dict[str, int]: Enum values for "intX", "uintX", or "bool" types."""
+    max_size: int = 0
+    """
+    int: Max size in bytes for variable "bytes" or "str" data types. Takes precedence over fix_size.
+    """
+    fixed_size: int = 0
+    """int: Fixed size in bytes for "bytes" or "str" data types."""
 
 
 @dataclass
 class EdlCommand:
+    """A EDL command."""
+
     uid: int
+    """int: Unique id to identify the EDL command."""
     name: str
+    """str: A unique snake_case name for the EDL command."""
     description: str = ""
+    """str: A short description of the EDL command."""
     request: list[EdlCommandField] = field(default_factory=list)
+    """list[EdlCommand]: List of request fields for the EDL command."""
     response: list[EdlCommandField] = field(default_factory=list)
+    """list[EdlCommand]: List of response fields for the EDL command."""
 
 
 class EdlCommands:
+    """
+    A custom dictionary-like class to store EDL commands that can use the EDL command uid and EDL
+    command name as keys.
+    """
 
     def __init__(self, file_path: str):
         self._names: dict[str, EdlCommand] = {}
@@ -74,6 +103,7 @@ class EdlCommands:
         return iter(self._uids)
 
     def values(self):
+        """Get dictionary values."""
         return self._uids.values()
 
 
@@ -106,5 +136,5 @@ class OreSatConfig:
         self.fram_def = _gen_c3_fram_defs(c3_od, self.configs["c3"])
         self.fw_base_od = _gen_fw_base_od(mission, FW_COMMON_CONFIG_PATH)
 
-        edl_file_path = f"{os.path.dirname(os.path.abspath(__file__))}/base/edl.yaml"
+        edl_file_path = f"{os.path.dirname(os.path.abspath(__file__))}/edl.yaml"
         self.edl_commands = EdlCommands(edl_file_path)

@@ -79,6 +79,7 @@ commands:
       - name: buffer
         data_type: bytes
         description: data buffer
+        max_size: 100
     response:
       - name: error_code
         data_type: uint32
@@ -231,12 +232,13 @@ commands:
         data_type: uint8
         description: the OD subindex to write to
     response:
-     - name: error_code
-       data_type: uint32
-       description: SDO error code (0 is no error)
-     - name: size
-       data_type: uint32
-       description: size of the data buffer
-     - name: buffer
-       data_type: bytes
-       description: data buffer
+      - name: error_code
+        data_type: uint32
+        description: SDO error code (0 is no error)
+      - name: size
+        data_type: uint32
+        description: size of the data buffer
+      - name: buffer
+        data_type: bytes
+        description: data buffer
+        max_size: 100
