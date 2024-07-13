@@ -262,14 +262,14 @@ def write_xtce(config: OreSatConfig, dir_path: str = ".") -> None:
 
             para_unit_set = ET.SubElement(para_type, "UnitSet")
             if obj.unit:
-                para_unit = ET.SubElement(
+                ET.SubElement(
                     para_unit_set,
                     "Unit",
                     attrib={
                         "description": obj.unit,
                     },
+                    text=obj.unit,
                 )
-                para_unit.text = obj.unit
 
             data_enc = ET.SubElement(
                 para_type,
@@ -343,6 +343,7 @@ def write_xtce(config: OreSatConfig, dir_path: str = ".") -> None:
         },
     )
 
+    # add beacon telemetry
     cont_set = ET.SubElement(tm_meta, "ContainerSet")
     seq_cont = ET.SubElement(
         cont_set,
@@ -372,6 +373,176 @@ def write_xtce(config: OreSatConfig, dir_path: str = ".") -> None:
             "parameterRef": "crc32",
         },
     )
+
+    cmd_meta_data = ET.SubElement(root, "CommandMetaData")
+    arg_type_set = ET.SubElement(cmd_meta_data, "ArgumentTypeSet")
+
+    # add node id type
+    node_id_arg_type = ET.SubElement(
+        arg_type_set, "EnumeratedArgumentType", attrib={"name": "node_id_type"}
+    )
+    ET.SubElement(node_id_arg_type, "UnitSet")
+    ET.SubElement(
+        node_id_arg_type,
+        "IntegerDataEncoding",
+        attrib={
+            "sizeInBits": "8",
+            "encoding": "unsigned",
+        },
+    )
+    enum_list = ET.SubElement(node_id_arg_type, "EnumerationList")
+    for name in config.od_db:
+        if config.cards[name].node_id == 0:
+            continue
+        ET.SubElement(
+            enum_list,
+            "Enumeration",
+            attrib={
+                "value": str(config.cards[name].node_id),
+                "label": config.cards[name].nice_name,
+            },
+        )
+
+    # add opd addr type
+    opd_addr_arg_type = ET.SubElement(
+        arg_type_set, "EnumeratedArgumentType", attrib={"name": "opd_addr_type"}
+    )
+    ET.SubElement(opd_addr_arg_type, "UnitSet")
+    ET.SubElement(
+        opd_addr_arg_type,
+        "IntegerDataEncoding",
+        attrib={
+            "sizeInBits": "8",
+            "encoding": "unsigned",
+        },
+    )
+    enum_list = ET.SubElement(opd_addr_arg_type, "EnumerationList")
+    for name in config.od_db:
+        if config.cards[name].opd_address == 0:
+            continue
+        ET.SubElement(
+            enum_list,
+            "Enumeration",
+            attrib={
+                "value": str(config.cards[name].opd_address),
+                "label": config.cards[name].nice_name,
+            },
+        )
+
+    # add telecomands
+    para_types = ["opd_addr_type", "node_id_type"]
+    meta_cmd_set = ET.SubElement(cmd_meta_data, "MetaCommandSet")
+    for cmd in config.edl_commands.values():
+
+        dynamic_len_type = False
+        for cmd_field in cmd.request:
+            if cmd_field.data_type in ["bytes", "str"]:
+                dynamic_len_type = True
+                break
+        if dynamic_len_type:
+            print(
+                f"WARNING: skiping command {cmd.name} (0x{cmd.uid:X}) due to dynamic length data type"
+            )
+            continue
+
+        meta_cmd = ET.SubElement(
+            meta_cmd_set,
+            "MetaCommand",
+            attrib={
+                "name": cmd.name,
+                "shortDescription": cmd.description.replace("\n", " ").strip(),
+            },
+        )
+
+        arg_list = ET.SubElement(meta_cmd, "ArgumentList")
+        cmd_cont = ET.SubElement(meta_cmd, "CommandContainer")
+        cmd_entry_list = ET.SubElement(cmd_cont, "EntryList")
+
+        ET.SubElement(
+            cmd_entry_list,
+            "FixedValueEntry",
+            attrib={
+                "binaryValue": f"{cmd.uid:02X}",
+                "sizeInBits": "8",
+            },
+        )
+
+        for cmd_field in cmd.request:
+
+            type_name = cmd_field.data_type
+            if type_name not in ["opd_addr", "node_id"]:
+                type_name = cmd_field.data_type + "_"
+                type_name += cmd_field.name
+            type_name += "_type"
+
+            if type_name not in para_types:
+                para_types.append(type_name)
+
+                attrib = {"shortDescription": cmd_field.description.replace("\n", " ").strip()}
+                if (
+                    cmd_field.data_type.startswith("int")
+                    or cmd_field.data_type.startswith("uint")
+                    or cmd_field.data_type == "bool"
+                ):
+                    if cmd_field.enums:
+                        name = "EnumeratedArgumentType"
+                    else:
+                        name = "IntegerArgumentType"
+                    attrib["name"] = type_name
+                elif cmd_field.data_type in ["float", "double"]:
+                    name = "FloatArgumentType"
+                elif cmd_field.data_type == "str":
+                    name = "StringArgumentType"
+                elif cmd_field.data_type == "bytes":
+                    name = "BinaryDataArgumentType"
+
+                data_type = ET.SubElement(arg_type_set, name, attrib=attrib)
+                ET.SubElement(data_type, "UnitSet")
+
+                if (
+                    cmd_field.data_type.startswith("int")
+                    or cmd_field.data_type.startswith("uint")
+                    or cmd_field.data_type == "bool"
+                ):
+                    size = (
+                        "8"
+                        if cmd_field.data_type == "bool"
+                        else cmd_field.data_type.split("int")[-1]
+                    )
+                    encoding = (
+                        "twosComplement" if cmd_field.data_type.startswith("int") else "unsigned"
+                    )
+
+                    ET.SubElement(
+                        data_type,
+                        "IntegerDataEncoding",
+                        attrib={"sizeInBits": size, "encoding": encoding},
+                    )
+
+                    if cmd_field.enums:
+                        enum_list = ET.SubElement(data_type, "EnumerationList")
+                        for name, value in cmd_field.enums.items():
+                            ET.SubElement(
+                                enum_list,
+                                "Enumeration",
+                                attrib={"value": str(value), "label": name},
+                            )
+                elif cmd_field.data_type in ["float", "double"]:
+                    ET.SubElement(data_type, "FloatDataEncoding")
+
+            ET.SubElement(
+                arg_list,
+                "Argument",
+                attrib={
+                    "name": cmd_field.name,
+                    "argumentType": type_name,
+                },
+            )
+            ET.SubElement(
+                cmd_entry_list,
+                "ArgumentRefEntry",
+                attrib={"argumentRef": type_name},
+            )
 
     tree = ET.ElementTree(root)
     ET.indent(tree, space="  ", level=0)
