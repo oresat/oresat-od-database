@@ -51,9 +51,7 @@ class EdlCommandField:
     enums: dict[str, int] = field(default_factory=dict)
     """dict[str, int]: Enum values for "intX", "uintX", or "bool" types."""
     max_size: int = 0
-    """
-    int: Max size in bytes for variable "bytes" or "str" data types. Takes precedence over fix_size.
-    """
+    """int: Max size in bytesi for variable "str" data types. Takes precedence over fix_size."""
     fixed_size: int = 0
     """int: Fixed size in bytes for "bytes" or "str" data types."""
 

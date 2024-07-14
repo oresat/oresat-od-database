@@ -79,7 +79,7 @@ commands:
       - name: buffer
         data_type: bytes
         description: data buffer
-        max_size: 100
+        fixed_size: 100
     response:
       - name: error_code
         data_type: uint32
@@ -204,7 +204,8 @@ commands:
     description: c3 will response with a beacon regardless of tx state
 
   - uid: 0x11
-    name: a basic ping to the c3
+    name: ping
+    description: a basic ping to the c3
     request:
       - name: value
         data_type: uint32
@@ -241,4 +242,4 @@ commands:
       - name: buffer
         data_type: bytes
         description: data buffer
-        max_size: 100
+        fixed_size: 100

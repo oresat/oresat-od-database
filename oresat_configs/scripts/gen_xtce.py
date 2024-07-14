@@ -1,4 +1,12 @@
-"""Generate XTCE for the beacon."""
+"""
+Generate XTCE for the beacon.
+
+To validate generated XTCE
+- download the xsd:
+  curl -O https://www.omg.org/spec/XTCE/20180204/SpaceSystem.xsd
+- run xmllint:
+  xmllint --noout --schema SpaceSystem.xsd *.xtce
+"""
 
 import xml.etree.ElementTree as ET
 from argparse import ArgumentParser, Namespace
@@ -440,8 +448,11 @@ def write_xtce(config: OreSatConfig, dir_path: str = ".") -> None:
             },
         )
 
-        arg_list = ET.SubElement(meta_cmd, "ArgumentList")
-        cmd_cont = ET.SubElement(meta_cmd, "CommandContainer")
+        if cmd.request:
+            arg_list = ET.SubElement(meta_cmd, "ArgumentList")
+        cmd_cont = ET.SubElement(
+            meta_cmd, "CommandContainer", attrib={"name": f"{cmd.name}_container"}
+        )
         cmd_entry_list = ET.SubElement(cmd_cont, "EntryList")
 
         ET.SubElement(
@@ -464,13 +475,15 @@ def write_xtce(config: OreSatConfig, dir_path: str = ".") -> None:
             if type_name not in para_types:
                 para_types.append(type_name)
 
-                attrib = {"shortDescription": cmd_field.description.replace("\n", " ").strip()}
+                attrib = {
+                    "name": type_name,
+                    "shortDescription": cmd_field.description.replace("\n", " ").strip(),
+                }
                 if cmd_field.data_type.startswith("int") or cmd_field.data_type.startswith("uint"):
                     if cmd_field.enums:
                         name = "EnumeratedArgumentType"
                     else:
                         name = "IntegerArgumentType"
-                    attrib["name"] = type_name
                 elif cmd_field.data_type == "bool":
                     name = "BooleanArgumentType"
                     if cmd_field.enums:
@@ -485,7 +498,7 @@ def write_xtce(config: OreSatConfig, dir_path: str = ".") -> None:
                 elif cmd_field.data_type == "str":
                     name = "StringArgumentType"
                 elif cmd_field.data_type == "bytes":
-                    name = "BinaryDataArgumentType"
+                    name = "BinaryArgumentType"
 
                 data_type = ET.SubElement(arg_type_set, name, attrib=attrib)
                 ET.SubElement(data_type, "UnitSet")
@@ -552,35 +565,23 @@ def write_xtce(config: OreSatConfig, dir_path: str = ".") -> None:
                         "BinaryDataEncoding",
                         attrib={"bitOrder": "mostSignificantBitFirst"},
                     )
-                    if cmd_field.max_size > 0:
-                        var = ET.SubElement(
-                            bytes_data,
-                            "Variable",
-                            attrib={"maxSizeInBits": f"{cmd_field.max_size * 8}"},
-                        )
-                        dyn_val = ET.SubElement(var, "DynamicValue")
-                        ET.SubElement(
-                            dyn_val,
-                            "ArgumentInstanceRef",
-                            attrib={"argumentRef": f"vstr_{cmd.uid}_length_{cmd_field.name}"},
-                        )
-                    elif cmd_field.fixed_size > 0:
-                        size_bits = ET.SubElement(bytes_data, "SizeInBits")
-                        fixed_value = ET.SubElement(size_bits, "FixedValue")
-                        fixed_value.text = f"{cmd_field.fixed_size * 8}"
+                    size_bits = ET.SubElement(bytes_data, "SizeInBits")
+                    fixed_value = ET.SubElement(size_bits, "FixedValue")
+                    fixed_value.text = f"{cmd_field.fixed_size * 8}"
 
-            ET.SubElement(
-                arg_list,
-                "Argument",
-                attrib={
-                    "name": cmd_field.name,
-                    "argumentType": type_name,
-                },
-            )
+            if cmd.request:
+                ET.SubElement(
+                    arg_list,
+                    "Argument",
+                    attrib={
+                        "name": cmd_field.name,
+                        "argumentTypeRef": type_name,
+                    },
+                )
             ET.SubElement(
                 cmd_entry_list,
                 "ArgumentRefEntry",
-                attrib={"argumentRef": type_name},
+                attrib={"argumentRef": cmd_field.name},
             )
 
     tree = ET.ElementTree(root)
