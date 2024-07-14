@@ -117,8 +117,8 @@ def write_xtce(config: OreSatConfig, dir_path: str = ".") -> None:
     root = ET.Element(
         "SpaceSystem",
         attrib={
-            "name": str(config.mission),
-            "xmlns:xtce": "http://www.omg.org/space/xtce",
+            "name": config.mission.filename(),
+            "xmlns": "http://www.omg.org/spec/XTCE/20180204",
             "xmlns:xsi": "http://www.w3.org/2001/XMLSchema-instance",
             "xsi:schemaLocation": (
                 "http://www.omg.org/spec/XTCE/20180204 "
@@ -175,7 +175,7 @@ def write_xtce(config: OreSatConfig, dir_path: str = ".") -> None:
             "shortDescription": "Unix coarse timestamp",
         },
     )
-    enc = ET.SubElement(para_type, "Encodings")
+    enc = ET.SubElement(para_type, "Encoding")
     ET.SubElement(
         enc,
         "IntegerDataEncoding",
@@ -340,7 +340,7 @@ def write_xtce(config: OreSatConfig, dir_path: str = ".") -> None:
     # write
     tree = ET.ElementTree(root)
     ET.indent(tree, space="  ", level=0)
-    file_name = f"{config.mission.name.lower()}.xtce"
+    file_name = f"{config.mission.filename()}.xtce"
     tree.write(f"{dir_path}/{file_name}", encoding="utf-8", xml_declaration=True)
 
 
