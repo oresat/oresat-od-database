@@ -79,7 +79,6 @@ commands:
       - name: buffer
         data_type: bytes
         description: data buffer
-        fixed_size: 100
     response:
       - name: error_code
         data_type: uint32
@@ -242,4 +241,3 @@ commands:
       - name: buffer
         data_type: bytes
         description: data buffer
-        fixed_size: 100

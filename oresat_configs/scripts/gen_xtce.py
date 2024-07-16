@@ -565,9 +565,18 @@ def write_xtce(config: OreSatConfig, dir_path: str = ".") -> None:
                         "BinaryDataEncoding",
                         attrib={"bitOrder": "mostSignificantBitFirst"},
                     )
-                    size_bits = ET.SubElement(bytes_data, "SizeInBits")
-                    fixed_value = ET.SubElement(size_bits, "FixedValue")
-                    fixed_value.text = f"{cmd_field.fixed_size * 8}"
+                    if cmd_field.fixed_size == 0:
+                        size_bits = ET.SubElement(bytes_data, "SizeInBits")
+                        dyn_val = ET.SubElement(size_bits, "DynamicValue")
+                        ET.SubElement(
+                            dyn_val,
+                            "ArgumentInstanceRef",
+                            attrib={"argumentRef": f"vstr_{cmd.uid}_length_{cmd_field.name}"},
+                        )
+                    elif cmd_field.fixed_size > 0:
+                        size_bits = ET.SubElement(bytes_data, "SizeInBits")
+                        fixed_value = ET.SubElement(size_bits, "FixedValue")
+                        fixed_value.text = f"{cmd_field.fixed_size * 8}"
 
             if cmd.request:
                 ET.SubElement(
