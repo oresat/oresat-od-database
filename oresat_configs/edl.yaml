@@ -73,12 +73,13 @@ commands:
       - name: subindex
         data_type: uint8
         description: the OD subindex to write to
-      - name: size
+      - name: buffer_size
         data_type: uint32
-        description: size of the data buffer
+        description: size of the sdo data buffer to write
       - name: buffer
         data_type: bytes
-        description: data buffer
+        size_ref: buffer_size
+        description: sdo data buffer to write
     response:
       - name: error_code
         data_type: uint32
@@ -235,9 +236,10 @@ commands:
       - name: error_code
         data_type: uint32
         description: SDO error code (0 is no error)
-      - name: size
+      - name: buffer_size
         data_type: uint32
-        description: size of the data buffer
+        description: buffer_size of the data buffer
       - name: buffer
         data_type: bytes
+        size_ref: buffer_size
         description: data buffer

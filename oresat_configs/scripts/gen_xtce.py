@@ -199,7 +199,7 @@ def write_xtce(config: OreSatConfig, dir_path: str = ".") -> None:
         tm_meta_para,
         "AbsoluteTimeParameterType",
         attrib={
-            "name": "unix_time",
+            "name": "unix_time_type",
             "shortDescription": "Unix coarse timestamp",
         },
     )
@@ -216,7 +216,7 @@ def write_xtce(config: OreSatConfig, dir_path: str = ".") -> None:
     epoch = ET.SubElement(ref_time, "Epoch")
     epoch.text = "1970-01-01T00:00:00.000"
 
-    para_types = ["unix_time", "b128_type", "uint32_type"]
+    para_types = ["unix_time_type", "b128_type", "uint32_type"]
     for obj in config.beacon_def:
         name = make_dt_name(obj)
         if name in para_types:
@@ -434,6 +434,20 @@ def write_xtce(config: OreSatConfig, dir_path: str = ".") -> None:
             },
         )
 
+    res_seq_cont = ET.SubElement(
+        cont_set,
+        "SequenceContainer",
+        attrib={
+            "name": "edl_responses",
+        },
+    )
+    res_entry_list = ET.SubElement(res_seq_cont, "EntryList")
+    ET.SubElement(
+        res_entry_list,
+        "ParameterRefEntry",
+        attrib={"parameterRef": "edl_command_code"},
+    )
+
     # add telecomands
     para_types = ["opd_addr_type", "node_id_type"]
     meta_cmd_set = ET.SubElement(cmd_meta_data, "MetaCommandSet")
@@ -464,12 +478,12 @@ def write_xtce(config: OreSatConfig, dir_path: str = ".") -> None:
             },
         )
 
-        for cmd_field in cmd.request:
+        for req_field in cmd.request:
 
-            type_name = cmd_field.data_type
+            type_name = req_field.data_type
             if type_name not in ["opd_addr", "node_id"]:
-                type_name = cmd_field.data_type + "_"
-                type_name += cmd_field.name
+                type_name = req_field.data_type + "_"
+                type_name += req_field.name
             type_name += "_type"
 
             if type_name not in para_types:
@@ -477,27 +491,27 @@ def write_xtce(config: OreSatConfig, dir_path: str = ".") -> None:
 
                 attrib = {
                     "name": type_name,
-                    "shortDescription": cmd_field.description.replace("\n", " ").strip(),
+                    "shortDescription": req_field.description.replace("\n", " ").strip(),
                 }
-                if cmd_field.data_type.startswith("int") or cmd_field.data_type.startswith("uint"):
-                    if cmd_field.enums:
+                if req_field.data_type.startswith("int") or req_field.data_type.startswith("uint"):
+                    if req_field.enums:
                         name = "EnumeratedArgumentType"
                     else:
                         name = "IntegerArgumentType"
-                elif cmd_field.data_type == "bool":
+                elif req_field.data_type == "bool":
                     name = "BooleanArgumentType"
-                    if cmd_field.enums:
-                        attrib["zeroStringValue"] = list(cmd_field.enums.keys())[
-                            list(cmd_field.enums.values()).index(0)
+                    if req_field.enums:
+                        attrib["zeroStringValue"] = list(req_field.enums.keys())[
+                            list(req_field.enums.values()).index(0)
                         ]
-                        attrib["oneStringValue"] = list(cmd_field.enums.keys())[
-                            list(cmd_field.enums.values()).index(1)
+                        attrib["oneStringValue"] = list(req_field.enums.keys())[
+                            list(req_field.enums.values()).index(1)
                         ]
-                elif cmd_field.data_type in ["float", "double"]:
+                elif req_field.data_type in ["float", "double"]:
                     name = "FloatArgumentType"
-                elif cmd_field.data_type == "str":
+                elif req_field.data_type == "str":
                     name = "StringArgumentType"
-                elif cmd_field.data_type == "bytes":
+                elif req_field.data_type == "bytes":
                     name = "BinaryArgumentType"
 
                 data_type = ET.SubElement(arg_type_set, name, attrib=attrib)
@@ -509,10 +523,10 @@ def write_xtce(config: OreSatConfig, dir_path: str = ".") -> None:
                     )
                     unit.text = obj.unit
 
-                if cmd_field.data_type.startswith("int") or cmd_field.data_type.startswith("uint"):
-                    size = cmd_field.data_type.split("int")[-1]
+                if req_field.data_type.startswith("int") or req_field.data_type.startswith("uint"):
+                    size = req_field.data_type.split("int")[-1]
                     encoding = (
-                        "twosComplement" if cmd_field.data_type.startswith("int") else "unsigned"
+                        "twosComplement" if req_field.data_type.startswith("int") else "unsigned"
                     )
 
                     ET.SubElement(
@@ -521,77 +535,122 @@ def write_xtce(config: OreSatConfig, dir_path: str = ".") -> None:
                         attrib={"sizeInBits": size, "encoding": encoding},
                     )
 
-                    if cmd_field.enums and cmd_field.data_type != "bool":
+                    if req_field.enums and req_field.data_type != "bool":
                         enum_list = ET.SubElement(data_type, "EnumerationList")
-                        for name, value in cmd_field.enums.items():
+                        for name, value in req_field.enums.items():
                             ET.SubElement(
                                 enum_list,
                                 "Enumeration",
                                 attrib={"value": str(value), "label": name},
                             )
-                elif cmd_field.data_type == "bool":
+                elif req_field.data_type == "bool":
                     ET.SubElement(
                         data_type,
                         "IntegerDataEncoding",
                         attrib={"sizeInBits": "8", "encoding": "unsigned"},
                     )
-                elif cmd_field.data_type in ["float", "double"]:
+                elif req_field.data_type in ["float", "double"]:
                     ET.SubElement(data_type, "FloatDataEncoding")
-                elif cmd_field.data_type == "str":
+                elif req_field.data_type == "str":
                     str_data = ET.SubElement(
                         data_type,
                         "StringDataEncoding",
                         attrib={"encoding": "US-ASCII", "bitOrder": "mostSignificantBitFirst"},
                     )
-                    if cmd_field.max_size > 0:
+                    if req_field.size_ref != "":
                         var = ET.SubElement(
                             str_data,
                             "Variable",
-                            attrib={"maxSizeInBits": f"{cmd_field.max_size * 8}"},
+                            attrib={"maxSizeInBits": f"{req_field.max_size * 8}"},
                         )
                         dyn_val = ET.SubElement(var, "DynamicValue")
                         ET.SubElement(
                             dyn_val,
                             "ArgumentInstanceRef",
-                            attrib={"argumentRef": f"vstr_{cmd.uid}_length_{cmd_field.name}"},
+                            attrib={"argumentRef": req_field.size_ref},
                         )
-                    elif cmd_field.fixed_size > 0:
+                    elif req_field.fixed_size > 0:
                         size_bits = ET.SubElement(str_data, "SizeInBits")
                         fixed_value = ET.SubElement(size_bits, "FixedValue")
-                        fixed_value.text = f"{cmd_field.fixed_size * 8}"
-                elif cmd_field.data_type == "bytes":
+                        fixed_value.text = f"{req_field.fixed_size * 8}"
+                elif req_field.data_type == "bytes":
                     bytes_data = ET.SubElement(
                         data_type,
                         "BinaryDataEncoding",
                         attrib={"bitOrder": "mostSignificantBitFirst"},
                     )
-                    if cmd_field.fixed_size == 0:
-                        size_bits = ET.SubElement(bytes_data, "SizeInBits")
+                    size_bits = ET.SubElement(bytes_data, "SizeInBits")
+                    if req_field.size_ref != "":
                         dyn_val = ET.SubElement(size_bits, "DynamicValue")
                         ET.SubElement(
                             dyn_val,
                             "ArgumentInstanceRef",
-                            attrib={"argumentRef": f"vstr_{cmd.uid}_length_{cmd_field.name}"},
+                            attrib={"argumentRef": req_field.size_ref},
                         )
-                    elif cmd_field.fixed_size > 0:
-                        size_bits = ET.SubElement(bytes_data, "SizeInBits")
+                    elif req_field.fixed_size > 0:
                         fixed_value = ET.SubElement(size_bits, "FixedValue")
-                        fixed_value.text = f"{cmd_field.fixed_size * 8}"
+                        fixed_value.text = f"{req_field.fixed_size * 8}"
 
             if cmd.request:
                 ET.SubElement(
                     arg_list,
                     "Argument",
                     attrib={
-                        "name": cmd_field.name,
+                        "name": req_field.name,
                         "argumentTypeRef": type_name,
                     },
                 )
             ET.SubElement(
                 cmd_entry_list,
                 "ArgumentRefEntry",
-                attrib={"argumentRef": cmd_field.name},
+                attrib={"argumentRef": req_field.name},
             )
+
+        if not cmd.response:
+            continue
+
+        seq_cont = ET.SubElement(
+            cont_set,
+            "SequenceContainer",
+            attrib={
+                "name": f"{cmd.name}_response",
+            },
+        )
+        entry_list = ET.SubElement(seq_cont, "EntryList")
+        for res_field in cmd.response:
+            ET.SubElement(
+                para_set,
+                "Parameter",
+                attrib={
+                    "name": f"{cmd.name}_{res_field.name}",
+                    "parameterTypeRef": f"{res_field.data_type}_type",
+                    "shortDescription": res_field.description,
+                },
+            )
+            ET.SubElement(
+                entry_list,
+                "ParameterRefEntry",
+                attrib={
+                    "parameterRef": f"{cmd.name}_{res_field.name}",
+                },
+            )
+
+        res_base_cont = ET.SubElement(
+            seq_cont,
+            "BaseContainer",
+            attrib={
+                "containerRef": f"{cmd.name}_response",
+            },
+        )
+        res_crit = ET.SubElement(res_base_cont, "RestrictionCriteria")
+        ET.SubElement(
+            res_crit,
+            "Comparison",
+            attrib={
+                "parameterRef": "edl_command_code",
+                "value": str(cmd.uid),
+            },
+        )
 
     tree = ET.ElementTree(root)
     ET.indent(tree, space="  ", level=0)
