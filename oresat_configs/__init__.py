@@ -52,11 +52,11 @@ class EdlCommandField:
     """dict[str, int]: Enum values for "intX", "uintX", or "bool" types."""
     max_size: int = 0
     """int: Max size in bytes for variable "str" data types. Takes precedence over fix_size."""
-    fixed_size_ref: int = 0
+    fixed_size: int = 0
     """int: Fixed size in bytes for "bytes" or "str" data types."""
     size_ref: str = ""
     """str: Name of field to use to get the size in bytes for "bytes" data types."""
-    uint: str = ""
+    unit: str = ""
 
 
 @dataclass
