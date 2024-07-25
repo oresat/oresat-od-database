@@ -233,7 +233,8 @@ def write_xtce(config: OreSatConfig, dir_path: str = ".") -> None:
         cont_set,
         "SequenceContainer",
         attrib={
-            "name": "edl_responses",
+            "name": "edl_response",
+            "abstract": "true",
         },
     )
     res_entry_list = ET.SubElement(res_seq_cont, "EntryList")
@@ -258,7 +259,7 @@ def write_xtce(config: OreSatConfig, dir_path: str = ".") -> None:
             # this must be added before CommandContainer, if it exist
             arg_list = ET.SubElement(meta_cmd, "ArgumentList")
         cmd_cont = ET.SubElement(
-            meta_cmd, "CommandContainer", attrib={"name": f"{cmd.name}_container"}
+            meta_cmd, "CommandContainer", attrib={"name": f"{cmd.name}_request"}
         )
         cmd_entry_list = ET.SubElement(cmd_cont, "EntryList")
 
@@ -330,11 +331,9 @@ def write_xtce(config: OreSatConfig, dir_path: str = ".") -> None:
                 seq_cont,
                 "BaseContainer",
                 attrib={
-                    "containerRef": f"{cmd.name}_response",
+                    "containerRef": "edl_response",
                 },
             )
-
-            # add to
             res_crit = ET.SubElement(res_base_cont, "RestrictionCriteria")
             ET.SubElement(
                 res_crit,
