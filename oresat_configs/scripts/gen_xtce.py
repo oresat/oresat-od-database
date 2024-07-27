@@ -161,7 +161,7 @@ def write_xtce(config: OreSatConfig, dir_path: str = ".") -> None:
         cont_set,
         "SequenceContainer",
         attrib={
-            "name": "Beacon",
+            "name": "beacon",
         },
     )
     entry_list = ET.SubElement(seq_cont, "EntryList")
@@ -233,8 +233,7 @@ def write_xtce(config: OreSatConfig, dir_path: str = ".") -> None:
         cont_set,
         "SequenceContainer",
         attrib={
-            "name": "edl_response",
-            "abstract": "true",
+            "name": "edl_reponses",
         },
     )
     res_entry_list = ET.SubElement(res_seq_cont, "EntryList")
@@ -298,12 +297,11 @@ def write_xtce(config: OreSatConfig, dir_path: str = ".") -> None:
 
         # add command parameter(s)
         if cmd.response:
+            container_name = f"{cmd.name}_response"
             seq_cont = ET.SubElement(
                 cont_set,
                 "SequenceContainer",
-                attrib={
-                    "name": f"{cmd.name}_response",
-                },
+                attrib={"name": container_name},
             )
             entry_list = ET.SubElement(seq_cont, "EntryList")
             for res_field in cmd.response:
@@ -324,19 +322,19 @@ def write_xtce(config: OreSatConfig, dir_path: str = ".") -> None:
                     )
 
                 para_name = f"{cmd.name}_{res_field.name}"
-                _add_parameter(para_set, para_name, res_field.data_type, res_field.description)
+                _add_parameter(para_set, para_name, para_type_name, res_field.description)
                 _add_parameter_ref(entry_list, para_name)
 
-            res_base_cont = ET.SubElement(
-                seq_cont,
-                "BaseContainer",
+            cont_ref_entry = ET.SubElement(
+                res_entry_list,
+                "ContainerRefEntry",
                 attrib={
-                    "containerRef": "edl_response",
+                    "containerRef": container_name,
                 },
             )
-            res_crit = ET.SubElement(res_base_cont, "RestrictionCriteria")
+            inc_cond = ET.SubElement(cont_ref_entry, "IncludeCondition")
             ET.SubElement(
-                res_crit,
+                inc_cond,
                 "Comparison",
                 attrib={
                     "parameterRef": "edl_command_code",
