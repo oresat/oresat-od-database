@@ -1,3 +1,5 @@
+"""Used to parse edl.yaml that defines all EDL command requests and responses."""
+
 import struct
 from dataclasses import dataclass, field
 from typing import Any, Union
@@ -81,14 +83,16 @@ class EdlCommand:
 
     def _decode(self, raw: bytes, fields: list[EdlCommandField]) -> tuple[Any]:
 
-        if len(raw) >= 1 or raw[0] != self.uid:
+        if len(raw) == 0:
             raise ValueError("invalid packet size")
 
+        # fixed size packet - quick decode
         if not self._dynamic_len(fields):
             fmt = "".join([_COMMAND_DATA_FMT[f.data_type] for f in fields])
             return struct.unpack(fmt, raw)
 
-        data: dict[str, Any] = {"uid": raw[0]}
+        # dynamic size packet - slower decode
+        data: dict[str, Any] = {}
         offset = 0
         for f in fields:
             if f.data_type in _COMMAND_DATA_TYPES_SIZE:
@@ -118,13 +122,17 @@ class EdlCommand:
 
     def _encode(self, values: tuple[Any], fields: list[EdlCommandField]) -> bytes:
 
-        if len(values) != len(fields) or values[0] != self.uid:
-            raise ValueError("invalid values for packet")
+        if len(values) != len(fields):
+            raise ValueError("invalid number of values for packet")
 
+        raw = self.uid.to_bytes(1, "little")
+
+        # fixed size packet - quick encode
         if not self._dynamic_len(fields):
             fmt = "".join([_COMMAND_DATA_FMT[f.data_type] for f in fields])
-            return struct.pack(fmt, values)
+            return raw + struct.pack(fmt, values)
 
+        # dynamic size packet - slower encode
         data: dict[str, bytes] = {}
         for f, v in zip(fields, values):
             if f.data_type in _COMMAND_DATA_TYPES_SIZE:
@@ -135,12 +143,16 @@ class EdlCommand:
             elif f.data_type == "str":
                 data[f.name] = v.encode()
                 if f.size_ref != "":  # dynamic length
-                    fmt = _COMMAND_DATA_FMT[fields[f.size_ref].data_type]
+                    index = -1
+                    for i in fields:
+                        if i.name == f.size_ref:
+                            index = fields.index(f)
+                            break
+                    fmt = _COMMAND_DATA_FMT[fields[index].data_type]
                     data[f.size_ref] = struct.pack(fmt, len(v))
             else:
                 raise ValueError(f"invalid edl field {f.name}")
 
-        raw = bytes()
         for f in fields:
             raw += data[f.name]
         return raw
