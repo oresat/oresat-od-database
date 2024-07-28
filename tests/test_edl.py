@@ -61,7 +61,7 @@ class ConfigTypes(unittest.TestCase):
             for req in cmd.request:
                 self.assertIn(req.data_type, DATA_TYPES)
                 self._test_snake_case(req.name)
-                if req.name in ["bytes", "str"]:
+                if req.name == "bytes":
                     self.assertTrue((req.fixed_size == 0) != (req.size_ref == ""))
                     if req.size_ref:
                         self.assertIn(
@@ -72,10 +72,25 @@ class ConfigTypes(unittest.TestCase):
                                 "reference field {req.size_ref}"
                             ),
                         )
+                elif req.name == "str":
+                    self.assertFalse(
+                        (req.fixed_size == 0) and (req.max_size == 0),
+                        (
+                            f"command {cmd.name} request field {req.name} has nether fixed_size and"
+                            " max_size set",
+                        ),
+                    )
+                    self.assertTrue(
+                        (req.fixed_size == 0) != (req.max_size == 0),
+                        (
+                            f"command {cmd.name} request field {req.name} has both fixed_size and "
+                            "max_size set",
+                        ),
+                    )
             for res in cmd.response:
                 self.assertIn(res.data_type, DATA_TYPES)
                 self._test_snake_case(res.name)
-                if res.name in ["bytes", "str"]:
+                if res.name == "bytes":
                     self.assertTrue((res.fixed_size == 0) != (res.size_ref == ""))
                     if res.size_ref:
                         self.assertIn(
@@ -83,3 +98,18 @@ class ConfigTypes(unittest.TestCase):
                             [res.name for res in cmd.response],
                             f"size_ref field {res.size_ref} is missing",
                         )
+                elif res.name == "str":
+                    self.assertFalse(
+                        (res.fixed_size == 0) and (res.max_size == 0),
+                        (
+                            f"command {cmd.name} response field {res.name} has nether fixed_size "
+                            "and max_size set",
+                        ),
+                    )
+                    self.assertTrue(
+                        (res.fixed_size == 0) != (res.max_size == 0),
+                        (
+                            f"command {cmd.name} response field {res.name} has both fixed_size and "
+                            "max_size set",
+                        ),
+                    )
