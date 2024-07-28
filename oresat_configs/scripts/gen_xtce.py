@@ -184,22 +184,21 @@ def write_xtce(config: OreSatConfig, dir_path: str = ".") -> None:
     for obj in config.beacon_def:
         para_name = make_obj_name(obj)
         para_type_name = make_dt_name(obj)
-        if para_type_name in para_types:
-            continue
-        para_types.append(para_type_name)
+        if para_type_name not in para_types:
+            para_types.append(para_type_name)
 
-        data_type = CANOPEN_TO_XTCE_DT[obj.data_type]
-        value_descriptions = {name: value for value, name in obj.value_descriptions.items()}
-        _add_parameter_type(
-            root=para_type_set,
-            name=para_type_name,
-            data_type=data_type,
-            description=obj.description,
-            unit=obj.unit,
-            factor=obj.factor,
-            default=obj.default,
-            value_descriptions=value_descriptions,
-        )
+            data_type = CANOPEN_TO_XTCE_DT[obj.data_type]
+            value_descriptions = {name: value for value, name in obj.value_descriptions.items()}
+            _add_parameter_type(
+                root=para_type_set,
+                name=para_type_name,
+                data_type=data_type,
+                description=obj.description,
+                unit=obj.unit,
+                factor=obj.factor,
+                default=obj.default,
+                value_descriptions=value_descriptions,
+            )
 
         _add_parameter(para_set, para_name, para_type_name, obj.description)
         _add_parameter_ref(entry_list, para_name)
