@@ -17,8 +17,8 @@ _COMMAND_DATA_TYPES_SIZE = {
     "uint16": 16,
     "uint32": 32,
     "uint64": 64,
-    "float": 32,
-    "double": 64,
+    "float32": 32,
+    "float64": 64,
 }
 
 _COMMAND_DATA_FMT = {
@@ -31,8 +31,8 @@ _COMMAND_DATA_FMT = {
     "uint16": "H",
     "uint32": "I",
     "uint64": "Q",
-    "float": "f",
-    "double": "d",
+    "float32": "f",
+    "float64": "d",
 }
 
 

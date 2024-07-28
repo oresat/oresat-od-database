@@ -63,8 +63,8 @@ CANOPEN_TO_XTCE_DT = {
     canopen.objectdictionary.UNSIGNED64: "uint64",
     canopen.objectdictionary.VISIBLE_STRING: "str",
     canopen.objectdictionary.OCTET_STRING: "bytes",
-    canopen.objectdictionary.REAL32: "float",
-    canopen.objectdictionary.REAL64: "double",
+    canopen.objectdictionary.REAL32: "float32",
+    canopen.objectdictionary.REAL64: "float64",
 }
 
 DT_LEN = {
@@ -575,7 +575,7 @@ def _add_argument_type(arg_type_set, req_field: EdlCommandField, type_name: str)
             attrib["oneStringValue"] = list(req_field.enums.keys())[
                 list(req_field.enums.values()).index(1)
             ]
-    elif req_field.data_type in ["float", "double"]:
+    elif req_field.data_type in ["float32", "float64"]:
         name = "FloatArgumentType"
     elif req_field.data_type == "str":
         name = "StringArgumentType"
@@ -616,7 +616,7 @@ def _add_argument_type(arg_type_set, req_field: EdlCommandField, type_name: str)
             "IntegerDataEncoding",
             attrib={"sizeInBits": "8", "encoding": "unsigned"},
         )
-    elif req_field.data_type in ["float", "double"]:
+    elif req_field.data_type in ["float32", "float64"]:
         ET.SubElement(data_type, "FloatDataEncoding")
     elif req_field.data_type == "str":
         str_data = ET.SubElement(
