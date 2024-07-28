@@ -229,11 +229,18 @@ def write_xtce(config: OreSatConfig, dir_path: str = ".") -> None:
 
     arg_types = ["opd_addr_type", "node_id_type"]
 
+    _add_parameter_type(
+        para_type_set,
+        "edl_code_type",
+        "uint8",
+        value_descriptions={cmd.name: cmd.uid for cmd in config.edl_commands.values()},
+    )
+    _add_parameter(para_set, "edl_command_code", "edl_code_type")
     res_seq_cont = ET.SubElement(
         cont_set,
         "SequenceContainer",
         attrib={
-            "name": "edl_reponses",
+            "name": "edl_responses",
         },
     )
     res_entry_list = ET.SubElement(res_seq_cont, "EntryList")
