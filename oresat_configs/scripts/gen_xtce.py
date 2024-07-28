@@ -231,11 +231,11 @@ def write_xtce(config: OreSatConfig, dir_path: str = ".") -> None:
 
     _add_parameter_type(
         para_type_set,
-        "edl_code_type",
+        "edl_command_code_type",
         "uint8",
         value_descriptions={cmd.name: cmd.uid for cmd in config.edl_commands.values()},
     )
-    _add_parameter(para_set, "edl_command_code", "edl_code_type")
+    _add_parameter(para_set, "edl_command_code", "edl_command_code_type")
     res_seq_cont = ET.SubElement(
         cont_set,
         "SequenceContainer",
@@ -258,9 +258,10 @@ def write_xtce(config: OreSatConfig, dir_path: str = ".") -> None:
             "MetaCommand",
             attrib={
                 "name": cmd.name,
-                "shortDescription": cmd.description.replace("\n", " ").strip(),
             },
         )
+        if cmd.description:
+            meta_cmd.attrib["shortDescription"] = cmd.description.replace("\n", " ").strip()
         if cmd.request:
             # this must be added before CommandContainer, if it exist
             arg_list = ET.SubElement(meta_cmd, "ArgumentList")
@@ -476,9 +477,10 @@ def _add_parameter_type(
             "BinaryParameterType",
             attrib={
                 "name": name,
-                "shortDescription": description,
             },
         )
+        if description:
+            param_type.attrib["shortDescription"] = description.replace("\n", " ").strip()
         ET.SubElement(param_type, "UnitSet")
         bin_data_enc = ET.SubElement(
             param_type, "BinaryDataEncoding", attrib={"bitOrder": "leastSignificantBitFirst"}
@@ -530,15 +532,16 @@ def _add_parameter_type(
 
 def _add_parameter(para_set, name: str, type_ref: str, description: str = ""):
     description = description.replace("\n", " ").strip()
-    ET.SubElement(
+    para = ET.SubElement(
         para_set,
         "Parameter",
         attrib={
             "name": name,
             "parameterTypeRef": type_ref,
-            "shortDescription": description,
         },
     )
+    if description:
+        para.attrib["shortDescription"] = description.replace("\n", " ").strip()
 
 
 def _add_parameter_ref(entry_list, name: str):
@@ -554,8 +557,9 @@ def _add_parameter_ref(entry_list, name: str):
 def _add_argument_type(arg_type_set, req_field: EdlCommandField, type_name: str):
     attrib = {
         "name": type_name,
-        "shortDescription": req_field.description.replace("\n", " ").strip(),
     }
+    if req_field.description:
+        attrib["shortDescription"] = req_field.description.replace("\n", " ").strip()
 
     if req_field.data_type.startswith("int") or req_field.data_type.startswith("uint"):
         if req_field.enums:
