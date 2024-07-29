@@ -2,6 +2,9 @@
 
 import re
 import unittest
+from random import choice, randbytes, randint, uniform
+from string import ascii_letters
+from typing import Any
 
 from oresat_configs import OreSatConfig, OreSatId
 
@@ -19,10 +22,31 @@ DATA_TYPES = [
     "float64",
     "str",
     "bytes",
-    # custom types
-    "node_id",
-    "opd_addr",
 ]
+
+
+def _gen_random_value(data_type: str, length: int = 0) -> Any:
+    """Generate a random value for non-custom data types."""
+
+    value: Any = None
+    if data_type == "bool":
+        value = bool(randint(0, 1))
+    elif data_type.startswith("int"):
+        bits = int(data_type[3:])
+        value = randint(-(2 ** (bits - 1)), 2 ** (bits - 1) - 1)
+    elif data_type.startswith("uint"):
+        bits = int(data_type[4:])
+        value = randint(0, 2**bits - 1)
+    elif data_type.startswith("float"):
+        value = uniform(-1_000.0, 1_000.0)
+    elif data_type == "str":
+        value = "".join(choice(ascii_letters) for i in range(length))
+    elif data_type == "bytes":
+        value = randbytes(length)
+    else:
+        raise ValueError(f"invalid data type {data_type}")
+
+    return value
 
 
 class ConfigTypes(unittest.TestCase):
@@ -58,6 +82,7 @@ class ConfigTypes(unittest.TestCase):
                 f"command {cmd.name} response fields names are not unique",
             )
 
+            test_values = tuple()
             for req in cmd.request:
                 self.assertIn(req.data_type, DATA_TYPES)
                 self._test_snake_case(req.name)
@@ -87,6 +112,30 @@ class ConfigTypes(unittest.TestCase):
                             "max_size set",
                         ),
                     )
+                size = 0
+                if req.data_type == "bytes":
+                    size = req.fixed_size
+                    if req.size_ref != "":
+                        size_ref_field = cmd.get_request_field(req.size_ref)
+                        index = cmd.request.index(size_ref_field)
+                        # override the random size to be reasonable
+                        size = randint(1, 100)
+                        test_values = test_values[:index] + (size,) + test_values[index + 1 :]
+                elif req.data_type == "str":
+                    size = req.fixed_size
+                    if req.max_size != 0:
+                        size = req.max_size
+                test_values += (_gen_random_value(req.data_type, size),)
+            if len(test_values) > 0:
+                raw = cmd.encode_request(test_values)
+                test_values2 = cmd.decode_request(raw)
+                self.assertTupleEqual(
+                    test_values,
+                    test_values2,
+                    f"command {cmd.name} request encode -> decode does not match",
+                )
+
+            test_values = tuple()
             for res in cmd.response:
                 self.assertIn(res.data_type, DATA_TYPES)
                 self._test_snake_case(res.name)
@@ -113,3 +162,25 @@ class ConfigTypes(unittest.TestCase):
                             "max_size set",
                         ),
                     )
+                size = 0
+                if res.data_type == "bytes":
+                    size = res.fixed_size
+                    if res.size_ref != "":
+                        size_ref_field = cmd.get_response_field(res.size_ref)
+                        index = cmd.response.index(size_ref_field)
+                        # override the random size to be reasonable
+                        size = randint(1, 100)
+                        test_values = test_values[:index] + (size,) + test_values[index + 1 :]
+                elif res.data_type == "str":
+                    size = res.fixed_size
+                    if res.max_size != 0:
+                        size = res.max_size
+                test_values += (_gen_random_value(res.data_type, size),)
+            if len(test_values) > 0:
+                raw = cmd.encode_response(test_values)
+                test_values2 = cmd.decode_response(raw)
+                self.assertTupleEqual(
+                    test_values,
+                    test_values2,
+                    f"command {cmd.name} response encode -> decode does not match",
+                )

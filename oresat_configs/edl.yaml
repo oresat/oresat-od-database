@@ -1,4 +1,4 @@
-# custom data types include: opd_addr, node_id
+# fields with name opd_addr or node_id, will have their enums generated
 commands:
   - uid: 0x0
     name: tx_ctrl
@@ -35,7 +35,7 @@ commands:
     description: enable a CANopen node
     request:
       - name: node_id
-        data_type: node_id
+        data_type: uint8
         description: node id of the CANopen node to enable / disable
       - name: enable
         data_type: bool
@@ -53,7 +53,7 @@ commands:
     description: get the status of a CANopen node
     request:
       - name: node_id
-        data_type: node_id
+        data_type: uint8
         description: node id of node to get the status for
     response:
       - name: status
@@ -65,7 +65,7 @@ commands:
     description: write a value to a node's OD over the CAN bus using a CANopen SDO message
     request:
       - name: node_id
-        data_type: node_id
+        data_type: uint8
         description: the id of The CANopen node to write to
       - name: index
         data_type: uint16
@@ -124,7 +124,7 @@ commands:
     description: probe for a node on the OPD
     request:
       - name: node_id
-        data_type: node_id
+        data_type: uint8
         description: the id of the OPD node to probe for
     response:
       - name: found
@@ -139,7 +139,7 @@ commands:
     description: enable / disable a node on the OPD
     request:
       - name: opd_addr
-        data_type: opd_addr
+        data_type: uint8
         description: the id of the OPD node to enable / disable
       - name: enable
         data_type: bool
@@ -157,7 +157,7 @@ commands:
     description: reset a node on the OPD.
     request:
       - name: opd_addr
-        data_type: opd_addr
+        data_type: uint8
         description: The id of the OPD node to reset
     response:
       - name: status
@@ -169,7 +169,7 @@ commands:
     description: get the status of a node on the OPD
     request:
       - name: opd_addr
-        data_type: opd_addr
+        data_type: uint8
         description: the id of the OPD node to get the status of
     response:
      - name: status
@@ -224,7 +224,7 @@ commands:
     description: read a value from a node's OD over the CAN bus using a CANopen SDO message
     request:
       - name: node_id
-        data_type: node_id
+        data_type: uint8
         description: the id of The CANopen node to write to
       - name: index
         data_type: uint16

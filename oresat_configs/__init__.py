@@ -58,5 +58,19 @@ class OreSatConfig:
         self.beacon_def = _gen_c3_beacon_defs(c3_od, beacon_config)
         self.fram_def = _gen_c3_fram_defs(c3_od, self.configs["c3"])
         self.fw_base_od = _gen_fw_base_od(mission, FW_COMMON_CONFIG_PATH)
+
+        # edl commands
+        node_ids = {}
+        opd_addrs = {}
+        for name in self.configs:
+            card = self.cards[name]
+            if card.node_id != 0:
+                node_ids[name] = card.node_id
+            if card.opd_address != 0:
+                opd_addrs[name] = card.opd_address
+        custom_enums = {
+            "node_id": node_ids,
+            "opd_addr": opd_addrs,
+        }
         edl_file_path = f"{os.path.dirname(os.path.abspath(__file__))}/edl.yaml"
-        self.edl_commands = EdlCommands(edl_file_path)
+        self.edl_commands = EdlCommands(edl_file_path, custom_enums)
