@@ -25,7 +25,7 @@ from .base import FW_COMMON_CONFIG_PATH
 from .beacon_config import BeaconConfig
 from .card_info import Card, cards_from_csv
 from .constants import Consts, NodeId, OreSatId, __version__
-from .edl import EdlCommand, EdlCommandField, EdlCommands
+from .edl import EdlCommand, EdlCommands, SubpacketField
 
 __all__ = ["Card", "Consts", "NodeId", "OreSatId", "__version__"]
 

@@ -15,7 +15,7 @@ from typing import Any, Optional
 
 import canopen
 
-from .. import Consts, EdlCommandField, OreSatConfig
+from .. import Consts, OreSatConfig, SubpacketField
 
 GEN_XTCE = "generate beacon xtce file"
 
@@ -216,14 +216,14 @@ def write_xtce(config: OreSatConfig, dir_path: str = ".") -> None:
         if config.cards[name].node_id != 0:
             node_ids[config.cards[name].nice_name] = config.cards[name].node_id
     _add_argument_type(
-        arg_type_set, EdlCommandField("node_id", "uint8", enums=node_ids), "node_id_type"
+        arg_type_set, SubpacketField("node_id", "uint8", enums=node_ids), "node_id_type"
     )
     opd_addrs = {}
     for name in config.od_db:
         if config.cards[name].opd_address != 0:
             opd_addrs[config.cards[name].nice_name] = config.cards[name].opd_address
     _add_argument_type(
-        arg_type_set, EdlCommandField("opd_addr", "uint8", enums=opd_addrs), "opd_addr_type"
+        arg_type_set, SubpacketField("opd_addr", "uint8", enums=opd_addrs), "opd_addr_type"
     )
 
     arg_types = ["opd_addr_type", "node_id_type"]
@@ -553,7 +553,7 @@ def _add_parameter_ref(entry_list, name: str):
     )
 
 
-def _add_argument_type(arg_type_set, req_field: EdlCommandField, type_name: str):
+def _add_argument_type(arg_type_set, req_field: SubpacketField, type_name: str):
     attrib = {
         "name": type_name,
     }

@@ -37,7 +37,7 @@ _COMMAND_DATA_FMT = {
 
 
 @dataclass
-class EdlCommandField:
+class SubpacketField:
     """A field in EDL command request or response packet."""
 
     name: str
@@ -86,30 +86,30 @@ class EdlCommand:
     """str: A unique snake_case name for the EDL command."""
     description: str = ""
     """str: A short description of the EDL command."""
-    request: list[EdlCommandField] = field(default_factory=list)
+    request: list[SubpacketField] = field(default_factory=list)
     """list[EdlCommand]: List of request fields for the EDL command."""
-    response: list[EdlCommandField] = field(default_factory=list)
+    response: list[SubpacketField] = field(default_factory=list)
     """list[EdlCommand]: List of response fields for the EDL command."""
 
-    def _get_field(self, name: str, fields: list[EdlCommandField]) -> EdlCommandField:
+    def _get_field(self, name: str, fields: list[SubpacketField]) -> SubpacketField:
 
         for req in fields:
             if req.name == name:
                 return req
         raise ValueError(f"no field named {name}")
 
-    def get_request_field(self, name: str) -> EdlCommandField:
+    def get_request_field(self, name: str) -> SubpacketField:
         """Get a request field based of a name."""
         return self._get_field(name, self.request)
 
-    def get_response_field(self, name: str) -> EdlCommandField:
+    def get_response_field(self, name: str) -> SubpacketField:
         """Get a respone field based of a name."""
         return self._get_field(name, self.response)
 
-    def _dynamic_len(self, fields: list[EdlCommandField]) -> bool:
+    def _dynamic_len(self, fields: list[SubpacketField]) -> bool:
         return True in [f.size_ref != "" for f in fields]
 
-    def _decode(self, raw: bytes, fields: list[EdlCommandField]) -> tuple[Any]:
+    def _decode(self, raw: bytes, fields: list[SubpacketField]) -> tuple[Any]:
 
         if len(raw) == 0:
             raise ValueError("packet size must be greater than 0")
@@ -146,7 +146,7 @@ class EdlCommand:
 
         return tuple(data.values())
 
-    def _encode(self, values: tuple[Any], fields: list[EdlCommandField]) -> bytes:
+    def _encode(self, values: tuple[Any], fields: list[SubpacketField]) -> bytes:
 
         if len(values) != len(fields):
             raise ValueError(
