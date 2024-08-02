@@ -54,7 +54,7 @@ class SubpacketField:
       - unsigned integers: `"uint8"`, `"uint16"`, `"uint32"`, `"uint64"`
       - floats: `"float32"`, `"float64"`
       - string: `"str"` (NOTE: `fix_size` or `max_size` must be set.)
-      - binary: `"bytes"` (NOTE: `fix_size` or `size_ref` must be set.)
+      - binary: `"bytes"` (NOTE: `fix_size` or `size_prefix` must be set.)
     """
     description: str = ""
     """str: A short description of the EDL command field."""
@@ -65,13 +65,16 @@ class SubpacketField:
     int: Max size in bytes for variable "str" data types. String must end with a '\0'.
     Takes precedence over fix_size.
     """
+    size_prefix: int = 0
+    """
+    int: Leading prefix in  is to determind the size of a "bytes" field. This
+    takes precedence over fix_size.
+    """
     fixed_size: int = 0
     """
-    int: Fixed size in bytes for "bytes" or "str" data types. Value that are not the full size will
-    be filled with "\0" at the end as padding.
+    int: Fixed size in bytes for "bytes" or "str" data types. Value that are not the full size
+    will be filled with "\0" at the end as padding.
     """
-    size_ref: str = ""
-    """str: Name of field to use to get the size in bytes for "bytes" data types."""
     unit: str = ""
     "str: Optional unit for the field"
 
@@ -91,23 +94,8 @@ class EdlCommand:
     response: list[SubpacketField] = field(default_factory=list)
     """list[EdlCommand]: List of response fields for the EDL command."""
 
-    def _get_field(self, name: str, fields: list[SubpacketField]) -> SubpacketField:
-
-        for req in fields:
-            if req.name == name:
-                return req
-        raise ValueError(f"no field named {name}")
-
-    def get_request_field(self, name: str) -> SubpacketField:
-        """Get a request field based of a name."""
-        return self._get_field(name, self.request)
-
-    def get_response_field(self, name: str) -> SubpacketField:
-        """Get a respone field based of a name."""
-        return self._get_field(name, self.response)
-
     def _dynamic_len(self, fields: list[SubpacketField]) -> bool:
-        return True in [f.size_ref != "" for f in fields]
+        return True in [f.size_prefix != 0 for f in fields]
 
     def _decode(self, raw: bytes, fields: list[SubpacketField]) -> tuple[Any]:
 
@@ -129,8 +117,9 @@ class EdlCommand:
                 fmt = _COMMAND_DATA_FMT[f.data_type]
                 data[f.name] = struct.unpack(fmt, tmp)[0]
             elif f.data_type == "bytes":
-                if f.size_ref != "":  # dynamic length
-                    data_type_size = data[f.size_ref]
+                if f.size_prefix != 0:  # dynamic length
+                    data_type_size = int.from_bytes(raw[offset : offset + f.size_prefix], "little")
+                    offset += f.size_prefix
                 else:  # fix_size
                     data_type_size = f.fixed_size
                 data[f.name] = raw[offset : offset + data_type_size]
@@ -159,33 +148,28 @@ class EdlCommand:
             return struct.pack(fmt, *values)
 
         # dynamic size packet - slower encode
-        data: dict[str, bytes] = {}
+        raw = b""
         for f, v in zip(fields, values):
             if f.data_type in _COMMAND_DATA_TYPES_SIZE:
                 fmt = _COMMAND_DATA_FMT[f.data_type]
-                data[f.name] = struct.pack(fmt, v)
+                raw += struct.pack(fmt, v)
             elif f.data_type == "bytes":
                 value = v
-                if f.size_ref != "":  # dynamic length
-                    index = [i.name for i in fields].index(f.size_ref)
-                    fmt = _COMMAND_DATA_FMT[fields[index].data_type]
-                    data[f.size_ref] = struct.pack(fmt, len(v))
+                if f.size_prefix != 0:  # dynamic length
+                    fmt = _COMMAND_DATA_FMT[f"uint{f.size_prefix * 8}"]
+                    raw += struct.pack(fmt, len(v))
                 else:  # fixed length
                     value += b"\x00" * (f.fixed_size - len(value))
-                data[f.name] = value
+                raw += value
             elif f.data_type == "str":
                 value = v.encode()
                 if f.max_size != 0:  # dynamic length
                     value += b"\0"
                 else:  # fixed length
                     value += b"\0" * (f.fixed_size - len(value))
-                data[f.name] = value
+                raw += value
             else:
                 raise ValueError(f"invalid data type {f.data_type} for edl field {f.name}")
-
-        raw = b""
-        for f in fields:
-            raw += data[f.name]
         return raw
 
     def decode_request(self, raw: bytes) -> tuple[Any]:
@@ -221,17 +205,20 @@ class EdlCommands:
 
         for command_raw in edl_commands_raw.get("commands", []):
             command = from_dict(data_class=EdlCommand, data=command_raw)
+            command.description = command.description.replace("\n", "")
             for req in command.request:
+                req.description = req.description.replace("\n", "")
                 if req.name in custom_enums:
                     req.enums = custom_enums[req.name]
             for res in command.response:
+                res.description = res.description.replace("\n", "")
                 if res.name in custom_enums:
                     res.enums = custom_enums[res.name]
             self._uids[command.uid] = command
             self._names[command.name] = command
 
-    def __getitem__(self, uid: Union[int, str]) -> EdlCommand:
-        return self._uids.get(uid) or self._names.get(uid)  # type: ignore
+    def __getitem__(self, value: Union[int, str]) -> EdlCommand:
+        return self._uids.get(value) or self._names.get(value)  # type: ignore
 
     def __len__(self) -> int:
         return len(self._uids)
@@ -242,3 +229,11 @@ class EdlCommands:
     def values(self):
         """Get dictionary values."""
         return self._uids.values()
+
+    def names(self):
+        """Get command names."""
+        return self._names.keys()
+
+    def uid(self):
+        """Get command unique ids."""
+        return self._uids.keys()

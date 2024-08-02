@@ -260,7 +260,7 @@ def write_xtce(config: OreSatConfig, dir_path: str = ".") -> None:
             },
         )
         if cmd.description:
-            meta_cmd.attrib["shortDescription"] = cmd.description.replace("\n", " ").strip()
+            meta_cmd.attrib["shortDescription"] = cmd.description
         if cmd.request:
             # this must be added before CommandContainer, if it exist
             arg_list = ET.SubElement(meta_cmd, "ArgumentList")
@@ -282,12 +282,31 @@ def write_xtce(config: OreSatConfig, dir_path: str = ".") -> None:
         # add command argument(s)
         if cmd.request:
             for req_field in cmd.request:
-                type_name = req_field.data_type + "_type"
+                if req_field.size_prefix > 0:
+                    data_type = f"uint{req_field.size_prefix * 8}"
+                    type_name = f"{data_type}_type"
+                    name = f"{req_field.name}_size"
+                    if type_name not in arg_types:
+                        arg_types.append(type_name)
+                        _add_argument_type(arg_type_set, SubpacketField(name, data_type), type_name)
+                    ET.SubElement(
+                        arg_list,
+                        "Argument",
+                        attrib={
+                            "name": name,
+                            "argumentTypeRef": type_name,
+                        },
+                    )
+                    ET.SubElement(
+                        cmd_entry_list,
+                        "ArgumentRefEntry",
+                        attrib={"argumentRef": name},
+                    )
 
+                type_name = req_field.data_type + "_type"
                 if type_name not in arg_types:
                     arg_types.append(type_name)
                     _add_argument_type(arg_type_set, req_field, type_name)
-
                 ET.SubElement(
                     arg_list,
                     "Argument",
@@ -312,6 +331,22 @@ def write_xtce(config: OreSatConfig, dir_path: str = ".") -> None:
             )
             entry_list = ET.SubElement(seq_cont, "EntryList")
             for res_field in cmd.response:
+                if res_field.size_prefix > 0:
+                    # add buffer size parameter
+                    para_data_type = f"uint{res_field.size_prefix * 8}"
+                    para_type_name = f"{para_data_type}_type"
+                    if para_type_name not in para_types:
+                        para_types.append(para_type_name)
+                        _add_parameter_type(
+                            para_type_set,
+                            para_type_name,
+                            para_data_type,
+                        )
+
+                    para_name = f"{cmd.name}_{res_field.name}_size"
+                    _add_parameter(para_set, para_name, para_type_name)
+                    _add_parameter_ref(entry_list, para_name)
+
                 if res_field.unit:
                     para_type_name = f"{res_field.data_type}_{res_field.unit}_type"
                 else:
@@ -325,7 +360,7 @@ def write_xtce(config: OreSatConfig, dir_path: str = ".") -> None:
                         res_field.data_type,
                         unit=res_field.unit,
                         value_descriptions=res_field.enums,
-                        size_ref=res_field.size_ref,
+                        size_prefix=res_field.size_prefix,
                     )
 
                 para_name = f"{cmd.name}_{res_field.name}"
@@ -373,7 +408,7 @@ def _add_parameter_type(
     factor: float = 1,
     default: Any = None,
     value_descriptions: dict[str, int] = {},
-    size_ref: str = "",
+    size_prefix: int = 0,
 ):
 
     if data_type == "bool":
@@ -479,7 +514,7 @@ def _add_parameter_type(
             },
         )
         if description:
-            param_type.attrib["shortDescription"] = description.replace("\n", " ").strip()
+            param_type.attrib["shortDescription"] = description
         ET.SubElement(param_type, "UnitSet")
         bin_data_enc = ET.SubElement(
             param_type, "BinaryDataEncoding", attrib={"bitOrder": "leastSignificantBitFirst"}
@@ -488,7 +523,7 @@ def _add_parameter_type(
             bin_data_enc,
             "SizeInBits",
         )
-        if size_ref:
+        if size_prefix != 0:
             dyn_val = ET.SubElement(
                 size_in_bits,
                 "DynamicValue",
@@ -496,7 +531,7 @@ def _add_parameter_type(
             ET.SubElement(
                 dyn_val,
                 "ParameterInstanceRef",
-                attrib={"parameterRef": size_ref},
+                attrib={"parameterRef": f"{name}_size"},
             )
         else:
             bin_data_enc_size_fixed = ET.SubElement(
@@ -530,7 +565,6 @@ def _add_parameter_type(
 
 
 def _add_parameter(para_set, name: str, type_ref: str, description: str = ""):
-    description = description.replace("\n", " ").strip()
     para = ET.SubElement(
         para_set,
         "Parameter",
@@ -623,7 +657,7 @@ def _add_argument_type(arg_type_set, req_field: SubpacketField, type_name: str):
             "StringDataEncoding",
             attrib={"encoding": "US-ASCII", "bitOrder": "mostSignificantBitFirst"},
         )
-        if req_field.size_ref != "":
+        if req_field.max_size > 0:
             var = ET.SubElement(
                 str_data,
                 "Variable",
@@ -633,7 +667,7 @@ def _add_argument_type(arg_type_set, req_field: SubpacketField, type_name: str):
             ET.SubElement(
                 dyn_val,
                 "ArgumentInstanceRef",
-                attrib={"argumentRef": req_field.size_ref},
+                attrib={"argumentRef": f"{req_field.name}_size"},
             )
         elif req_field.fixed_size > 0:
             size_bits = ET.SubElement(str_data, "SizeInBits")
@@ -646,12 +680,12 @@ def _add_argument_type(arg_type_set, req_field: SubpacketField, type_name: str):
             attrib={"bitOrder": "mostSignificantBitFirst"},
         )
         size_bits = ET.SubElement(bytes_data, "SizeInBits")
-        if req_field.size_ref != "":
+        if req_field.size_prefix:
             dyn_val = ET.SubElement(size_bits, "DynamicValue")
             ET.SubElement(
                 dyn_val,
                 "ArgumentInstanceRef",
-                attrib={"argumentRef": req_field.size_ref},
+                attrib={"argumentRef": f"{req_field.name}_size"},
             )
         elif req_field.fixed_size > 0:
             fixed_value = ET.SubElement(size_bits, "FixedValue")

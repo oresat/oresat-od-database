@@ -87,16 +87,21 @@ class ConfigTypes(unittest.TestCase):
                 self.assertIn(req.data_type, DATA_TYPES)
                 self._test_snake_case(req.name)
                 if req.name == "bytes":
-                    self.assertTrue((req.fixed_size == 0) != (req.size_ref == ""))
-                    if req.size_ref:
-                        self.assertIn(
-                            req.size_ref,
-                            [req.name for req in cmd.request],
-                            (
-                                f"command {cmd.name} request field {req.name} is missing size "
-                                "reference field {req.size_ref}"
-                            ),
-                        )
+                    self.assertTrue(
+                        (req.fixed_size == 0) != (req.size_prefix == 0),
+                        (
+                            f"command {cmd.name} request field {req.name} has both fixed_size "
+                            "and size_prefix set"
+                        ),
+                    )
+                    self.assertIn(
+                        req.size_prefix,
+                        [0, 1, 2, 4, 8],
+                        (
+                            f"command {cmd.name} request field {req.name} size_prefix "
+                            "size not a standard integer size or 0"
+                        ),
+                    )
                 elif req.name == "str":
                     self.assertFalse(
                         (req.fixed_size == 0) and (req.max_size == 0),
@@ -115,12 +120,8 @@ class ConfigTypes(unittest.TestCase):
                 size = 0
                 if req.data_type == "bytes":
                     size = req.fixed_size
-                    if req.size_ref != "":
-                        size_ref_field = cmd.get_request_field(req.size_ref)
-                        index = cmd.request.index(size_ref_field)
-                        # override the random size to be reasonable
-                        size = randint(1, 100)
-                        test_values = test_values[:index] + (size,) + test_values[index + 1 :]
+                    if req.size_prefix > 0:
+                        size = randint(1, 100)  # set the random size to be reasonable
                 elif req.data_type == "str":
                     size = req.fixed_size
                     if req.max_size != 0:
@@ -140,13 +141,21 @@ class ConfigTypes(unittest.TestCase):
                 self.assertIn(res.data_type, DATA_TYPES)
                 self._test_snake_case(res.name)
                 if res.name == "bytes":
-                    self.assertTrue((res.fixed_size == 0) != (res.size_ref == ""))
-                    if res.size_ref:
-                        self.assertIn(
-                            res.size_ref,
-                            [res.name for res in cmd.response],
-                            f"size_ref field {res.size_ref} is missing",
-                        )
+                    self.assertTrue(
+                        (req.fixed_size == 0) != (req.size_prefix == 0),
+                        (
+                            f"command {cmd.name} request field {req.name} has both fixed_size "
+                            "and size_prefix set"
+                        ),
+                    )
+                    self.assertIn(
+                        req.size_prefix,
+                        [0, 1, 2, 4, 8],
+                        (
+                            f"command {cmd.name} request field {req.name} size_prefix "
+                            "size not a standard integer size or 0"
+                        ),
+                    )
                 elif res.name == "str":
                     self.assertFalse(
                         (res.fixed_size == 0) and (res.max_size == 0),
@@ -165,12 +174,8 @@ class ConfigTypes(unittest.TestCase):
                 size = 0
                 if res.data_type == "bytes":
                     size = res.fixed_size
-                    if res.size_ref != "":
-                        size_ref_field = cmd.get_response_field(res.size_ref)
-                        index = cmd.response.index(size_ref_field)
-                        # override the random size to be reasonable
-                        size = randint(1, 100)
-                        test_values = test_values[:index] + (size,) + test_values[index + 1 :]
+                    if req.size_prefix > 0:
+                        size = randint(1, 100)  # set the random size to be reasonable
                 elif res.data_type == "str":
                     size = res.fixed_size
                     if res.max_size != 0:

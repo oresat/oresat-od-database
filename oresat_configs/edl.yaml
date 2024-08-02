@@ -1,7 +1,7 @@
 # fields with name opd_addr or node_id, will have their enums generated
 commands:
   - uid: 0x0
-    name: tx_ctrl
+    name: tx_control
     description: enable / disable tx
     request:
       - name: enable
@@ -73,13 +73,11 @@ commands:
       - name: subindex
         data_type: uint8
         description: the OD subindex to write to
-      - name: buffer_size
-        data_type: uint32
-        description: size of the sdo data buffer to write
       - name: buffer
         data_type: bytes
-        size_ref: buffer_size
         description: sdo data buffer to write
+        size_prefix: 4
+
     response:
       - name: error_code
         data_type: uint32
@@ -145,8 +143,8 @@ commands:
         data_type: bool
         description: true to enable or false to disable
         enums:
-          enable: 0
-          disable: 1
+          disable: 0
+          enable: 1
     response:
       - name: status
         data_type: uint8
@@ -236,10 +234,7 @@ commands:
       - name: error_code
         data_type: uint32
         description: SDO error code (0 is no error)
-      - name: buffer_size
-        data_type: uint32
-        description: buffer_size of the data buffer
       - name: buffer
         data_type: bytes
-        size_ref: buffer_size
         description: data buffer
+        size_prefix: 4
