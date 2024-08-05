@@ -164,9 +164,9 @@ def write_xtce(config: OreSatConfig, dir_path: str = ".") -> None:
             "name": "beacon",
         },
     )
-    entry_list = ET.SubElement(seq_cont, "EntryList")
+    beacon_entry_list = ET.SubElement(seq_cont, "EntryList")
     ET.SubElement(
-        entry_list,
+        beacon_entry_list,
         "ParameterRefEntry",
         attrib={"parameterRef": "ax25_header"},
     )
@@ -179,7 +179,7 @@ def write_xtce(config: OreSatConfig, dir_path: str = ".") -> None:
 
     # beacon headers
     _add_parameter(para_set, "ax25_header", "b128_type", "AX.25 Header")
-    _add_parameter_ref(entry_list, "ax25_header")
+    _add_parameter_ref(beacon_entry_list, "ax25_header")
 
     for obj in config.beacon_def:
         para_name = make_obj_name(obj)
@@ -201,11 +201,11 @@ def write_xtce(config: OreSatConfig, dir_path: str = ".") -> None:
             )
 
         _add_parameter(para_set, para_name, para_type_name, obj.description)
-        _add_parameter_ref(entry_list, para_name)
+        _add_parameter_ref(beacon_entry_list, para_name)
 
     # beacon tails
     _add_parameter(para_set, "crc32", "uint32_type", "beacon crc32")
-    _add_parameter_ref(entry_list, "crc32")
+    _add_parameter_ref(beacon_entry_list, "crc32")
 
     cmd_meta_data = ET.SubElement(root, "CommandMetaData")
     arg_type_set = ET.SubElement(cmd_meta_data, "ArgumentTypeSet")
@@ -250,15 +250,75 @@ def write_xtce(config: OreSatConfig, dir_path: str = ".") -> None:
     )
     meta_cmd_set = ET.SubElement(cmd_meta_data, "MetaCommandSet")
 
+    # uslp containers
+    meta_cmd = ET.SubElement(
+        meta_cmd_set, "MetaCommand", attrib={"name": "uslp_header", "abstract": "true"}
+    )
+    uslp_header_cont = ET.SubElement(meta_cmd, "CommandContainer", attrib={"name": "uslp_header"})
+    uslp_header_entry_list = ET.SubElement(uslp_header_cont, "EntryList")
+
+    # fill uslp transfer frame container
+    uslp_fields = [
+        # uslp primary header
+        (SubpacketField("version_number", "uint4"), 0xC),
+        (SubpacketField("spacecraft_id", "uint16"), 0x4F53),
+        (SubpacketField("src_dest", "bool"), 0),
+        (SubpacketField("virtual_channel_id", "uint6"), 0),
+        (SubpacketField("map_id", "uint6"), 0),
+        (SubpacketField("eof_flag", "bool"), 0),
+        (SubpacketField("frame_length", "uint16"), 0),
+        (SubpacketField("bypass_sequence_control_flag", "bool"), 0),
+        (SubpacketField("protocol_control_command_flag", "bool"), 0),
+        (SubpacketField("reserved", "uint2"), 0),
+        (SubpacketField("operation_control_field_flag", "bool"), 0),
+        (SubpacketField("vc_frame_count_length", "uint3"), 0),
+        # uslp transfer frame insert zone
+        (SubpacketField("sequence_number", "uint32"), 0),
+        # uslp data field header
+        (SubpacketField("tfdz_contruction_rules", "uint3"), 0x7),
+        (SubpacketField("protocol_id", "uint5"), 0x5),
+    ]
+
+    uslp_seq_cont = ET.SubElement(
+        cont_set,
+        "SequenceContainer",
+        attrib={"name": "uslp_header", "abstract": "true"},
+    )
+    uslp_entry_list = ET.SubElement(uslp_seq_cont, "EntryList")
+
+    _add_parameter_type(para_type_set, "bytes_hmac_type", "bytes", default="00" * 32)
+    _add_parameter(para_set, "hmac", "bytes_hmac_type")
+    _add_parameter(para_set, "uslp_fecf", "uint32_type")
+
+    for subpacket, fixed_value in uslp_fields:
+        size = "1" if subpacket.data_type == "bool" else subpacket.data_type[4:]
+        if int(size) > 16 and int(size) <= 32:
+            value = f"{fixed_value:08X}"
+        elif int(size) > 8 and int(size) <= 16:
+            value = f"{fixed_value:04X}"
+        else:
+            value = f"{fixed_value:02X}"
+
+        para_name = f"uslp_{subpacket.name}"
+
+        # add uslp subpacket to telemetery
+        para_type_name = f"{subpacket.data_type}_type"
+        if para_type_name not in para_types:
+            para_types.append(para_type_name)
+            _add_parameter_type(para_type_set, para_type_name, subpacket.data_type)
+        _add_parameter(para_set, para_name, para_type_name)
+        _add_parameter_ref(uslp_entry_list, para_name)
+
+        # add uslp subpacket to telecommand
+        ET.SubElement(
+            uslp_header_entry_list,
+            "FixedValueEntry",
+            attrib={"name": para_name, "binaryValue": value, "sizeInBits": size},
+        )
+
     for cmd in config.edl_commands.values():
         # add command
-        meta_cmd = ET.SubElement(
-            meta_cmd_set,
-            "MetaCommand",
-            attrib={
-                "name": cmd.name,
-            },
-        )
+        meta_cmd = ET.SubElement(meta_cmd_set, "MetaCommand", attrib={"name": cmd.name})
         if cmd.description:
             meta_cmd.attrib["shortDescription"] = cmd.description
         if cmd.request:
@@ -269,7 +329,8 @@ def write_xtce(config: OreSatConfig, dir_path: str = ".") -> None:
         )
         cmd_entry_list = ET.SubElement(cmd_cont, "EntryList")
 
-        # add the leading edl command byte to request
+        ET.SubElement(cmd_cont, "BaseContainer", attrib={"containerRef": "uslp_header"})
+
         ET.SubElement(
             cmd_entry_list,
             "FixedValueEntry",
@@ -325,6 +386,17 @@ def write_xtce(config: OreSatConfig, dir_path: str = ".") -> None:
                     attrib={"argumentRef": req_field.name},
                 )
 
+        ET.SubElement(
+            cmd_entry_list,
+            "FixedValueEntry",
+            attrib={"name": "hmac", "binaryValue": "0" * 64, "sizeInBits": str(32 * 8)},
+        )
+        ET.SubElement(
+            cmd_entry_list,
+            "FixedValueEntry",
+            attrib={"name": "uslp_fecf", "binaryValue": "0000", "sizeInBits": "16"},
+        )
+
         # add command parameter(s)
         if cmd.response:
             container_name = f"{cmd.name}_response"
@@ -334,6 +406,7 @@ def write_xtce(config: OreSatConfig, dir_path: str = ".") -> None:
                 attrib={"name": container_name},
             )
             entry_list = ET.SubElement(seq_cont, "EntryList")
+            ET.SubElement(seq_cont, "BaseContainer", attrib={"containerRef": "uslp_header"})
             for res_field in cmd.response:
                 para_name = f"{cmd.name}_{res_field.name}"
                 para_ref = ""
@@ -341,7 +414,6 @@ def write_xtce(config: OreSatConfig, dir_path: str = ".") -> None:
                     # add buffer size parameter
                     para_data_type = f"uint{res_field.size_prefix * 8}"
                     para_type_name = f"{para_name}_type"
-                    print(para_name)
                     if para_type_name not in para_types:
                         para_types.append(para_type_name)
                         _add_parameter_type(
@@ -372,6 +444,8 @@ def write_xtce(config: OreSatConfig, dir_path: str = ".") -> None:
 
                 _add_parameter(para_set, para_name, para_type_name, res_field.description)
                 _add_parameter_ref(entry_list, para_name)
+            _add_parameter_ref(entry_list, "hmac")
+            _add_parameter_ref(entry_list, "uslp_fecf")
 
             cont_ref_entry = ET.SubElement(
                 res_entry_list,
@@ -598,8 +672,6 @@ def _add_argument_type(arg_type_set, req_field: SubpacketField, type_name: str):
     attrib = {
         "name": type_name,
     }
-    if req_field.description:
-        attrib["shortDescription"] = req_field.description.replace("\n", " ").strip()
 
     if req_field.data_type.startswith("int") or req_field.data_type.startswith("uint"):
         if req_field.enums:
