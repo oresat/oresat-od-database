@@ -303,7 +303,11 @@ def write_xtce(config: OreSatConfig, dir_path: str = ".") -> None:
                         attrib={"argumentRef": name},
                     )
 
-                type_name = req_field.data_type + "_type"
+                if req_field.name in ["opd_addr", "node_id"]:
+                    type_name = req_field.name + "_type"
+                else:
+                    type_name = req_field.data_type + "_type"
+
                 if type_name not in arg_types:
                     arg_types.append(type_name)
                     _add_argument_type(arg_type_set, req_field, type_name)
@@ -331,10 +335,13 @@ def write_xtce(config: OreSatConfig, dir_path: str = ".") -> None:
             )
             entry_list = ET.SubElement(seq_cont, "EntryList")
             for res_field in cmd.response:
+                para_name = f"{cmd.name}_{res_field.name}"
+                para_ref = ""
                 if res_field.size_prefix > 0:
                     # add buffer size parameter
                     para_data_type = f"uint{res_field.size_prefix * 8}"
-                    para_type_name = f"{para_data_type}_type"
+                    para_type_name = f"{para_name}_type"
+                    print(para_name)
                     if para_type_name not in para_types:
                         para_types.append(para_type_name)
                         _add_parameter_type(
@@ -342,10 +349,9 @@ def write_xtce(config: OreSatConfig, dir_path: str = ".") -> None:
                             para_type_name,
                             para_data_type,
                         )
-
-                    para_name = f"{cmd.name}_{res_field.name}_size"
-                    _add_parameter(para_set, para_name, para_type_name)
-                    _add_parameter_ref(entry_list, para_name)
+                    para_ref = f"{para_name}_size"
+                    _add_parameter(para_set, para_ref, para_type_name)
+                    _add_parameter_ref(entry_list, para_ref)
 
                 if res_field.unit:
                     para_type_name = f"{res_field.data_type}_{res_field.unit}_type"
@@ -361,9 +367,9 @@ def write_xtce(config: OreSatConfig, dir_path: str = ".") -> None:
                         unit=res_field.unit,
                         value_descriptions=res_field.enums,
                         size_prefix=res_field.size_prefix,
+                        param_ref=para_ref,
                     )
 
-                para_name = f"{cmd.name}_{res_field.name}"
                 _add_parameter(para_set, para_name, para_type_name, res_field.description)
                 _add_parameter_ref(entry_list, para_name)
 
@@ -409,6 +415,7 @@ def _add_parameter_type(
     default: Any = None,
     value_descriptions: dict[str, int] = {},
     size_prefix: int = 0,
+    param_ref: str = "",
 ):
 
     if data_type == "bool":
@@ -531,7 +538,7 @@ def _add_parameter_type(
             ET.SubElement(
                 dyn_val,
                 "ParameterInstanceRef",
-                attrib={"parameterRef": f"{name}_size"},
+                attrib={"parameterRef": param_ref},
             )
         else:
             bin_data_enc_size_fixed = ET.SubElement(
