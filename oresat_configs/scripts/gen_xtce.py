@@ -15,7 +15,7 @@ from typing import Any, Optional
 
 import canopen
 
-from .. import Consts, EdlCommandField, OreSatConfig
+from .. import Consts, EdlCommandField, OreSatConfig, __version__
 
 GEN_XTCE = "generate beacon xtce file"
 
@@ -143,7 +143,7 @@ def write_xtce(config: OreSatConfig, dir_path: str = ".") -> None:
         attrib={
             "validationStatus": "Working",
             "classification": "NotClassified",
-            "version": f'{config.od_db["c3"]["beacon"]["revision"].value}.0',
+            "version": f"{__version__}",
             "date": datetime.now().strftime("%Y-%m-%d"),
         },
     )
@@ -207,6 +207,24 @@ def write_xtce(config: OreSatConfig, dir_path: str = ".") -> None:
     _add_parameter(para_set, "crc32", "uint32_type", "beacon crc32")
     _add_parameter_ref(beacon_entry_list, "crc32")
 
+    # OreSat0 was before oresat-configs and had different commands
+    if config.mission != Consts.ORESAT0:
+        _add_edl(config, root, cont_set, para_type_set, para_set, para_types)
+
+    tree = ET.ElementTree(root)
+    ET.indent(tree, space="  ", level=0)
+    file_name = f"{config.mission.filename()}.xtce"
+    tree.write(f"{dir_path}/{file_name}", encoding="utf-8", xml_declaration=True)
+
+
+def _add_edl(
+    config: OreSatConfig,
+    root: ET.Element,
+    cont_set: ET.Element,
+    para_type_set: ET.Element,
+    para_set: ET.Element,
+    para_types: list[str],
+):
     cmd_meta_data = ET.SubElement(root, "CommandMetaData")
     arg_type_set = ET.SubElement(cmd_meta_data, "ArgumentTypeSet")
 
@@ -264,7 +282,7 @@ def write_xtce(config: OreSatConfig, dir_path: str = ".") -> None:
         (EdlCommandField("spacecraft_id", "uint16"), 0x4F53),
         (EdlCommandField("src_dest", "bool"), 0),
         (EdlCommandField("virtual_channel_id", "uint6"), 0),
-        (EdlCommandField("map_id", "uint6"), 0),
+        (EdlCommandField("map_id", "uint4"), 0),
         (EdlCommandField("eof_flag", "bool"), 0),
         (EdlCommandField("frame_length", "uint16"), 0),
         (EdlCommandField("bypass_sequence_control_flag", "bool"), 0),
@@ -466,11 +484,6 @@ def write_xtce(config: OreSatConfig, dir_path: str = ".") -> None:
                 },
             )
 
-    tree = ET.ElementTree(root)
-    ET.indent(tree, space="  ", level=0)
-    file_name = f"{config.mission.filename()}.xtce"
-    tree.write(f"{dir_path}/{file_name}", encoding="utf-8", xml_declaration=True)
-
 
 def gen_xtce(args: Optional[Namespace] = None) -> None:
     """Gen_dcf main."""
@@ -647,7 +660,7 @@ def _add_parameter_type(
         raise ValueError(f"data type {data_type} not implemented")
 
 
-def _add_parameter(para_set, name: str, type_ref: str, description: str = ""):
+def _add_parameter(para_set: ET.Element, name: str, type_ref: str, description: str = ""):
     para = ET.SubElement(
         para_set,
         "Parameter",
@@ -660,7 +673,7 @@ def _add_parameter(para_set, name: str, type_ref: str, description: str = ""):
         para.attrib["shortDescription"] = description.replace("\n", " ").strip()
 
 
-def _add_parameter_ref(entry_list, name: str):
+def _add_parameter_ref(entry_list: ET.Element, name: str):
     ET.SubElement(
         entry_list,
         "ParameterRefEntry",
@@ -670,7 +683,7 @@ def _add_parameter_ref(entry_list, name: str):
     )
 
 
-def _add_argument_type(arg_type_set, req_field: EdlCommandField, type_name: str):
+def _add_argument_type(arg_type_set: ET.Element, req_field: EdlCommandField, type_name: str):
     attrib = {
         "name": type_name,
     }

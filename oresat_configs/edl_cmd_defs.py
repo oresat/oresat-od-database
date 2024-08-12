@@ -7,20 +7,6 @@ from typing import Any, Union
 from dacite import from_dict
 from yaml import CLoader, load
 
-_COMMAND_DATA_TYPES_SIZE = {
-    "bool": 1,
-    "int8": 1,
-    "int16": 2,
-    "int32": 4,
-    "int64": 8,
-    "uint8": 1,
-    "uint16": 2,
-    "uint32": 4,
-    "uint64": 8,
-    "float32": 4,
-    "float64": 8,
-}
-
 _COMMAND_DATA_FMT = {
     "bool": "?",
     "int8": "b",
@@ -63,12 +49,12 @@ class EdlCommandField:
     max_size: int = 0
     """
     int: Max size in bytes for variable "str" data types. String must end with a '\0'.
-    Takes precedence over fix_size.
+    This takes precedence over fix_size.
     """
     size_prefix: int = 0
     """
-    int: Leading prefix in  is to determind the size of a "bytes" field. This
-    takes precedence over fix_size.
+    int: Number of leading prefix bytes used to determind the size of a "bytes" field.
+    This takes precedence over fix_size.
     """
     fixed_size: int = 0
     """
@@ -108,20 +94,21 @@ class EdlCommandDefinition:
         data: dict[str, Any] = {}
         offset = 0
         for f in fields:
-            if f.data_type in _COMMAND_DATA_TYPES_SIZE:
-                data_type_size = _COMMAND_DATA_TYPES_SIZE[f.data_type]
+            if f.data_type in _COMMAND_DATA_FMT:
+                data_type_size = struct.calcsize(_COMMAND_DATA_FMT[f.data_type])
                 tmp = raw[offset : offset + data_type_size]
                 fmt = _COMMAND_DATA_FMT[f.data_type]
                 data[f.name] = struct.unpack(fmt, tmp)[0]
             elif f.data_type == "bytes":
-                if f.size_prefix != 0:  # dynamic length
-                    data_type_size = int.from_bytes(raw[offset : offset + f.size_prefix], "little")
+                if f.size_prefix != 0:  # dynamic length in bits
+                    data_type_size_raw = raw[offset : offset + f.size_prefix]
+                    data_type_size = int.from_bytes(data_type_size_raw, "little") // 8
                     offset += f.size_prefix
                 else:  # fix_size
                     data_type_size = f.fixed_size
                 data[f.name] = raw[offset : offset + data_type_size]
             elif f.data_type == "str":
-                if f.max_size != "":  # dynamic length
+                if f.max_size != "":  # dynamic length that ends with "\0"
                     data_type_size = raw[offset:].find(b"\0")
                 else:  # fix_size
                     data_type_size = f.fixed_size
@@ -150,20 +137,20 @@ class EdlCommandDefinition:
         # dynamic size packet - slower encode
         raw = b""
         for f, v in zip(fields, values):
-            if f.data_type in _COMMAND_DATA_TYPES_SIZE:
+            if f.data_type in _COMMAND_DATA_FMT:
                 fmt = _COMMAND_DATA_FMT[f.data_type]
                 raw += struct.pack(fmt, v)
             elif f.data_type == "bytes":
                 value = v
-                if f.size_prefix != 0:  # dynamic length
+                if f.size_prefix != 0:  # dynamic length in bits
                     fmt = _COMMAND_DATA_FMT[f"uint{f.size_prefix * 8}"]
-                    raw += struct.pack(fmt, len(v))
+                    raw += struct.pack(fmt, len(v) * 8)
                 else:  # fixed length
                     value += b"\x00" * (f.fixed_size - len(value))
                 raw += value
             elif f.data_type == "str":
                 value = v.encode()
-                if f.max_size != 0:  # dynamic length
+                if f.max_size != "":  # dynamic length that ends with "\0"
                     value += b"\0"
                 else:  # fixed length
                     value += b"\0" * (f.fixed_size - len(value))

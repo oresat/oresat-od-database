@@ -119,14 +119,21 @@ class ConfigTypes(unittest.TestCase):
                     )
                 size = 0
                 if req.data_type == "bytes":
-                    size = req.fixed_size
                     if req.size_prefix > 0:
                         size = randint(1, 100)  # set the random size to be reasonable
+                        size_prefix = (size * 8).to_bytes(req.size_prefix, "little")
+                        data = _gen_random_value(req.data_type, size)
+                        test_values += (size_prefix + data,)
+                    else:
+                        size = req.fixed_size
+                        test_values += (_gen_random_value(req.data_type, size),)
                 elif req.data_type == "str":
                     size = req.fixed_size
                     if req.max_size != 0:
                         size = req.max_size
-                test_values += (_gen_random_value(req.data_type, size),)
+                    test_values += (_gen_random_value(req.data_type, size),)
+                else:
+                    test_values += (_gen_random_value(req.data_type, size),)
             if len(test_values) > 0:
                 raw = cmd.encode_request(test_values)
                 test_values2 = cmd.decode_request(raw)
@@ -173,14 +180,21 @@ class ConfigTypes(unittest.TestCase):
                     )
                 size = 0
                 if res.data_type == "bytes":
-                    size = res.fixed_size
                     if res.size_prefix > 0:
                         size = randint(1, 100)  # set the random size to be reasonable
+                        size_prefix = (size * 8).to_bytes(res.size_prefix, "little")
+                        data = _gen_random_value(res.data_type, size)
+                        test_values += (size_prefix + data,)
+                    else:
+                        size = res.fixed_size
+                        test_values += (_gen_random_value(res.data_type, size),)
                 elif res.data_type == "str":
                     size = res.fixed_size
                     if res.max_size != 0:
                         size = res.max_size
-                test_values += (_gen_random_value(res.data_type, size),)
+                    test_values += (_gen_random_value(res.data_type, size),)
+                else:
+                    test_values += (_gen_random_value(res.data_type, size),)
             if len(test_values) > 0:
                 raw = cmd.encode_response(test_values)
                 test_values2 = cmd.decode_response(raw)
