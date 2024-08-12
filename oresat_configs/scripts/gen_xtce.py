@@ -232,7 +232,7 @@ def write_xtce(config: OreSatConfig, dir_path: str = ".") -> None:
         para_type_set,
         "edl_command_code_type",
         "uint8",
-        value_descriptions={cmd.name: cmd.uid for cmd in config.edl_commands.values()},
+        value_descriptions={cmd.name: cmd.uid for cmd in config.edl_cmd_defs.values()},
     )
     _add_parameter(para_set, "edl_command_code", "edl_command_code_type")
     res_seq_cont = ET.SubElement(
@@ -316,7 +316,7 @@ def write_xtce(config: OreSatConfig, dir_path: str = ".") -> None:
             attrib={"name": para_name, "binaryValue": value, "sizeInBits": size},
         )
 
-    for cmd in config.edl_commands.values():
+    for cmd in config.edl_cmd_defs.values():
         # add command
         meta_cmd = ET.SubElement(meta_cmd_set, "MetaCommand", attrib={"name": cmd.name})
         if cmd.description:
