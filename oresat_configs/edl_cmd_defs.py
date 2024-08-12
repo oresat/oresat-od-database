@@ -134,9 +134,12 @@ class EdlCommandDefinition:
 
     def _encode(self, values: tuple[Any], fields: list[EdlCommandField]) -> bytes:
 
+        if not isinstance(values, (tuple, list)):
+            values = (values,)
+
         if len(values) != len(fields):
             raise ValueError(
-                f"invalid number of values for packet: got {len(fields)} expected {len(values)}"
+                f"invalid number of values for packet: got {len(values)} expected {len(fields)}"
             )
 
         # fixed size packet - quick encode
