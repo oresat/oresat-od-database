@@ -77,7 +77,6 @@ commands:
         data_type: bytes
         description: sdo data buffer to write
         size_prefix: 4
-
     response:
       - name: error_code
         data_type: uint32
@@ -104,14 +103,14 @@ commands:
     response:
       - name: status
         data_type: bool
-        description: OPD subsystem enable status.
+        description: OPD subsystem enable status
         enums:
           disabled: 0
           enabled: 1
 
   - uid: 0x9
     name: opd_scan
-    description: scan for all nodes on the OPD.
+    description: scan for all nodes on the OPD
     response:
       - name: nodes_found
         data_type: uint8
@@ -152,7 +151,7 @@ commands:
 
   - uid: 0xC
     name: opd_reset
-    description: reset a node on the OPD.
+    description: reset a node on the OPD
     request:
       - name: opd_addr
         data_type: uint8
@@ -185,7 +184,7 @@ commands:
     response:
       - name: set
         data_type: bool
-        description: the RTC time was set successfully.
+        description: the RTC time was set successfully
 
   - uid: 0xF
     name: time_sync

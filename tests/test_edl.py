@@ -58,17 +58,17 @@ class ConfigTypes(unittest.TestCase):
         regex_str = r"^[a-z][a-z0-9_]*[a-z0-9]*$"  # snake_case with no leading/trailing num or "_"
         self.assertIsNotNone(re.match(regex_str, string), f'"{string}" is not snake_case')
 
-    def test_edl_commands(self):
+    def test_edl_cmd_defs(self):
         """Validate edl commands configs."""
 
-        edl_commands = OreSatConfig(OreSatId.ORESAT0_5).edl_commands
+        edl_cmd_defs = OreSatConfig(OreSatId.ORESAT0_5).edl_cmd_defs
 
-        cmd_uids = [cmd.uid for cmd in edl_commands.values()]
+        cmd_uids = [cmd.uid for cmd in edl_cmd_defs.values()]
         self.assertEqual(len(cmd_uids), len(set(cmd_uids)), "command uids are not unique")
-        cmd_names = [cmd.name for cmd in edl_commands.values()]
+        cmd_names = [cmd.name for cmd in edl_cmd_defs.values()]
         self.assertEqual(len(cmd_names), len(set(cmd_names)), "command names are not unique")
 
-        for cmd in edl_commands.values():
+        for cmd in edl_cmd_defs.values():
             req_names = [req.name for req in cmd.request]
             self.assertEqual(
                 len(req_names),
@@ -142,17 +142,17 @@ class ConfigTypes(unittest.TestCase):
                 self._test_snake_case(res.name)
                 if res.name == "bytes":
                     self.assertTrue(
-                        (req.fixed_size == 0) != (req.size_prefix == 0),
+                        (res.fixed_size == 0) != (res.size_prefix == 0),
                         (
-                            f"command {cmd.name} request field {req.name} has both fixed_size "
+                            f"command {cmd.name} request field {res.name} has both fixed_size "
                             "and size_prefix set"
                         ),
                     )
                     self.assertIn(
-                        req.size_prefix,
+                        res.size_prefix,
                         [0, 1, 2, 4, 8],
                         (
-                            f"command {cmd.name} request field {req.name} size_prefix "
+                            f"command {cmd.name} request field {res.name} size_prefix "
                             "size not a standard integer size or 0"
                         ),
                     )
@@ -174,7 +174,7 @@ class ConfigTypes(unittest.TestCase):
                 size = 0
                 if res.data_type == "bytes":
                     size = res.fixed_size
-                    if req.size_prefix > 0:
+                    if res.size_prefix > 0:
                         size = randint(1, 100)  # set the random size to be reasonable
                 elif res.data_type == "str":
                     size = res.fixed_size

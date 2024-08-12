@@ -15,7 +15,7 @@ from typing import Any, Optional
 
 import canopen
 
-from .. import Consts, OreSatConfig, SubpacketField
+from .. import Consts, EdlCommandField, OreSatConfig
 
 GEN_XTCE = "generate beacon xtce file"
 
@@ -216,14 +216,14 @@ def write_xtce(config: OreSatConfig, dir_path: str = ".") -> None:
         if config.cards[name].node_id != 0:
             node_ids[config.cards[name].nice_name] = config.cards[name].node_id
     _add_argument_type(
-        arg_type_set, SubpacketField("node_id", "uint8", enums=node_ids), "node_id_type"
+        arg_type_set, EdlCommandField("node_id", "uint8", enums=node_ids), "node_id_type"
     )
     opd_addrs = {}
     for name in config.od_db:
         if config.cards[name].opd_address != 0:
             opd_addrs[config.cards[name].nice_name] = config.cards[name].opd_address
     _add_argument_type(
-        arg_type_set, SubpacketField("opd_addr", "uint8", enums=opd_addrs), "opd_addr_type"
+        arg_type_set, EdlCommandField("opd_addr", "uint8", enums=opd_addrs), "opd_addr_type"
     )
 
     arg_types = ["opd_addr_type", "node_id_type"]
@@ -260,23 +260,23 @@ def write_xtce(config: OreSatConfig, dir_path: str = ".") -> None:
     # fill uslp transfer frame container
     uslp_fields = [
         # uslp primary header
-        (SubpacketField("version_number", "uint4"), 0xC),
-        (SubpacketField("spacecraft_id", "uint16"), 0x4F53),
-        (SubpacketField("src_dest", "bool"), 0),
-        (SubpacketField("virtual_channel_id", "uint6"), 0),
-        (SubpacketField("map_id", "uint6"), 0),
-        (SubpacketField("eof_flag", "bool"), 0),
-        (SubpacketField("frame_length", "uint16"), 0),
-        (SubpacketField("bypass_sequence_control_flag", "bool"), 0),
-        (SubpacketField("protocol_control_command_flag", "bool"), 0),
-        (SubpacketField("reserved", "uint2"), 0),
-        (SubpacketField("operation_control_field_flag", "bool"), 0),
-        (SubpacketField("vc_frame_count_length", "uint3"), 0),
+        (EdlCommandField("version_number", "uint4"), 0xC),
+        (EdlCommandField("spacecraft_id", "uint16"), 0x4F53),
+        (EdlCommandField("src_dest", "bool"), 0),
+        (EdlCommandField("virtual_channel_id", "uint6"), 0),
+        (EdlCommandField("map_id", "uint6"), 0),
+        (EdlCommandField("eof_flag", "bool"), 0),
+        (EdlCommandField("frame_length", "uint16"), 0),
+        (EdlCommandField("bypass_sequence_control_flag", "bool"), 0),
+        (EdlCommandField("protocol_control_command_flag", "bool"), 0),
+        (EdlCommandField("reserved", "uint2"), 0),
+        (EdlCommandField("operation_control_field_flag", "bool"), 0),
+        (EdlCommandField("vc_frame_count_length", "uint3"), 0),
         # uslp transfer frame insert zone
-        (SubpacketField("sequence_number", "uint32"), 0),
+        (EdlCommandField("sequence_number", "uint32"), 0),
         # uslp data field header
-        (SubpacketField("tfdz_contruction_rules", "uint3"), 0x7),
-        (SubpacketField("protocol_id", "uint5"), 0x5),
+        (EdlCommandField("tfdz_contruction_rules", "uint3"), 0x7),
+        (EdlCommandField("protocol_id", "uint5"), 0x5),
     ]
 
     uslp_seq_cont = ET.SubElement(
@@ -349,7 +349,9 @@ def write_xtce(config: OreSatConfig, dir_path: str = ".") -> None:
                     name = f"{req_field.name}_size"
                     if type_name not in arg_types:
                         arg_types.append(type_name)
-                        _add_argument_type(arg_type_set, SubpacketField(name, data_type), type_name)
+                        _add_argument_type(
+                            arg_type_set, EdlCommandField(name, data_type), type_name
+                        )
                     ET.SubElement(
                         arg_list,
                         "Argument",
@@ -668,7 +670,7 @@ def _add_parameter_ref(entry_list, name: str):
     )
 
 
-def _add_argument_type(arg_type_set, req_field: SubpacketField, type_name: str):
+def _add_argument_type(arg_type_set, req_field: EdlCommandField, type_name: str):
     attrib = {
         "name": type_name,
     }

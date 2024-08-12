@@ -1,4 +1,4 @@
-"""Used to parse edl.yaml that defines all EDL command requests and responses."""
+"""Used to parse edl_cmd_defs.yaml that defines all EDL command requests and responses."""
 
 import struct
 from dataclasses import dataclass, field
@@ -37,7 +37,7 @@ _COMMAND_DATA_FMT = {
 
 
 @dataclass
-class SubpacketField:
+class EdlCommandField:
     """A field in EDL command request or response packet."""
 
     name: str
@@ -80,7 +80,7 @@ class SubpacketField:
 
 
 @dataclass
-class EdlCommand:
+class EdlCommandDefinition:
     """A EDL command."""
 
     uid: int
@@ -89,18 +89,15 @@ class EdlCommand:
     """str: A unique snake_case name for the EDL command."""
     description: str = ""
     """str: A short description of the EDL command."""
-    request: list[SubpacketField] = field(default_factory=list)
-    """list[EdlCommand]: List of request fields for the EDL command."""
-    response: list[SubpacketField] = field(default_factory=list)
-    """list[EdlCommand]: List of response fields for the EDL command."""
+    request: list[EdlCommandField] = field(default_factory=list)
+    """list[EdlCommandDefinition]: List of request fields for the EDL command."""
+    response: list[EdlCommandField] = field(default_factory=list)
+    """list[EdlCommandDefinition]: List of response fields for the EDL command."""
 
-    def _dynamic_len(self, fields: list[SubpacketField]) -> bool:
+    def _dynamic_len(self, fields: list[EdlCommandField]) -> bool:
         return True in [f.size_prefix != 0 for f in fields]
 
-    def _decode(self, raw: bytes, fields: list[SubpacketField]) -> tuple[Any]:
-
-        if len(raw) == 0:
-            raise ValueError("packet size must be greater than 0")
+    def _decode(self, raw: bytes, fields: list[EdlCommandField]) -> tuple[Any]:
 
         # fixed size packet - quick decode
         if not self._dynamic_len(fields):
@@ -135,7 +132,7 @@ class EdlCommand:
 
         return tuple(data.values())
 
-    def _encode(self, values: tuple[Any], fields: list[SubpacketField]) -> bytes:
+    def _encode(self, values: tuple[Any], fields: list[EdlCommandField]) -> bytes:
 
         if len(values) != len(fields):
             raise ValueError(
@@ -189,22 +186,22 @@ class EdlCommand:
         return self._encode(values, self.response)
 
 
-class EdlCommands:
+class EdlCommandDefinitions:
     """
     A custom dictionary-like class to store EDL commands that can use the EDL command uid and EDL
     command name as keys.
     """
 
     def __init__(self, file_path: str, custom_enums: dict[str, dict[str, int]] = {}):
-        self._names: dict[str, EdlCommand] = {}
-        self._uids: dict[int, EdlCommand] = {}
+        self._names: dict[str, EdlCommandDefinition] = {}
+        self._uids: dict[int, EdlCommandDefinition] = {}
 
-        edl_commands_raw = {}
+        _raw = {}
         with open(file_path, "r") as f:
-            edl_commands_raw = load(f, Loader=CLoader)
+            _raw = load(f, Loader=CLoader)
 
-        for command_raw in edl_commands_raw.get("commands", []):
-            command = from_dict(data_class=EdlCommand, data=command_raw)
+        for command_raw in _raw.get("commands", []):
+            command = from_dict(data_class=EdlCommandDefinition, data=command_raw)
             command.description = command.description.replace("\n", "")
             for req in command.request:
                 req.description = req.description.replace("\n", "")
@@ -217,7 +214,7 @@ class EdlCommands:
             self._uids[command.uid] = command
             self._names[command.name] = command
 
-    def __getitem__(self, value: Union[int, str]) -> EdlCommand:
+    def __getitem__(self, value: Union[int, str]) -> EdlCommandDefinition:
         return self._uids.get(value) or self._names.get(value)  # type: ignore
 
     def __len__(self) -> int:

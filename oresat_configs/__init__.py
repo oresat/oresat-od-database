@@ -25,7 +25,7 @@ from .base import FW_COMMON_CONFIG_PATH
 from .beacon_config import BeaconConfig
 from .card_info import Card, cards_from_csv
 from .constants import Consts, NodeId, OreSatId, __version__
-from .edl import EdlCommand, EdlCommands, SubpacketField
+from .edl_cmd_defs import EdlCommandDefinition, EdlCommandDefinitions, EdlCommandField
 
 __all__ = ["Card", "Consts", "NodeId", "OreSatId", "__version__"]
 
@@ -59,7 +59,7 @@ class OreSatConfig:
         self.fram_def = _gen_c3_fram_defs(c3_od, self.configs["c3"])
         self.fw_base_od = _gen_fw_base_od(mission, FW_COMMON_CONFIG_PATH)
 
-        # edl commands
+        # edl commands definitions
         node_ids = {}
         opd_addrs = {}
         for name in self.configs:
@@ -72,5 +72,5 @@ class OreSatConfig:
             "node_id": node_ids,
             "opd_addr": opd_addrs,
         }
-        edl_file_path = f"{os.path.dirname(os.path.abspath(__file__))}/edl.yaml"
-        self.edl_commands = EdlCommands(edl_file_path, custom_enums)
+        edl_file_path = f"{os.path.dirname(os.path.abspath(__file__))}/edl_cmd_defs.yaml"
+        self.edl_cmd_defs = EdlCommandDefinitions(edl_file_path, custom_enums)
