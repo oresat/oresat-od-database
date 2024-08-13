@@ -65,13 +65,13 @@ def write_kaitai(config: OreSatConfig, dir_path: str = ".") -> None:
     """Write beacon configs to a kaitai file."""
 
     # Grab and format mission name
-    name = config.mission.filename()
+    filename = config.mission.filename()
 
     #  Setup pre-determined canned types
     kaitai_data: Any = {
         "meta": {
-            "id": name,
-            "title": f"{name} Decoder Struct",
+            "id": filename,
+            "title": f"{filename} Decoder Struct",
             "endian": "le",
         },
         "seq": [
@@ -225,7 +225,7 @@ def write_kaitai(config: OreSatConfig, dir_path: str = ".") -> None:
         kaitai_data["types"]["ax25_info_data"]["seq"].append(new_var)
 
     # Write kaitai to output file
-    with open(f"{dir_path}/{name}.ksy", "w+") as file:
+    with open(f"{dir_path}/{filename}.ksy", "w+") as file:
         dump(kaitai_data, file)
 
 
