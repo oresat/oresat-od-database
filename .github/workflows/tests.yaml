@@ -25,9 +25,14 @@ jobs:
 
     - name: Install dependencies
       run: |
-        sudo apt install libxml2-utils libyaml-0-2 python3-kaitaistruct
+        sudo apt install libxml2-utils libyaml-0-2
         python -m pip install --upgrade pip
         pip install -r requirements.txt
+
+    - name: Install Kaitai Struct Compiler
+      run: |
+        curl -LO https://github.com/kaitai-io/kaitai_struct_compiler/releases/download/0.10/kaitai-struct-compiler_0.10_all.deb
+        sudo apt-get install ./kaitai-struct-compiler_0.10_all.deb
 
     - name: Lint with Pylama
       run: pylama
