@@ -34,7 +34,7 @@ def build_parser(parser: ArgumentParser) -> ArgumentParser:
         nargs="?",
         default="",
         help="Data to write or for only octet/domain data types a path to a file."
-        " (e.g. file:data.bin) (Default: %(default)s)",
+        " (e.g. file:data.bin)",
     )
     parser.add_argument(
         "--oresat",

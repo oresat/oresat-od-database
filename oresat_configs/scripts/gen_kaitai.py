@@ -4,6 +4,7 @@ from argparse import ArgumentParser, Namespace
 from typing import Any, Optional, cast
 
 import canopen
+from canopen.objectdictionary import Record, Array
 from yaml import dump
 
 from .. import Consts, OreSatConfig
@@ -40,23 +41,23 @@ def register_subparser(subparsers: Any) -> None:
     See https://docs.python.org/3/library/argparse.html#sub-commands, especially the end of that
     section, for more.
     """
-    parser = build_parser(subparsers.add_parser("xtce", help=GEN_KAITAI))
-    parser.set_defaults(func=GEN_KAITAI)
+    parser = build_parser(subparsers.add_parser("kaitai", help=GEN_KAITAI))
+    parser.set_defaults(func=gen_kaitai)
 
 
 CANOPEN_TO_KAITAI_DT = {
-    canopen.objectdictionary.BOOLEAN: "s",
-    canopen.objectdictionary.INTEGER8: "int8",
-    canopen.objectdictionary.INTEGER16: "i1",
-    canopen.objectdictionary.INTEGER32: "i2",
-    canopen.objectdictionary.INTEGER64: "i3",
+    canopen.objectdictionary.BOOLEAN: "b1",
+    canopen.objectdictionary.INTEGER8: "i1",
+    canopen.objectdictionary.INTEGER16: "i2",
+    canopen.objectdictionary.INTEGER32: "i4",
+    canopen.objectdictionary.INTEGER64: "i8",
     canopen.objectdictionary.UNSIGNED8: "u1",
     canopen.objectdictionary.UNSIGNED16: "u2",
-    canopen.objectdictionary.UNSIGNED32: "u3",
-    canopen.objectdictionary.UNSIGNED64: "u4",
+    canopen.objectdictionary.UNSIGNED32: "u4",
+    canopen.objectdictionary.UNSIGNED64: "u8",
     canopen.objectdictionary.VISIBLE_STRING: "str",
-    canopen.objectdictionary.REAL32: "float",
-    canopen.objectdictionary.REAL64: "double",
+    canopen.objectdictionary.REAL32: "f4",
+    canopen.objectdictionary.REAL64: "f8",
 }
 
 
@@ -64,16 +65,15 @@ def write_kaitai(config: OreSatConfig, dir_path: str = ".") -> None:
     """Write beacon configs to a kaitai file."""
 
     # Grab and format mission name
-    name = config.mission.name.lower().replace("_", ".")
+    name = config.mission.filename()
 
     #  Setup pre-determined canned types
-    kaitai_data = {
+    kaitai_data: Any = {
         "meta": {
             "id": name,
             "title": f"{name} Decoder Struct",
             "endian": "le",
         },
-        "doc": "",
         "seq": [
             {
                 "id": "ax25_frame",
@@ -98,9 +98,13 @@ def write_kaitai(config: OreSatConfig, dir_path: str = ".") -> None:
                                 "0x00": "i_frame",
                                 "0x02": "i_frame",
                                 "0x10": "i_frame",
-                                "0x12": "i_framec",
+                                "0x12": "i_frame",
                             },
                         },
+                    },
+                    {
+                        "id": "ax25_trunk",
+                        "type": "ax25_trunk",
                     },
                 ]
             },
@@ -119,13 +123,21 @@ def write_kaitai(config: OreSatConfig, dir_path: str = ".") -> None:
                     {"id": "ctl", "type": "u1"},
                 ],
             },
+            "ax25_trunk": {
+                    "seq": [
+                        {
+                            "id": "refcs",
+                            "type": "u4",
+                        }
+                    ]
+            },
             "repeater": {
                 "seq": [
                     {
                         "id": "rpt_instance",
                         "type": "repeaters",
                         "repeat": "until",
-                        "repeat-until": "until",
+                        "repeat-until": "_.rpt_ssid_raw.ssid_mask & 0x01 == 1",
                         "doc": "Repeat until no repeater flag is set!",
                     }
                 ]
@@ -196,8 +208,12 @@ def write_kaitai(config: OreSatConfig, dir_path: str = ".") -> None:
 
     # Append field types for each field
     for obj in config.beacon_def:
+        name = '_'.join([obj.parent.name, obj.name]) \
+            if isinstance(obj.parent, (Record, Array)) \
+            else obj.name 
+
         new_var = {
-            "id": obj.name,
+            "id": name,
             "type": CANOPEN_TO_KAITAI_DT[obj.data_type],
             "doc": obj.description,
         }
@@ -206,11 +222,7 @@ def write_kaitai(config: OreSatConfig, dir_path: str = ".") -> None:
             if obj.access_type == "const":
                 new_var["size"] = len(obj.default)
 
-        cast(
-            Any, cast(Any, cast(Any, kaitai_data.get("types")).get("ax25_info_data")).get("seq")
-        ).append(
-            new_var
-        )  # Same as: `kaitai_data["types"]["ax25_info_data"]["seq"].append(new_var)`D
+        kaitai_data["types"]["ax25_info_data"]["seq"].append(new_var)
 
     # Write kaitai to output file
     with open(f"{dir_path}/{name}.ksy", "w+") as file:

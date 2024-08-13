@@ -25,7 +25,7 @@ jobs:
 
     - name: Install dependencies
       run: |
-        sudo apt install libyaml-0-2
+        sudo apt install libyaml-0-2 python3-kaitaistruct
         python -m pip install --upgrade pip
         pip install -r requirements.txt
 
@@ -59,3 +59,6 @@ jobs:
         oresat-configs cards > /dev/null
         oresat-configs pdo c3 --list > /dev/null
         pip uninstall -y oresat-configs
+    
+    - name: Compile Kaitai
+      run: ksc -t python oresat0_5.ksy
