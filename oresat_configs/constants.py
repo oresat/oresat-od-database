@@ -47,6 +47,13 @@ class Consts(Mission, Enum):
     def __str__(self) -> str:
         return "OreSat" + self.arg
 
+    def filename(self) -> str:
+        """Returns a string safe to use in filenames and other restricted settings.
+
+        All lower case, dots replaced with underscores.
+        """
+        return str(self).lower().replace(".", "_")
+
     @classmethod
     def default(cls) -> Consts:
         """Returns the currently active mission"""

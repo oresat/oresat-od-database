@@ -56,6 +56,8 @@ jobs:
         oresat-print-od c3 > /dev/null
         oresat-gen-kaitai
         oresat-gen-xtce
+        curl -O https://www.omg.org/spec/XTCE/20180204/SpaceSystem.xsd
+        xmllint --noout --schema SpaceSystem.xsd oresat0_5.xtce
         oresat-configs cards > /dev/null
         oresat-configs pdo c3 --list > /dev/null
         pip uninstall -y oresat-configs
