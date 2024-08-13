@@ -1,10 +1,10 @@
 """Generate KaiTai for the beacon."""
 
 from argparse import ArgumentParser, Namespace
-from typing import Any, Optional, cast
+from typing import Any, Optional
 
 import canopen
-from canopen.objectdictionary import Record, Array
+from canopen.objectdictionary import Array, Record
 from yaml import dump
 
 from .. import Consts, OreSatConfig
@@ -124,12 +124,12 @@ def write_kaitai(config: OreSatConfig, dir_path: str = ".") -> None:
                 ],
             },
             "ax25_trunk": {
-                    "seq": [
-                        {
-                            "id": "refcs",
-                            "type": "u4",
-                        }
-                    ]
+                "seq": [
+                    {
+                        "id": "refcs",
+                        "type": "u4",
+                    }
+                ]
             },
             "repeater": {
                 "seq": [
@@ -208,9 +208,11 @@ def write_kaitai(config: OreSatConfig, dir_path: str = ".") -> None:
 
     # Append field types for each field
     for obj in config.beacon_def:
-        name = '_'.join([obj.parent.name, obj.name]) \
-            if isinstance(obj.parent, (Record, Array)) \
-            else obj.name 
+        name = (
+            "_".join([obj.parent.name, obj.name])
+            if isinstance(obj.parent, (Record, Array))
+            else obj.name
+        )
 
         new_var = {
             "id": name,
