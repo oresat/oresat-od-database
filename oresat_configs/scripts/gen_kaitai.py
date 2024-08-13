@@ -47,10 +47,10 @@ def register_subparser(subparsers: Any) -> None:
 
 CANOPEN_TO_KAITAI_DT = {
     canopen.objectdictionary.BOOLEAN: "b1",
-    canopen.objectdictionary.INTEGER8: "i1",
-    canopen.objectdictionary.INTEGER16: "i2",
-    canopen.objectdictionary.INTEGER32: "i4",
-    canopen.objectdictionary.INTEGER64: "i8",
+    canopen.objectdictionary.INTEGER8: "s1",
+    canopen.objectdictionary.INTEGER16: "s2",
+    canopen.objectdictionary.INTEGER32: "s4",
+    canopen.objectdictionary.INTEGER64: "s8",
     canopen.objectdictionary.UNSIGNED8: "u1",
     canopen.objectdictionary.UNSIGNED16: "u2",
     canopen.objectdictionary.UNSIGNED32: "u4",
