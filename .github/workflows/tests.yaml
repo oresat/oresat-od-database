@@ -25,7 +25,7 @@ jobs:
 
     - name: Install dependencies
       run: |
-        sudo apt install libyaml-0-2 python3-kaitaistruct
+        sudo apt install libxml2-utils libyaml-0-2 python3-kaitaistruct
         python -m pip install --upgrade pip
         pip install -r requirements.txt
 
