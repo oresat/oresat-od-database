@@ -670,7 +670,7 @@ def _add_parameter(para_set: ET.Element, name: str, type_ref: str, description: 
         },
     )
     if description:
-        para.attrib["shortDescription"] = description.replace("\n", " ").strip()
+        para.attrib["shortDescription"] = description
 
 
 def _add_parameter_ref(entry_list: ET.Element, name: str):

@@ -181,14 +181,10 @@ commands:
         data_type: uint32
         description: the Unix time to set the rtc to
         unit: s
-    response:
-      - name: set
-        data_type: bool
-        description: the RTC time was set successfully
 
   - uid: 0xF
     name: time_sync
-    description: |
+    description: >-
       c3 will send OreSat's time sync TPDO over the CAN bus (all nodes that are powered on and care
       about time will sync to it)
     response:
