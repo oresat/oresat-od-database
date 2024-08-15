@@ -61,6 +61,7 @@ CANOPEN_TO_KAITAI_DT = {
 }
 
 
+
 def write_kaitai(config: OreSatConfig, dir_path: str = ".") -> None:
     """Write beacon configs to a kaitai file."""
 
@@ -137,7 +138,7 @@ def write_kaitai(config: OreSatConfig, dir_path: str = ".") -> None:
                         "id": "rpt_instance",
                         "type": "repeaters",
                         "repeat": "until",
-                        "repeat-until": "_.rpt_ssid_raw.ssid_mask & 0x01 == 1",
+                        "repeat-until": "((_.rpt_ssid_raw.ssid_mask & 0x1) == 0x1)",
                         "doc": "Repeat until no repeater flag is set!",
                     }
                 ]
@@ -158,7 +159,7 @@ def write_kaitai(config: OreSatConfig, dir_path: str = ".") -> None:
                 "seq": [
                     {
                         "id": "callsign_ror",
-                        "process": "repeaters",
+                        "process": "ror(1)",
                         "size": 6,
                         "type": "callsign",
                     }
@@ -190,7 +191,7 @@ def write_kaitai(config: OreSatConfig, dir_path: str = ".") -> None:
                         "id": "pid",
                         "type": "u1",
                     },
-                    {"id": "ax25_info", "type": "ax25_info_data", "size-eos": True},
+                    {"id": "ax25_info", "type": "ax25_info_data", "size": -1},
                 ]
             },
             "ui_frame": {
@@ -199,7 +200,7 @@ def write_kaitai(config: OreSatConfig, dir_path: str = ".") -> None:
                         "id": "pid",
                         "type": "u1",
                     },
-                    {"id": "ax25_info", "type": "ax25_info_data", "size-eos": True},
+                    {"id": "ax25_info", "type": "ax25_info_data", "size": -1},
                 ]
             },
             "ax25_info_data": {"seq": []},
@@ -207,6 +208,8 @@ def write_kaitai(config: OreSatConfig, dir_path: str = ".") -> None:
     }
 
     # Append field types for each field
+    payload_size = 0
+    
     for obj in config.beacon_def:
         name = (
             "_".join([obj.parent.name, obj.name])
@@ -223,8 +226,16 @@ def write_kaitai(config: OreSatConfig, dir_path: str = ".") -> None:
             new_var["encoding"] = "ASCII"
             if obj.access_type == "const":
                 new_var["size"] = len(obj.default)
+            payload_size += new_var["size"] * 8     
+        else:
+            payload_size += len(obj)
 
         kaitai_data["types"]["ax25_info_data"]["seq"].append(new_var)
+
+    payload_size //= 8
+    kaitai_data["types"]["i_frame"]["seq"][1]["size"] = payload_size
+    kaitai_data["types"]["ui_frame"]["seq"][1]["size"] = payload_size
+
 
     # Write kaitai to output file
     with open(f"{dir_path}/{filename}.ksy", "w+") as file:
