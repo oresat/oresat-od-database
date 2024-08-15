@@ -61,7 +61,6 @@ CANOPEN_TO_KAITAI_DT = {
 }
 
 
-
 def write_kaitai(config: OreSatConfig, dir_path: str = ".") -> None:
     """Write beacon configs to a kaitai file."""
 
@@ -209,7 +208,7 @@ def write_kaitai(config: OreSatConfig, dir_path: str = ".") -> None:
 
     # Append field types for each field
     payload_size = 0
-    
+
     for obj in config.beacon_def:
         name = (
             "_".join([obj.parent.name, obj.name])
@@ -226,7 +225,7 @@ def write_kaitai(config: OreSatConfig, dir_path: str = ".") -> None:
             new_var["encoding"] = "ASCII"
             if obj.access_type == "const":
                 new_var["size"] = len(obj.default)
-            payload_size += new_var["size"] * 8     
+            payload_size += new_var["size"] * 8
         else:
             payload_size += len(obj)
 
@@ -235,7 +234,6 @@ def write_kaitai(config: OreSatConfig, dir_path: str = ".") -> None:
     payload_size //= 8
     kaitai_data["types"]["i_frame"]["seq"][1]["size"] = payload_size
     kaitai_data["types"]["ui_frame"]["seq"][1]["size"] = payload_size
-
 
     # Write kaitai to output file
     with open(f"{dir_path}/{filename}.ksy", "w+") as file:
