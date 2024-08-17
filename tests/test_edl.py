@@ -88,7 +88,7 @@ class ConfigTypes(unittest.TestCase):
                 self._test_snake_case(req.name)
                 if req.name == "bytes":
                     self.assertTrue(
-                        (req.fixed_size == 0) != (req.size_prefix == 0),
+                        (req.fixed_size == 0) != (req.size_prefix == ""),
                         (
                             f"command {cmd.name} request field {req.name} has both fixed_size "
                             "and size_prefix set"
@@ -96,10 +96,10 @@ class ConfigTypes(unittest.TestCase):
                     )
                     self.assertIn(
                         req.size_prefix,
-                        [0, 1, 2, 4, 8],
+                        ["", "uint8", "uint16", "uint32"],
                         (
                             f"command {cmd.name} request field {req.name} size_prefix "
-                            "size not a standard integer size or 0"
+                            'uintX data type or ""'
                         ),
                     )
                 elif req.name == "str":
@@ -119,9 +119,9 @@ class ConfigTypes(unittest.TestCase):
                     )
                 size = 0
                 if req.data_type == "bytes":
-                    if req.size_prefix > 0:
+                    if req.size_prefix != "":
                         size = randint(1, 100)  # set the random size to be reasonable
-                        size_prefix = (size * 8).to_bytes(req.size_prefix, "little")
+                        size_prefix = (size * 8).to_bytes(int(req.size_prefix[4:]) // 8, "little")
                         data = _gen_random_value(req.data_type, size)
                         test_values += (size_prefix + data,)
                     else:
@@ -149,7 +149,7 @@ class ConfigTypes(unittest.TestCase):
                 self._test_snake_case(res.name)
                 if res.name == "bytes":
                     self.assertTrue(
-                        (res.fixed_size == 0) != (res.size_prefix == 0),
+                        (res.fixed_size == 0) != (res.size_prefix == ""),
                         (
                             f"command {cmd.name} request field {res.name} has both fixed_size "
                             "and size_prefix set"
@@ -157,10 +157,10 @@ class ConfigTypes(unittest.TestCase):
                     )
                     self.assertIn(
                         res.size_prefix,
-                        [0, 1, 2, 4, 8],
+                        ["", "uint8", "uint16", "uint32"],
                         (
                             f"command {cmd.name} request field {res.name} size_prefix "
-                            "size not a standard integer size or 0"
+                            'uintX data type or ""'
                         ),
                     )
                 elif res.name == "str":
@@ -180,9 +180,9 @@ class ConfigTypes(unittest.TestCase):
                     )
                 size = 0
                 if res.data_type == "bytes":
-                    if res.size_prefix > 0:
+                    if res.size_prefix != "":
                         size = randint(1, 100)  # set the random size to be reasonable
-                        size_prefix = (size * 8).to_bytes(res.size_prefix, "little")
+                        size_prefix = (size * 8).to_bytes(int(res.size_prefix[4:]) // 8, "little")
                         data = _gen_random_value(res.data_type, size)
                         test_values += (size_prefix + data,)
                     else:

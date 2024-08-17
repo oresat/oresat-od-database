@@ -338,14 +338,14 @@ def _add_edl(
     loc_in_cont = ET.SubElement(
         para_ref_entry, "LocationInContainerInBits", attrib={"referenceLocation": "nextEntry"}
     )
-    fixed_value = ET.SubElement(loc_in_cont, "FixedValue")
-    fixed_value.text = str(32 * 8 + 16)
+    fixed_value_str = ET.SubElement(loc_in_cont, "FixedValue")
+    fixed_value_str.text = str(32 * 8 + 16)
     para_ref_entry = _add_parameter_ref(uslp_entry_list, "uslp_fecf")
     loc_in_cont = ET.SubElement(
         para_ref_entry, "LocationInContainerInBits", attrib={"referenceLocation": "containerEnd"}
     )
-    fixed_value = ET.SubElement(loc_in_cont, "FixedValue")
-    fixed_value.text = "16"
+    fixed_value_str = ET.SubElement(loc_in_cont, "FixedValue")
+    fixed_value_str.text = "16"
 
     for cmd in config.edl_cmd_defs.values():
         # add command
@@ -374,8 +374,8 @@ def _add_edl(
         # add command argument(s)
         if cmd.request:
             for req_field in cmd.request:
-                if req_field.size_prefix > 0:
-                    data_type = f"uint{req_field.size_prefix * 8}"
+                if req_field.size_prefix != "":
+                    data_type = req_field.size_prefix
                     type_name = f"{data_type}_type"
                     name = f"{req_field.name}_size"
                     if type_name not in arg_types:
@@ -443,9 +443,9 @@ def _add_edl(
             for res_field in cmd.response:
                 para_name = f"{cmd.name}_{res_field.name}"
                 para_ref = ""
-                if res_field.size_prefix > 0:
+                if res_field.size_prefix != "":
                     # add buffer size parameter
-                    para_data_type = f"uint{res_field.size_prefix * 8}"
+                    para_data_type = res_field.size_prefix
                     para_type_name = f"{para_name}_type"
                     if para_type_name not in para_types:
                         para_types.append(para_type_name)
@@ -514,7 +514,7 @@ def _add_parameter_type(
     factor: float = 1,
     default: Any = None,
     value_descriptions: dict[str, int] = {},
-    size_prefix: int = 0,
+    size_prefix: str = "",
     param_ref: str = "",
 ):
 
@@ -648,7 +648,7 @@ def _add_parameter_type(
             bin_data_enc,
             "SizeInBits",
         )
-        if size_prefix != 0:
+        if size_prefix != "":
             dyn_val = ET.SubElement(
                 size_in_bits,
                 "DynamicValue",
@@ -803,7 +803,7 @@ def _add_argument_type(arg_type_set: ET.Element, req_field: EdlCommandField, typ
             attrib={"bitOrder": "mostSignificantBitFirst"},
         )
         size_bits = ET.SubElement(bytes_data, "SizeInBits")
-        if req_field.size_prefix:
+        if req_field.size_prefix != "":
             dyn_val = ET.SubElement(size_bits, "DynamicValue")
             ET.SubElement(
                 dyn_val,

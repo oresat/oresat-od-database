@@ -51,10 +51,10 @@ class EdlCommandField:
     int: Max size in bytes for variable "str" data types. String must end with a '\0'.
     This takes precedence over fix_size.
     """
-    size_prefix: int = 0
+    size_prefix: str = ""
     """
-    int: Number of leading prefix bytes used to determind the size of a "bytes" field.
-    This takes precedence over fix_size.
+    str: Data type of leading prefix bytes used to determind the size of a "bytes" field. Set to a
+    "uintX" data type. This takes precedence over fix_size.
     """
     fixed_size: int = 0
     """
@@ -81,7 +81,7 @@ class EdlCommandDefinition:
     """list[EdlCommandDefinition]: List of response fields for the EDL command."""
 
     def _dynamic_len(self, fields: list[EdlCommandField]) -> bool:
-        return True in [f.size_prefix != 0 for f in fields]
+        return True in [f.size_prefix != "" for f in fields]
 
     def _decode(self, raw: bytes, fields: list[EdlCommandField]) -> tuple[Any]:
 
@@ -100,10 +100,11 @@ class EdlCommandDefinition:
                 fmt = _COMMAND_DATA_FMT[f.data_type]
                 data[f.name] = struct.unpack(fmt, tmp)[0]
             elif f.data_type == "bytes":
-                if f.size_prefix != 0:  # dynamic length in bits
-                    data_type_size_raw = raw[offset : offset + f.size_prefix]
+                if f.size_prefix != "":  # dynamic length in bits
+                    size_prefix = int(f.size_prefix[4:]) // 8
+                    data_type_size_raw = raw[offset : offset + size_prefix]
                     data_type_size = int.from_bytes(data_type_size_raw, "little") // 8
-                    offset += f.size_prefix
+                    offset += size_prefix
                 else:  # fix_size
                     data_type_size = f.fixed_size
                 data[f.name] = raw[offset : offset + data_type_size]
@@ -142,8 +143,8 @@ class EdlCommandDefinition:
                 raw += struct.pack(fmt, v)
             elif f.data_type == "bytes":
                 value = v
-                if f.size_prefix != 0:  # dynamic length in bits
-                    fmt = _COMMAND_DATA_FMT[f"uint{f.size_prefix * 8}"]
+                if f.size_prefix != "":  # dynamic length in bits
+                    fmt = _COMMAND_DATA_FMT[f.size_prefix]
                     raw += struct.pack(fmt, len(v) * 8)
                 else:  # fixed length
                     value += b"\x00" * (f.fixed_size - len(value))

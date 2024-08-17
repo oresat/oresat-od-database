@@ -76,7 +76,7 @@ commands:
       - name: buffer
         data_type: bytes
         description: sdo data buffer to write
-        size_prefix: 4
+        size_prefix: "uint32"
     response:
       - name: error_code
         data_type: uint32
@@ -232,4 +232,4 @@ commands:
       - name: buffer
         data_type: bytes
         description: data buffer
-        size_prefix: 4
+        size_prefix: "uint32"
