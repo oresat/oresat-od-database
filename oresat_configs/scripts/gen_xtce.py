@@ -335,13 +335,17 @@ def _add_edl(
         )
     uslp_entry_list.append(ET.Comment("child containers go here"))
     para_ref_entry = _add_parameter_ref(uslp_entry_list, "hmac")
-    ET.SubElement(
+    loc_in_cont = ET.SubElement(
         para_ref_entry, "LocationInContainerInBits", attrib={"referenceLocation": "nextEntry"}
     )
+    fixed_value = ET.SubElement(loc_in_cont, "FixedValue")
+    fixed_value.text = str(32 * 8 + 16)
     para_ref_entry = _add_parameter_ref(uslp_entry_list, "uslp_fecf")
-    ET.SubElement(
+    loc_in_cont = ET.SubElement(
         para_ref_entry, "LocationInContainerInBits", attrib={"referenceLocation": "containerEnd"}
     )
+    fixed_value = ET.SubElement(loc_in_cont, "FixedValue")
+    fixed_value.text = "16"
 
     for cmd in config.edl_cmd_defs.values():
         # add command
@@ -524,12 +528,30 @@ def _add_parameter_type(
                 "oneStringValue": "1",
             },
         )
+        ET.SubElement(
+            para_type,
+            "IntegerDataEncoding",
+            attrib={
+                "byteOrder": "leastSignificantByteFirst",
+                "encoding": "unsigned",
+                "sizeInBits": "8",
+            },
+        )
     elif data_type.startswith("uint") and value_descriptions:  # enums
         para_type = ET.SubElement(
             root,
             "EnumeratedParameterType",
             attrib={
                 "name": name,
+            },
+        )
+        ET.SubElement(
+            para_type,
+            "IntegerDataEncoding",
+            attrib={
+                "byteOrder": "leastSignificantByteFirst",
+                "encoding": "unsigned",
+                "sizeInBits": data_type[4:],
             },
         )
         enum_list = ET.SubElement(para_type, "EnumerationList")
