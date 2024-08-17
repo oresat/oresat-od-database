@@ -333,6 +333,15 @@ def _add_edl(
             "FixedValueEntry",
             attrib={"name": para_name, "binaryValue": value, "sizeInBits": size},
         )
+    uslp_entry_list.append(ET.Comment("child containers go here"))
+    para_ref_entry = _add_parameter_ref(uslp_entry_list, "hmac")
+    ET.SubElement(
+        para_ref_entry, "LocationInContainerInBits", attrib={"referenceLocation": "nextEntry"}
+    )
+    para_ref_entry = _add_parameter_ref(uslp_entry_list, "uslp_fecf")
+    ET.SubElement(
+        para_ref_entry, "LocationInContainerInBits", attrib={"referenceLocation": "containerEnd"}
+    )
 
     for cmd in config.edl_cmd_defs.values():
         # add command
@@ -464,8 +473,6 @@ def _add_edl(
 
                 _add_parameter(para_set, para_name, para_type_name, res_field.description)
                 _add_parameter_ref(entry_list, para_name)
-            _add_parameter_ref(entry_list, "hmac")
-            _add_parameter_ref(entry_list, "uslp_fecf")
 
             cont_ref_entry = ET.SubElement(
                 res_entry_list,
@@ -673,8 +680,8 @@ def _add_parameter(para_set: ET.Element, name: str, type_ref: str, description: 
         para.attrib["shortDescription"] = description
 
 
-def _add_parameter_ref(entry_list: ET.Element, name: str):
-    ET.SubElement(
+def _add_parameter_ref(entry_list: ET.Element, name: str) -> ET.Element:
+    return ET.SubElement(
         entry_list,
         "ParameterRefEntry",
         attrib={
