@@ -8,6 +8,17 @@ import canopen
 from oresat_configs import Consts, OreSatConfig
 from oresat_configs._yaml_to_od import OD_DATA_TYPES, TPDO_COMM_START, TPDO_PARA_START
 
+INT_MIN_MAX = {
+    canopen.objectdictionary.INTEGER8: (-(2**7), 2**7 - 1),
+    canopen.objectdictionary.INTEGER16: (-(2**15), 2**15 - 1),
+    canopen.objectdictionary.INTEGER32: (-(2**31), 2**31 - 1),
+    canopen.objectdictionary.INTEGER64: (-(2**63), 2**63 - 1),
+    canopen.objectdictionary.UNSIGNED8: (0, 2**8 - 1),
+    canopen.objectdictionary.UNSIGNED16: (0, 2**16 - 1),
+    canopen.objectdictionary.UNSIGNED32: (0, 2**32 - 1),
+    canopen.objectdictionary.UNSIGNED64: (0, 2**64 - 1),
+}
+
 
 class TestConfig(unittest.TestCase):
     """Base class to test a OreSat OD databases."""
@@ -123,6 +134,12 @@ class TestConfig(unittest.TestCase):
                 obj.default,
                 int,
                 f"{node_name} object 0x{obj.index:X} 0x{obj.subindex:02X} was not a int",
+            )
+            int_min, int_max = INT_MIN_MAX[obj.data_type]
+            self.assertTrue(
+                int_min <= obj.default <= int_max,
+                f"{node_name} object 0x{obj.index:X} 0x{obj.subindex:02X} default of {obj.default}"
+                f" not between {int_min} and {int_max}",
             )
         elif obj.data_type in canopen.objectdictionary.FLOAT_TYPES:
             self.assertIsInstance(

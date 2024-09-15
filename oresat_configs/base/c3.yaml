@@ -81,7 +81,7 @@ objects:
 
       - subindex: 0x3
         name: pre_attempt_timeout
-        data_type: uint8
+        data_type: uint16
         description: timeout before trying to deploy the antennas
         access_type: const
         default: 300 # 5 minutes
