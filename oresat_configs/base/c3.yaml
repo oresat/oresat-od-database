@@ -118,7 +118,7 @@ objects:
       - subindex: 0x8
         name: good_test_threshold
         data_type: uint16
-        description: |
+        description: >-
           when testing the antennas, any voltage above this threshold is considered good
         access_type: const
         default: 100

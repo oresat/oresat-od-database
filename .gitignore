@@ -187,3 +187,6 @@ OD.*
 
 # setuptools-scm
 */_version.py
+
+# xml
+*.xsd
