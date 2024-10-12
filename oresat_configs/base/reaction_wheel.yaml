@@ -147,26 +147,26 @@ objects:
 
 tpdos:
   - num: 1
-    fields: 
+    fields:
       - [ctrl_stat, current_state]
       - [ctrl_stat, procedure_result]
       - [ctrl_stat, errors]
     event_timer_ms: 100
 
   - num: 2
-    fields: 
+    fields:
       - [motor, velocity]
       - [motor, current]
     event_timer_ms: 100
 
   - num: 3
-    fields: 
+    fields:
       - [bus, voltage]
       - [bus, current]
     event_timer_ms: 100
-      
+
   - num: 4
-    fields: 
+    fields:
       - [temperature, sensor_1]
       - [temperature, sensor_2]
       - [temperature, sensor_3]
