@@ -90,12 +90,26 @@ def _set_var_default(obj: ConfigObject, var: Variable) -> None:
     var.default = default
 
 
+def _parse_bit_definitions(obj: Union[IndexObject, SubindexObject]) -> dict[str, list[int]]:
+    bit_defs = {}
+    for name, bits in obj.bit_definitions.items():
+        if isinstance(bits, int):
+            bit_defs[name] = [bits]
+        elif isinstance(bits, list):
+            bit_defs[name] = list(sorted(bits))
+        elif isinstance(bits, str) and "-" in bits:
+            low, high = bits.split("-")
+            low, high = (low, high) if low < high else (high, low)
+            bit_defs[name] = list(range(int(low), int(high) + 1))
+    sorted_bit_defs_keys = sorted(bit_defs, key=lambda k: max(bit_defs.get(k)))
+    return {key: bit_defs[key] for key in sorted_bit_defs_keys}
+
+
 def _make_var(obj: Union[IndexObject, SubindexObject], index: int, subindex: int = 0) -> Variable:
     var = canopen.objectdictionary.Variable(obj.name, index, subindex)
     var.access_type = obj.access_type
     var.description = obj.description
-    for name, bits in obj.bit_definitions.items():
-        var.add_bit_definition(name, bits)
+    var.bit_definitions = _parse_bit_definitions(obj)
     for name, value in obj.value_descriptions.items():
         var.add_value_description(value, name)
     var.unit = obj.unit

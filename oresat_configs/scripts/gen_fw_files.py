@@ -671,11 +671,84 @@ def write_canopennode_h(od: canopen.ObjectDictionary, dir_path: str = ".") -> No
                 lines.append(f"#define OD_SUBINDEX_{sub_name.upper()} 0x{j:X}")
         lines.append("")
 
+    for obj in od.values():
+        if isinstance(obj, canopen.objectdictionary.Variable):
+            lines += _make_enum_lines(obj)
+        elif isinstance(obj, canopen.objectdictionary.Array):
+            subindex = list(obj.subindices.keys())[1]
+            lines += _make_enum_lines(obj[subindex])
+        else:
+            for subindex, sub_obj in obj.subindices.items():
+                lines += _make_enum_lines(sub_obj)
+
+    for obj in od.values():
+        if isinstance(obj, canopen.objectdictionary.Variable):
+            lines += _make_bitfields_lines(obj)
+        elif isinstance(obj, canopen.objectdictionary.Array):
+            subindex = list(obj.subindices.keys())[1]
+            lines += _make_bitfields_lines(obj[subindex])
+        else:
+            for subindex in obj.subindices:
+                lines += _make_bitfields_lines(obj[subindex])
+
     lines.append("#endif /* OD_H */")
 
     with open(file_path, "w") as f:
         for i in lines:
             f.write(i + "\n")
+
+
+def _make_enum_lines(obj: canopen.objectdictionary.Variable) -> list[str]:
+    lines: list[str] = []
+    if not obj.value_descriptions:
+        return lines
+
+    obj_name = obj.name
+    if isinstance(obj.parent, canopen.objectdictionary.Record):
+        obj_name = f"{obj.parent.name}_{obj_name}"
+    elif isinstance(obj.parent, canopen.objectdictionary.Array):
+        obj_name = obj.parent.name
+
+    lines.append(f"enum {obj_name}_enum " + "{")
+    for value, name in obj.value_descriptions.items():
+        lines.append(f"{INDENT4}{obj_name.upper()}_{name.upper()} = {value},")
+    lines.append("};")
+    lines.append("")
+
+    return lines
+
+
+def _make_bitfields_lines(obj: canopen.objectdictionary.Variable) -> list[str]:
+    lines: list[str] = []
+    if not obj.bit_definitions:
+        return lines
+
+    obj_name = obj.name
+    if isinstance(obj.parent, canopen.objectdictionary.Record):
+        obj_name = f"{obj.parent.name}_{obj_name}"
+    elif isinstance(obj.parent, canopen.objectdictionary.Array):
+        obj_name = obj.parent.name
+
+    data_type = DATA_TYPE_C_TYPES[obj.data_type]
+    lines.append(f"union {obj_name}_bitfield " + "{")
+    lines.append(f"{INDENT4}{data_type} value;")
+    lines.append(INDENT4 + "struct __attribute((packed)) {")
+    total_bits = 0
+    for name, bits in obj.bit_definitions.items():
+        if total_bits < min(bits):
+            unused_bits = min(bits) - total_bits
+            lines.append(f"{INDENT8}{data_type} unused{total_bits} : {unused_bits};")
+            total_bits += unused_bits
+        lines.append(f"{INDENT8}{data_type} {name.lower()} : {len(bits)};")
+        total_bits += len(bits)
+    if total_bits < DATA_TYPE_C_SIZE[obj.data_type]:
+        unused_bits = DATA_TYPE_C_SIZE[obj.data_type] - total_bits
+        lines.append(f"{INDENT8}{data_type} unused{total_bits} : {unused_bits};")
+    lines.append(INDENT4 + "} fields;")
+    lines.append("};")
+    lines.append("")
+
+    return lines
 
 
 def gen_fw_files(args: Optional[Namespace] = None) -> None:
