@@ -605,18 +605,16 @@ def write_canopennode_h(od: canopen.ObjectDictionary, dir_path: str = ".") -> No
     lines.append("")
 
     lines.append("#define OD_CNT_NMT 1")
-    lines.append("#define OD_CNT_EM 1")
-    lines.append("#define OD_CNT_SYNC 1")
-    lines.append("#define OD_CNT_EM_PROD 1")
     lines.append("#define OD_CNT_HB_PROD 1")
-    lines.append("#define OD_CNT_HB_CONS 0")
-    lines.append("#define OD_CNT_SDO_SRV 1")
-    if 0x1280 in od:
-        lines.append("#define OD_CNT_SDO_CLI 1")
-    if od.device_information.nr_of_RXPDO > 0:
-        lines.append(f"#define OD_CNT_RPDO {od.device_information.nr_of_RXPDO}")
-    if od.device_information.nr_of_TXPDO > 0:
-        lines.append(f"#define OD_CNT_TPDO {od.device_information.nr_of_TXPDO}")
+    lines.append(f"#define OD_CNT_HB_CONS {int(0x1016 in od)}")
+    lines.append("#define OD_CNT_EM 1")
+    lines.append("#define OD_CNT_EM_PROD 1")
+    lines.append(f"#define OD_CNT_SDO_SRV {int(0x1200 in od)}")
+    lines.append(f"#define OD_CNT_SDO_CLI {int(0x1280 in od)}")
+    lines.append(f"#define OD_CNT_TIME {int(0x1012 in od)}")
+    lines.append(f"#define OD_CNT_SYNC {int(0x1005 in od and 0x1006 in od)}")
+    lines.append(f"#define OD_CNT_RPDO {od.device_information.nr_of_RXPDO}")
+    lines.append(f"#define OD_CNT_TPDO {od.device_information.nr_of_TXPDO}")
     lines.append("")
 
     for i in od:
