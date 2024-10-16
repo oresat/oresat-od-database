@@ -154,24 +154,6 @@ def write_canopennode(od: canopen.ObjectDictionary, dir_path: str = ".") -> None
     write_canopennode_h(od, dir_path)
 
 
-def remove_node_id(default: str) -> str:
-    """Remove "+$NODEID" or "$NODEID+" from the default value"""
-
-    if default == "":
-        return "0"
-
-    temp = default.split("+")
-
-    if len(temp) == 1:
-        return default  # does not include $NODEID
-    if temp[0] == "$NODEID":
-        return temp[1].rsplit()[0]
-    if temp[1] == "$NODEID":
-        return temp[0].rsplit()[0]
-
-    return default  # does not include $NODEID
-
-
 def attr_lines(od: canopen.ObjectDictionary, index: int) -> list[str]:
     """Generate attr lines for OD.c for a sepecific index"""
 
@@ -203,10 +185,8 @@ def attr_lines(od: canopen.ObjectDictionary, index: int) -> list[str]:
             line += f"0x{obj.default:X},"
         elif obj.data_type == canopen.objectdictionary.datatypes.BOOLEAN:
             line += f"{int(obj.default)},"
-        elif obj.data_type in canopen.objectdictionary.datatypes.FLOAT_TYPES:
-            line += f"{obj.default},"
         else:
-            line += f"{remove_node_id(obj.default)},"
+            line += f"{obj.default},"
 
         if index not in _SKIP_INDEXES:
             lines.append(line)
@@ -242,7 +222,7 @@ def attr_lines(od: canopen.ObjectDictionary, index: int) -> list[str]:
             elif obj[i].data_type == canopen.objectdictionary.datatypes.BOOLEAN:
                 line += f"{int(obj[i].default)}, "
             else:
-                line += f"{remove_node_id(obj[i].default)}, "
+                line += f"{obj[i].default}, "
 
         line = line[:-2]  # remove trailing ', '
         line += "},"
@@ -257,17 +237,7 @@ def attr_lines(od: canopen.ObjectDictionary, index: int) -> list[str]:
             if obj[i].data_type == canopen.objectdictionary.datatypes.DOMAIN:
                 continue  # skip domains
 
-            if obj[i].name == "cob_id":
-                # oresat firmware only wants 0x180, 0x280, 0x380, 0x480
-                # no +node_id or +1, +2, +3 for TPDO nums > 4
-                default = obj[i].default
-                if default & 0xFFC not in [0x180, 0x280, 0x380, 0x480, 0x200, 0x300, 0x400, 0x500]:
-                    cob_id = (default - od.node_id) & 0xFFC
-                    cob_id += default & 0xC0_00_00_00  # add back pdo flags (2 MSBs)
-                else:
-                    cob_id = default
-                lines.append(f"{INDENT8}.{name} = 0x{cob_id:X},")
-            elif obj[i].data_type == canopen.objectdictionary.datatypes.VISIBLE_STRING:
+            if obj[i].data_type == canopen.objectdictionary.datatypes.VISIBLE_STRING:
                 line = f"{INDENT8}.{name} = " + "{"
                 for i in obj[i].default:
                     line += f"'{i}', "
@@ -292,10 +262,8 @@ def attr_lines(od: canopen.ObjectDictionary, index: int) -> list[str]:
                 lines.append(f"{INDENT8}.{name} = 0x{obj[i].default:X},")
             elif obj[i].data_type == canopen.objectdictionary.datatypes.BOOLEAN:
                 lines.append(f"{INDENT8}.{name} = {int(obj[i].default)},")
-            elif obj[i].data_type in canopen.objectdictionary.datatypes.FLOAT_TYPES:
-                lines.append(f"{INDENT8}.{name} = {obj[i].default},")
             else:
-                lines.append(f"{INDENT8}.{name} = {remove_node_id(obj[i].default)},")
+                lines.append(f"{INDENT8}.{name} = {obj[i].default},")
 
         lines.append(INDENT4 + "},")
 
@@ -779,5 +747,28 @@ def gen_fw_files(args: Optional[Namespace] = None) -> None:
         od["versions"]["hw_version"].default = args.hardware_version
     if args.firmware_version is not None:
         od["versions"]["fw_version"].default = args.firmware_version
+
+    # remove node id from emcy cob id
+    if 0x1014 in od:
+        od[0x1014].default = 0x80
+
+    max_pdos = 12 if arg_card == "c3" else 16
+    tpdo_cob_ids = [0x180 + (0x100 * (i % 4)) + (i // 4) + od.node_id for i in range(max_pdos)]
+    rpdo_cob_ids = [i + 0x80 for i in tpdo_cob_ids]
+
+    def _remove_pdo_cob_ids(start: int, num: int, cob_ids: list[int]):
+        for index in range(start, start + num):
+            obj = od[index]
+            default = obj[1].default
+            if default & 0x7FF in cob_ids:
+                cob_id = (default - od.node_id) & 0xFFC
+                cob_id += default & 0xC0_00_00_00  # add back pdo flags (2 MSBs)
+            else:
+                cob_id = default
+            obj[1].default = cob_id
+
+    # remove node id from pdo cob ids
+    _remove_pdo_cob_ids(0x1400, od.device_information.nr_of_RXPDO, rpdo_cob_ids)
+    _remove_pdo_cob_ids(0x1800, od.device_information.nr_of_TXPDO, tpdo_cob_ids)
 
     write_canopennode(od, args.dir_path)
