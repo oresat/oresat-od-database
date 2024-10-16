@@ -98,40 +98,6 @@ DATA_TYPE_C_SIZE = {
 }
 
 
-def format_name(string: str) -> str:
-    """Convert object name to standard format"""
-
-    if len(string) == 0:
-        return ""  # nothing to do
-
-    # remove invalid chars for variable names in C
-    string = string.replace("-", "_").replace("(", " ").replace(")", " ")
-    string = string.replace("  ", " ")
-
-    s_list = string.split()
-
-    name = ""
-    for i in s_list:
-        try:
-            int(i)
-        except ValueError:
-            name += f"_{i}_"  # add '_' arounds numbers
-
-    name = name.replace("__", "_")
-
-    # remove any trailing '_'
-    if name[-1] == "_":
-        name = name[:-1]
-
-    # remove any leading '_'
-    if name[0] == "_":
-        name = name[1:]
-
-    name = name.lower()
-
-    return name
-
-
 def write_canopennode(od: canopen.ObjectDictionary, dir_path: str = ".") -> None:
     """Save an od/dcf as CANopenNode OD.[c/h] files
 
@@ -161,7 +127,7 @@ def attr_lines(od: canopen.ObjectDictionary, index: int) -> list[str]:
 
     obj = od[index]
     if isinstance(obj, canopen.objectdictionary.Variable):
-        line = f"{INDENT4}.x{index:X}_{format_name(obj.name)} = "
+        line = f"{INDENT4}.x{index:X}_{obj.name} = "
 
         if obj.data_type == canopen.objectdictionary.datatypes.VISIBLE_STRING:
             line += "{"
@@ -191,7 +157,7 @@ def attr_lines(od: canopen.ObjectDictionary, index: int) -> list[str]:
         if index not in _SKIP_INDEXES:
             lines.append(line)
     elif isinstance(obj, canopen.objectdictionary.Array):
-        name = format_name(obj.name)
+        name = obj.name
         lines.append(f"{INDENT4}.x{index:X}_{name}_sub0 = {obj[0].default},")
         line = f"{INDENT4}.x{index:X}_{name} = " + "{"
 
@@ -230,10 +196,10 @@ def attr_lines(od: canopen.ObjectDictionary, index: int) -> list[str]:
         if index not in _SKIP_INDEXES:
             lines.append(line)
     else:  # ObjectType.Record
-        lines.append(f"{INDENT4}.x{index:X}_{format_name(obj.name)} = " + "{")
+        lines.append(f"{INDENT4}.x{index:X}_{obj.name} = " + "{")
 
         for i in obj:
-            name = format_name(obj[i].name)
+            name = obj[i].name
             if obj[i].data_type == canopen.objectdictionary.datatypes.DOMAIN:
                 continue  # skip domains
 
@@ -324,7 +290,7 @@ def obj_lines(od: canopen.ObjectDictionary, index: int) -> list[str]:
     lines = []
 
     obj = od[index]
-    name = format_name(obj.name)
+    name = obj.name
     lines.append(f"{INDENT4}.o_{index:X}_{name} = " + "{")
 
     if isinstance(obj, canopen.objectdictionary.Variable):
@@ -376,7 +342,7 @@ def obj_lines(od: canopen.ObjectDictionary, index: int) -> list[str]:
             lines.append(f"{INDENT8}.dataElementSizeof = sizeof({c_name}),")
     else:  # ObjectType.DOMAIN
         for i in obj:
-            name_sub = format_name(obj[i].name)
+            name_sub = obj[i].name
             lines.append(INDENT8 + "{")
 
             if obj[i].data_type == canopen.objectdictionary.datatypes.DOMAIN:
@@ -438,7 +404,7 @@ def write_canopennode_c(od: canopen.ObjectDictionary, dir_path: str = ".") -> No
 
     lines.append("typedef struct {")
     for i in od:
-        name = format_name(od[i].name)
+        name = od[i].name
         if isinstance(od[i], canopen.objectdictionary.Variable):
             lines.append(f"{INDENT4}OD_obj_var_t o_{i:X}_{name};")
         elif isinstance(od[i], canopen.objectdictionary.Array):
@@ -457,7 +423,7 @@ def write_canopennode_c(od: canopen.ObjectDictionary, dir_path: str = ".") -> No
 
     lines.append("static OD_ATTR_OD OD_entry_t ODList[] = {")
     for i in od:
-        name = format_name(od[i].name)
+        name = od[i].name
         if isinstance(od[i], canopen.objectdictionary.Variable):
             length = 1
             obj_type = "ODT_VAR"
@@ -492,7 +458,7 @@ def _canopennode_h_lines(od: canopen.ObjectDictionary, index: int) -> list[str]:
     lines = []
 
     obj = od[index]
-    name = format_name(obj.name)
+    name = obj.name
 
     if isinstance(obj, canopen.objectdictionary.Variable):
         c_name = DATA_TYPE_C_TYPES[obj.data_type]
@@ -530,7 +496,7 @@ def _canopennode_h_lines(od: canopen.ObjectDictionary, index: int) -> list[str]:
         for i in obj:
             data_type = obj[i].data_type
             c_name = DATA_TYPE_C_TYPES[data_type]
-            sub_name = format_name(obj[i].name)
+            sub_name = obj[i].name
 
             if data_type == canopen.objectdictionary.datatypes.DOMAIN:
                 continue  # skip domains
@@ -616,7 +582,7 @@ def write_canopennode_h(od: canopen.ObjectDictionary, dir_path: str = ".") -> No
 
     num = 0
     for i in od:
-        name = format_name(od[i].name)
+        name = od[i].name
         lines.append(f"#define OD_ENTRY_H{i:X}_{name.upper()} &OD->list[{num}]")
         num += 1
     lines.append("")
@@ -626,14 +592,14 @@ def write_canopennode_h(od: canopen.ObjectDictionary, dir_path: str = ".") -> No
         if i < 0x2000:
             continue  # only care about common, card, and RPDO mapped objects
 
-        name = format_name(od[i].name)
+        name = od[i].name
         lines.append(f"#define OD_INDEX_{name.upper()} 0x{i:X}")
 
         if not isinstance(od[i], canopen.objectdictionary.Variable):
             for j in od[i]:
                 if j == 0:
                     continue
-                sub_name = f"{name}_" + format_name(od[i][j].name)
+                sub_name = f"{name}_" + od[i][j].name
                 lines.append(f"#define OD_SUBINDEX_{sub_name.upper()} 0x{j:X}")
         lines.append("")
 
