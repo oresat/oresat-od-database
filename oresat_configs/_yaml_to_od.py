@@ -98,10 +98,9 @@ def _parse_bit_definitions(obj: Union[IndexObject, SubindexObject]) -> dict[str,
         elif isinstance(bits, list):
             bit_defs[name] = list(sorted(bits))
         elif isinstance(bits, str) and "-" in bits:
-            low, high = bits.split("-")
-            low, high = (low, high) if low < high else (high, low)
-            bit_defs[name] = list(range(int(low), int(high) + 1))
-    sorted_bit_defs_keys = sorted(bit_defs, key=lambda k: max(bit_defs.get(k)))
+            bits_ints = [int(i) for i in bits.split("-")]
+            bit_defs[name] = list(range(min(bits_ints), max(bits_ints) + 1))
+    sorted_bit_defs_keys = sorted(bit_defs, key=lambda k: max(bit_defs[k]))
     return {key: bit_defs[key] for key in sorted_bit_defs_keys}
 
 
