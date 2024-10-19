@@ -129,7 +129,7 @@ objects:
     data_type: uint8
     description: mppt (maximum power point tracking) algorithm
     value_descriptions:
-      perturb_and_observse: 0
+      perturb_and_observe: 0
     access_type: rw
 
   - index: 0x4004
