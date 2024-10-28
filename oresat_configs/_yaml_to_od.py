@@ -138,9 +138,7 @@ def _make_rec(obj: IndexObject) -> Record:
 
     for sub_obj in obj.subindexes:
         if sub_obj.subindex in rec.subindices:
-            raise ValueError(
-                f"subindex 0x{sub_obj.subindex:X} aleady in record at record 0x{index:X}"
-            )
+            raise ValueError(f"subindex 0x{sub_obj.subindex:X} already in record")
         var = _make_var(sub_obj, index, sub_obj.subindex)
         rec.add_member(var)
         var0.default = sub_obj.subindex
@@ -160,42 +158,47 @@ def _make_arr(obj: IndexObject, node_ids: dict[str, int]) -> Array:
     subindexes = []
     names = []
     gen_sub = obj.generate_subindexes
-    if gen_sub is None:
-        raise ValueError("IndexObject for array missing generate_subindexes: {obj}")
+    if gen_sub is not None:
+        if gen_sub.subindexes == "fixed_length":
+            subindexes = list(range(1, gen_sub.length + 1))
+            names = [f"{gen_sub.name}_{subindex}" for subindex in subindexes]
+        elif gen_sub.subindexes == "node_ids":
+            for name, sub in node_ids.items():
+                if sub == 0:
+                    continue  # a node_id of 0 is flag for not on can bus
+                names.append(name)
+                subindexes.append(sub)
 
-    if gen_sub.subindexes == "fixed_length":
-        subindexes = list(range(1, gen_sub.length + 1))
-        names = [obj.name + f"_{subindex}" for subindex in subindexes]
-    elif gen_sub.subindexes == "node_ids":
-        for name, sub in node_ids.items():
-            if sub == 0:
-                continue  # a node_id of 0 is flag for not on can bus
-            names.append(name)
-            subindexes.append(sub)
-
-    for subindex, name in zip(subindexes, names):
-        if subindex in arr.subindices:
-            raise ValueError(f"subindex 0x{subindex:X} aleady in record at array 0x{index:X}")
-        var = canopen.objectdictionary.Variable(name, index, subindex)
-        var.access_type = gen_sub.access_type
-        var.data_type = STR_2_OD_DATA_TYPE[gen_sub.data_type]
-        for name, bits in gen_sub.bit_definitions.items():
-            var.add_bit_definition(name, bits)
-        for name, value in gen_sub.value_descriptions.items():
-            var.add_value_description(value, name)
-        var.unit = gen_sub.unit
-        var.factor = gen_sub.scale_factor
-        if obj.value_descriptions:
-            var.max = gen_sub.high_limit or max(gen_sub.value_descriptions.values())
-            var.min = gen_sub.low_limit or min(gen_sub.value_descriptions.values())
-        else:
-            var.max = gen_sub.high_limit or OD_DATA_TYPES[var.data_type].high_limit
-            var.min = gen_sub.low_limit or OD_DATA_TYPES[var.data_type].low_limit
-        _set_var_default(gen_sub, var)
-        if var.data_type not in DYNAMIC_LEN_DATA_TYPES:
-            var.pdo_mappable = True
-        arr.add_member(var)
-        var0.default = subindex
+        for subindex, name in zip(subindexes, names):
+            if subindex in arr.subindices:
+                raise ValueError(f"subindex 0x{subindex:X} already in array")
+            var = canopen.objectdictionary.Variable(name, index, subindex)
+            var.access_type = gen_sub.access_type
+            var.data_type = STR_2_OD_DATA_TYPE[gen_sub.data_type]
+            for name, bits in gen_sub.bit_definitions.items():
+                var.add_bit_definition(name, bits)
+            for name, value in gen_sub.value_descriptions.items():
+                var.add_value_description(value, name)
+            var.unit = gen_sub.unit
+            var.factor = gen_sub.scale_factor
+            if obj.value_descriptions:
+                var.max = gen_sub.high_limit or max(gen_sub.value_descriptions.values())
+                var.min = gen_sub.low_limit or min(gen_sub.value_descriptions.values())
+            else:
+                var.max = gen_sub.high_limit or OD_DATA_TYPES[var.data_type].high_limit
+                var.min = gen_sub.low_limit or OD_DATA_TYPES[var.data_type].low_limit
+            _set_var_default(gen_sub, var)
+            if var.data_type not in DYNAMIC_LEN_DATA_TYPES:
+                var.pdo_mappable = True
+            arr.add_member(var)
+            var0.default = subindex
+    else:
+        for sub_obj in obj.subindexes:
+            if sub_obj.subindex in arr.subindices:
+                raise ValueError(f"subindex 0x{sub_obj.subindex:X} already in array")
+            var = _make_var(sub_obj, index, sub_obj.subindex)
+            arr.add_member(var)
+            var0.default = sub_obj.subindex
 
     return arr
 
@@ -207,7 +210,7 @@ def _add_objects(
 
     for obj in objects:
         if obj.index in od.indices:
-            raise ValueError(f"index 0x{obj.index:X} aleady in OD")
+            raise ValueError(f"index 0x{obj.index:X} already in OD")
 
         if obj.object_type == "variable":
             var = _make_var(obj, obj.index)

@@ -104,31 +104,15 @@ objects:
   - index: 0x4003
     name: temperature
     description: reaction wheel controller temperatures
-    object_type: record
-    subindexes:
-      - subindex: 0x1
-        name: sensor_1
-        data_type: int16
-        description: temperature sensor 1 temp
-        access_type: ro
-        unit: C
-        scale_factor: 0.01
-
-      - subindex: 0x2
-        name: sensor_2
-        data_type: int16
-        description: temperature sensor 2 temp
-        access_type: ro
-        unit: C
-        scale_factor: 0.01
-
-      - subindex: 0x3
-        name: sensor_3
-        data_type: int16
-        description: temperature sensor 3 temp
-        access_type: ro
-        unit: C
-        scale_factor: 0.01
+    object_type: array
+    generate_subindexes:
+      subindexes: fixed_length
+      length: 3
+      name: sensor
+      data_type: int16
+      access_type: ro
+      unit: C
+      scale_factor: 0.01
 
   - index: 0x4004
     name: requested
@@ -192,23 +176,23 @@ tpdos:
       - [ctrl_stat, current_state]
       - [ctrl_stat, procedure_result]
       - [ctrl_stat, errors]
-    event_timer_ms: 100
+    event_timer_ms: 5000
 
   - num: 2
     fields:
       - [motor, velocity]
       - [motor, current]
-    event_timer_ms: 100
+    event_timer_ms: 5000
 
   - num: 3
     fields:
       - [bus, voltage]
       - [bus, current]
-    event_timer_ms: 100
+    event_timer_ms: 5000
 
   - num: 4
     fields:
       - [temperature, sensor_1]
       - [temperature, sensor_2]
       - [temperature, sensor_3]
-    event_timer_ms: 100
+    event_timer_ms: 5000

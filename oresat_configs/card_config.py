@@ -55,20 +55,55 @@ class GenerateSubindex(ConfigObject):
 
     .. code-block:: yaml
 
-        subindexes: node_ids
-        names: node_ids
-        data_type: uint8
-        access_type: ro
-        value_descriptions:
-          0: "OFF"
-          1: "BOOT"
-          2: "ON"
-          3: "ERROR"
-          4: "NOT_FOUND"
-          0xFF: "DEAD"
+      - index: 0x4000
+        name: my_array
+        object_type: array
+        generate_subindexes:
+            subindexes: fixed_length
+            name: item
+            length: 10
+            data_type: uint16
+            access_type: ro
+            unit: C
+            scale_factor: 0.001
+
+    will generate the equivalent of
+
+    .. code-block:: yaml
+
+      - index: 0x4000
+        name: my_array
+        object_type: array
+        subindexes:
+        generate_subindexes:
+        - subindex: 1
+          name: item_1
+          data_type: uint16
+          access_type: ro
+          unit: C
+          scale_factor: 0.001
+        - subindex: 2
+          name: item_2
+          data_type: uint16
+          access_type: ro
+          unit: C
+          scale_factor: 0.001
+        ...
+        - subindex: 9
+          name: item_9
+          data_type: uint16
+          access_type: ro
+          unit: C
+          scale_factor: 0.001
+        - subindex: 10
+          name: item_10
+          data_type: uint16
+          access_type: ro
+          unit: C
+          scale_factor: 0.001
     """
 
-    names: str = ""
+    name: str = ""
     """Names of objects to generate."""
     subindexes: Union[str, int] = 0
     """Subindexes of objects to generate."""
