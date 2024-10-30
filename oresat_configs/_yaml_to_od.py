@@ -568,6 +568,10 @@ def _load_configs(config_paths: ConfigPaths) -> dict[str, CardConfig]:
 
         if len(paths) > 2:
             overlay_config = CardConfig.from_yaml(paths[2])
+            # because conf is cached by CardConfig, if multiple missions are loaded, the cached
+            # version should not be modified because the changes will persist to later loaded
+            # missions.
+            conf = deepcopy(conf)
             overlay_configs(conf, overlay_config)
 
         configs[name] = conf
