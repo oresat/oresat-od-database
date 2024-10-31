@@ -665,7 +665,7 @@ def _make_bitfields_lines(obj: canopen.objectdictionary.Variable) -> list[str]:
 
     data_type = DATA_TYPE_C_TYPES[obj.data_type]
     bitfield_name = obj_name + "_bitfield"
-    lines.append(f"union {bitfield_name} " + "{")
+    lines.append(f"typedef union {bitfield_name} " + "{")
     lines.append(f"{INDENT4}{data_type} value;")
     lines.append(INDENT4 + "struct __attribute((packed)) {")
     total_bits = 0
@@ -684,9 +684,9 @@ def _make_bitfields_lines(obj: canopen.objectdictionary.Variable) -> list[str]:
         unused_bits = DATA_TYPE_C_SIZE[obj.data_type] - total_bits
         lines.append(f"{INDENT8}{data_type} unused{total_bits} : {unused_bits};")
     lines.append(INDENT4 + "} fields;")
-    lines.append("};")
+    lines.append("} " + f"{bitfield_name}_t;")
     lines.append(
-        f"static_assert(sizeof({bitfield_name}) == sizeof({data_type}), "
+        f"static_assert(sizeof({bitfield_name}_t) == sizeof({data_type}), "
         '"pack size did not match value size");'
     )
     lines.append("")
