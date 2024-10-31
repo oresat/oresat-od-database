@@ -537,6 +537,8 @@ def write_canopennode_h(od: canopen.ObjectDictionary, dir_path: str = ".") -> No
     lines.append("#ifndef OD_H")
     lines.append("#define OD_H")
     lines.append("")
+    lines.append("#include <assert.h>")
+    lines.append("")
 
     lines.append("#define OD_CNT_NMT 1")
     lines.append("#define OD_CNT_HB_PROD 1")
@@ -662,11 +664,16 @@ def _make_bitfields_lines(obj: canopen.objectdictionary.Variable) -> list[str]:
         obj_name = obj.parent.name
 
     data_type = DATA_TYPE_C_TYPES[obj.data_type]
-    lines.append(f"union {obj_name}_bitfield " + "{")
+    bitfield_name = obj_name + "_bitfield"
+    lines.append(f"union {bitfield_name} " + "{")
     lines.append(f"{INDENT4}{data_type} value;")
     lines.append(INDENT4 + "struct __attribute((packed)) {")
     total_bits = 0
-    for name, bits in obj.bit_definitions.items():
+
+    sorted_keys = sorted(obj.bit_definitions, key=lambda k: max(obj.bit_definitions.get(k)))
+    bit_defs = {key: obj.bit_definitions[key] for key in sorted_keys}
+
+    for name, bits in bit_defs.items():
         if total_bits < min(bits):
             unused_bits = min(bits) - total_bits
             lines.append(f"{INDENT8}{data_type} unused{total_bits} : {unused_bits};")
@@ -678,6 +685,10 @@ def _make_bitfields_lines(obj: canopen.objectdictionary.Variable) -> list[str]:
         lines.append(f"{INDENT8}{data_type} unused{total_bits} : {unused_bits};")
     lines.append(INDENT4 + "} fields;")
     lines.append("};")
+    lines.append(
+        f"static_assert(sizeof({bitfield_name}) == sizeof({data_type}), "
+        '"pack size did not match value size");'
+    )
     lines.append("")
 
     return lines
