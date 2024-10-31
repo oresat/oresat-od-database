@@ -686,8 +686,8 @@ def _make_bitfields_lines(obj: canopen.objectdictionary.Variable) -> list[str]:
     lines.append(INDENT4 + "} fields;")
     lines.append("} " + f"{bitfield_name}_t;")
     lines.append(
-        f"static_assert(sizeof({bitfield_name}_t) == sizeof({data_type}), "
-        '"pack size did not match value size");'
+        f"_Static_assert(sizeof({bitfield_name}_t) == sizeof({data_type}), "
+        '"packed size did not match value size");'
     )
     lines.append("")
 
