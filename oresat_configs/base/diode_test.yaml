@@ -20,7 +20,7 @@ objects:
           dtc_muxEnable: 7
           dtc_muxDisable: 8
           dtc_clearErrors: 9
-        access_type: rw 
+        access_type: rw
 
       - subindex: 0x2
         name: mux_select
@@ -29,23 +29,23 @@ objects:
         low_limit: 0x0
         default: 0x0
         description: diode mux select
-        access_type: rw 
+        access_type: rw
 
       - subindex: 0x3
-        name: dac 
+        name: dac
         data_type: uint16
         high_limit: 0xFFF
         low_limit: 0x0
         default: 0x0
         description: dac output
-        access_type: rw 
+        access_type: rw
 
       - subindex: 0x4
         name: status
         data_type: uint16
         default: 0x0
         description: status bits
-        access_type: rw 
+        access_type: rw
         bit_definitions:
            DAC_EN: 0
            GPT_EN: 1
@@ -60,7 +60,7 @@ objects:
         data_type: uint16
         default: 0x0
         description: error bits
-        access_type: rw 
+        access_type: rw
         bit_definitions:
           DAC: 0
           ADC_CB: 1
@@ -68,7 +68,7 @@ objects:
           ADC_STOP: 3
 
   - index: 0x4001
-    name: adcsample 
+    name: adcsample
     description: adc samples
     object_type: record
     subindexes:
@@ -76,21 +76,21 @@ objects:
         name: led_current
         data_type: uint16
         description: led feedback current
-        access_type: rw 
+        access_type: rw
         unit: lsb
 
       - subindex: 0x2
         name: led_swir_pd_current
         data_type: uint16
         description: swir feedback current
-        access_type: rw 
+        access_type: rw
         unit: lsb
 
       - subindex: 0x3
         name: uv_pd_current
         data_type: uint16
         description: uv feedback current
-        access_type: rw 
+        access_type: rw
         unit: lsb
 
 tpdos:

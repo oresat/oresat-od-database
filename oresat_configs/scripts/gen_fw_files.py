@@ -98,40 +98,6 @@ DATA_TYPE_C_SIZE = {
 }
 
 
-def format_name(string: str) -> str:
-    """Convert object name to standard format"""
-
-    if len(string) == 0:
-        return ""  # nothing to do
-
-    # remove invalid chars for variable names in C
-    string = string.replace("-", "_").replace("(", " ").replace(")", " ")
-    string = string.replace("  ", " ")
-
-    s_list = string.split()
-
-    name = ""
-    for i in s_list:
-        try:
-            int(i)
-        except ValueError:
-            name += f"_{i}_"  # add '_' arounds numbers
-
-    name = name.replace("__", "_")
-
-    # remove any trailing '_'
-    if name[-1] == "_":
-        name = name[:-1]
-
-    # remove any leading '_'
-    if name[0] == "_":
-        name = name[1:]
-
-    name = name.lower()
-
-    return name
-
-
 def write_canopennode(od: canopen.ObjectDictionary, dir_path: str = ".") -> None:
     """Save an od/dcf as CANopenNode OD.[c/h] files
 
@@ -154,24 +120,6 @@ def write_canopennode(od: canopen.ObjectDictionary, dir_path: str = ".") -> None
     write_canopennode_h(od, dir_path)
 
 
-def remove_node_id(default: str) -> str:
-    """Remove "+$NODEID" or "$NODEID+" from the default value"""
-
-    if default == "":
-        return "0"
-
-    temp = default.split("+")
-
-    if len(temp) == 1:
-        return default  # does not include $NODEID
-    if temp[0] == "$NODEID":
-        return temp[1].rsplit()[0]
-    if temp[1] == "$NODEID":
-        return temp[0].rsplit()[0]
-
-    return default  # does not include $NODEID
-
-
 def attr_lines(od: canopen.ObjectDictionary, index: int) -> list[str]:
     """Generate attr lines for OD.c for a sepecific index"""
 
@@ -179,7 +127,7 @@ def attr_lines(od: canopen.ObjectDictionary, index: int) -> list[str]:
 
     obj = od[index]
     if isinstance(obj, canopen.objectdictionary.Variable):
-        line = f"{INDENT4}.x{index:X}_{format_name(obj.name)} = "
+        line = f"{INDENT4}.x{index:X}_{obj.name} = "
 
         if obj.data_type == canopen.objectdictionary.datatypes.VISIBLE_STRING:
             line += "{"
@@ -203,15 +151,13 @@ def attr_lines(od: canopen.ObjectDictionary, index: int) -> list[str]:
             line += f"0x{obj.default:X},"
         elif obj.data_type == canopen.objectdictionary.datatypes.BOOLEAN:
             line += f"{int(obj.default)},"
-        elif obj.data_type in canopen.objectdictionary.datatypes.FLOAT_TYPES:
-            line += f"{obj.default},"
         else:
-            line += f"{remove_node_id(obj.default)},"
+            line += f"{obj.default},"
 
         if index not in _SKIP_INDEXES:
             lines.append(line)
     elif isinstance(obj, canopen.objectdictionary.Array):
-        name = format_name(obj.name)
+        name = obj.name
         lines.append(f"{INDENT4}.x{index:X}_{name}_sub0 = {obj[0].default},")
         line = f"{INDENT4}.x{index:X}_{name} = " + "{"
 
@@ -242,7 +188,7 @@ def attr_lines(od: canopen.ObjectDictionary, index: int) -> list[str]:
             elif obj[i].data_type == canopen.objectdictionary.datatypes.BOOLEAN:
                 line += f"{int(obj[i].default)}, "
             else:
-                line += f"{remove_node_id(obj[i].default)}, "
+                line += f"{obj[i].default}, "
 
         line = line[:-2]  # remove trailing ', '
         line += "},"
@@ -250,24 +196,14 @@ def attr_lines(od: canopen.ObjectDictionary, index: int) -> list[str]:
         if index not in _SKIP_INDEXES:
             lines.append(line)
     else:  # ObjectType.Record
-        lines.append(f"{INDENT4}.x{index:X}_{format_name(obj.name)} = " + "{")
+        lines.append(f"{INDENT4}.x{index:X}_{obj.name} = " + "{")
 
         for i in obj:
-            name = format_name(obj[i].name)
+            name = obj[i].name
             if obj[i].data_type == canopen.objectdictionary.datatypes.DOMAIN:
                 continue  # skip domains
 
-            if obj[i].name == "cob_id":
-                # oresat firmware only wants 0x180, 0x280, 0x380, 0x480
-                # no +node_id or +1, +2, +3 for TPDO nums > 4
-                default = obj[i].default
-                if default & 0xFFC not in [0x180, 0x280, 0x380, 0x480, 0x200, 0x300, 0x400, 0x500]:
-                    cob_id = (default - od.node_id) & 0xFFC
-                    cob_id += default & 0xC0_00_00_00  # add back pdo flags (2 MSBs)
-                else:
-                    cob_id = default
-                lines.append(f"{INDENT8}.{name} = 0x{cob_id:X},")
-            elif obj[i].data_type == canopen.objectdictionary.datatypes.VISIBLE_STRING:
+            if obj[i].data_type == canopen.objectdictionary.datatypes.VISIBLE_STRING:
                 line = f"{INDENT8}.{name} = " + "{"
                 for i in obj[i].default:
                     line += f"'{i}', "
@@ -292,10 +228,8 @@ def attr_lines(od: canopen.ObjectDictionary, index: int) -> list[str]:
                 lines.append(f"{INDENT8}.{name} = 0x{obj[i].default:X},")
             elif obj[i].data_type == canopen.objectdictionary.datatypes.BOOLEAN:
                 lines.append(f"{INDENT8}.{name} = {int(obj[i].default)},")
-            elif obj[i].data_type in canopen.objectdictionary.datatypes.FLOAT_TYPES:
-                lines.append(f"{INDENT8}.{name} = {obj[i].default},")
             else:
-                lines.append(f"{INDENT8}.{name} = {remove_node_id(obj[i].default)},")
+                lines.append(f"{INDENT8}.{name} = {obj[i].default},")
 
         lines.append(INDENT4 + "},")
 
@@ -356,7 +290,7 @@ def obj_lines(od: canopen.ObjectDictionary, index: int) -> list[str]:
     lines = []
 
     obj = od[index]
-    name = format_name(obj.name)
+    name = obj.name
     lines.append(f"{INDENT4}.o_{index:X}_{name} = " + "{")
 
     if isinstance(obj, canopen.objectdictionary.Variable):
@@ -408,7 +342,7 @@ def obj_lines(od: canopen.ObjectDictionary, index: int) -> list[str]:
             lines.append(f"{INDENT8}.dataElementSizeof = sizeof({c_name}),")
     else:  # ObjectType.DOMAIN
         for i in obj:
-            name_sub = format_name(obj[i].name)
+            name_sub = obj[i].name
             lines.append(INDENT8 + "{")
 
             if obj[i].data_type == canopen.objectdictionary.datatypes.DOMAIN:
@@ -470,7 +404,7 @@ def write_canopennode_c(od: canopen.ObjectDictionary, dir_path: str = ".") -> No
 
     lines.append("typedef struct {")
     for i in od:
-        name = format_name(od[i].name)
+        name = od[i].name
         if isinstance(od[i], canopen.objectdictionary.Variable):
             lines.append(f"{INDENT4}OD_obj_var_t o_{i:X}_{name};")
         elif isinstance(od[i], canopen.objectdictionary.Array):
@@ -489,7 +423,7 @@ def write_canopennode_c(od: canopen.ObjectDictionary, dir_path: str = ".") -> No
 
     lines.append("static OD_ATTR_OD OD_entry_t ODList[] = {")
     for i in od:
-        name = format_name(od[i].name)
+        name = od[i].name
         if isinstance(od[i], canopen.objectdictionary.Variable):
             length = 1
             obj_type = "ODT_VAR"
@@ -524,7 +458,7 @@ def _canopennode_h_lines(od: canopen.ObjectDictionary, index: int) -> list[str]:
     lines = []
 
     obj = od[index]
-    name = format_name(obj.name)
+    name = obj.name
 
     if isinstance(obj, canopen.objectdictionary.Variable):
         c_name = DATA_TYPE_C_TYPES[obj.data_type]
@@ -562,7 +496,7 @@ def _canopennode_h_lines(od: canopen.ObjectDictionary, index: int) -> list[str]:
         for i in obj:
             data_type = obj[i].data_type
             c_name = DATA_TYPE_C_TYPES[data_type]
-            sub_name = format_name(obj[i].name)
+            sub_name = obj[i].name
 
             if data_type == canopen.objectdictionary.datatypes.DOMAIN:
                 continue  # skip domains
@@ -603,20 +537,20 @@ def write_canopennode_h(od: canopen.ObjectDictionary, dir_path: str = ".") -> No
     lines.append("#ifndef OD_H")
     lines.append("#define OD_H")
     lines.append("")
+    lines.append("#include <assert.h>")
+    lines.append("")
 
     lines.append("#define OD_CNT_NMT 1")
-    lines.append("#define OD_CNT_EM 1")
-    lines.append("#define OD_CNT_SYNC 1")
-    lines.append("#define OD_CNT_EM_PROD 1")
     lines.append("#define OD_CNT_HB_PROD 1")
-    lines.append("#define OD_CNT_HB_CONS 0")
-    lines.append("#define OD_CNT_SDO_SRV 1")
-    if 0x1280 in od:
-        lines.append("#define OD_CNT_SDO_CLI 1")
-    if od.device_information.nr_of_RXPDO > 0:
-        lines.append(f"#define OD_CNT_RPDO {od.device_information.nr_of_RXPDO}")
-    if od.device_information.nr_of_TXPDO > 0:
-        lines.append(f"#define OD_CNT_TPDO {od.device_information.nr_of_TXPDO}")
+    lines.append(f"#define OD_CNT_HB_CONS {int(0x1016 in od)}")
+    lines.append("#define OD_CNT_EM 1")
+    lines.append("#define OD_CNT_EM_PROD 1")
+    lines.append(f"#define OD_CNT_SDO_SRV {int(0x1200 in od)}")
+    lines.append(f"#define OD_CNT_SDO_CLI {int(0x1280 in od)}")
+    lines.append(f"#define OD_CNT_TIME {int(0x1012 in od)}")
+    lines.append(f"#define OD_CNT_SYNC {int(0x1005 in od and 0x1006 in od)}")
+    lines.append(f"#define OD_CNT_RPDO {od.device_information.nr_of_RXPDO}")
+    lines.append(f"#define OD_CNT_TPDO {od.device_information.nr_of_TXPDO}")
     lines.append("")
 
     for i in od:
@@ -650,7 +584,7 @@ def write_canopennode_h(od: canopen.ObjectDictionary, dir_path: str = ".") -> No
 
     num = 0
     for i in od:
-        name = format_name(od[i].name)
+        name = od[i].name
         lines.append(f"#define OD_ENTRY_H{i:X}_{name.upper()} &OD->list[{num}]")
         num += 1
     lines.append("")
@@ -660,22 +594,104 @@ def write_canopennode_h(od: canopen.ObjectDictionary, dir_path: str = ".") -> No
         if i < 0x2000:
             continue  # only care about common, card, and RPDO mapped objects
 
-        name = format_name(od[i].name)
+        name = od[i].name
         lines.append(f"#define OD_INDEX_{name.upper()} 0x{i:X}")
 
         if not isinstance(od[i], canopen.objectdictionary.Variable):
             for j in od[i]:
                 if j == 0:
                     continue
-                sub_name = f"{name}_" + format_name(od[i][j].name)
+                sub_name = f"{name}_" + od[i][j].name
                 lines.append(f"#define OD_SUBINDEX_{sub_name.upper()} 0x{j:X}")
         lines.append("")
+
+    for obj in od.values():
+        if isinstance(obj, canopen.objectdictionary.Variable):
+            lines += _make_enum_lines(obj)
+        elif isinstance(obj, canopen.objectdictionary.Array):
+            subindex = list(obj.subindices.keys())[1]
+            lines += _make_enum_lines(obj[subindex])
+        else:
+            for subindex, sub_obj in obj.subindices.items():
+                lines += _make_enum_lines(sub_obj)
+
+    for obj in od.values():
+        if isinstance(obj, canopen.objectdictionary.Variable):
+            lines += _make_bitfields_lines(obj)
+        elif isinstance(obj, canopen.objectdictionary.Array):
+            subindex = list(obj.subindices.keys())[1]
+            lines += _make_bitfields_lines(obj[subindex])
+        else:
+            for subindex in obj.subindices:
+                lines += _make_bitfields_lines(obj[subindex])
 
     lines.append("#endif /* OD_H */")
 
     with open(file_path, "w") as f:
         for i in lines:
             f.write(i + "\n")
+
+
+def _make_enum_lines(obj: canopen.objectdictionary.Variable) -> list[str]:
+    lines: list[str] = []
+    if not obj.value_descriptions:
+        return lines
+
+    obj_name = obj.name
+    if isinstance(obj.parent, canopen.objectdictionary.Record):
+        obj_name = f"{obj.parent.name}_{obj_name}"
+    elif isinstance(obj.parent, canopen.objectdictionary.Array):
+        obj_name = obj.parent.name
+
+    lines.append(f"enum {obj_name}_enum " + "{")
+    for value, name in obj.value_descriptions.items():
+        lines.append(f"{INDENT4}{obj_name.upper()}_{name.upper()} = {value},")
+    lines.append("};")
+    lines.append("")
+
+    return lines
+
+
+def _make_bitfields_lines(obj: canopen.objectdictionary.Variable) -> list[str]:
+    lines: list[str] = []
+    if not obj.bit_definitions:
+        return lines
+
+    obj_name = obj.name
+    if isinstance(obj.parent, canopen.objectdictionary.Record):
+        obj_name = f"{obj.parent.name}_{obj_name}"
+    elif isinstance(obj.parent, canopen.objectdictionary.Array):
+        obj_name = obj.parent.name
+
+    data_type = DATA_TYPE_C_TYPES[obj.data_type]
+    bitfield_name = obj_name + "_bitfield"
+    lines.append(f"typedef union {bitfield_name} " + "{")
+    lines.append(f"{INDENT4}{data_type} value;")
+    lines.append(INDENT4 + "struct __attribute((packed)) {")
+    total_bits = 0
+
+    sorted_keys = sorted(obj.bit_definitions, key=lambda k: max(obj.bit_definitions.get(k)))
+    bit_defs = {key: obj.bit_definitions[key] for key in sorted_keys}
+
+    for name, bits in bit_defs.items():
+        if total_bits < min(bits):
+            unused_bits = min(bits) - total_bits
+            lines.append(f"{INDENT8}{data_type} unused{total_bits} : {unused_bits};")
+            total_bits += unused_bits
+        lines.append(f"{INDENT8}{data_type} {name.lower()} : {len(bits)};")
+        total_bits += len(bits)
+    if total_bits < DATA_TYPE_C_SIZE[obj.data_type]:
+        unused_bits = DATA_TYPE_C_SIZE[obj.data_type] - total_bits
+        lines.append(f"{INDENT8}{data_type} unused{total_bits} : {unused_bits};")
+    lines.append(INDENT4 + "} fields;")
+    lines.append("} " + f"{bitfield_name}_t;")
+    lines.append(
+        f"_Static_assert(sizeof({bitfield_name}_t) == sizeof({data_type}), "
+        '"packed size did not match value size");'
+    )
+    lines.append("")
+
+    return lines
 
 
 def gen_fw_files(args: Optional[Namespace] = None) -> None:
@@ -708,5 +724,28 @@ def gen_fw_files(args: Optional[Namespace] = None) -> None:
         od["versions"]["hw_version"].default = args.hardware_version
     if args.firmware_version is not None:
         od["versions"]["fw_version"].default = args.firmware_version
+
+    # remove node id from emcy cob id
+    if 0x1014 in od:
+        od[0x1014].default = 0x80
+
+    max_pdos = 12 if arg_card == "c3" else 16
+    tpdo_cob_ids = [0x180 + (0x100 * (i % 4)) + (i // 4) + od.node_id for i in range(max_pdos)]
+    rpdo_cob_ids = [i + 0x80 for i in tpdo_cob_ids]
+
+    def _remove_pdo_cob_ids(start: int, num: int, cob_ids: list[int]):
+        for index in range(start, start + num):
+            obj = od[index]
+            default = obj[1].default
+            if default & 0x7FF in cob_ids:
+                cob_id = (default - od.node_id) & 0xFFC
+                cob_id += default & 0xC0_00_00_00  # add back pdo flags (2 MSBs)
+            else:
+                cob_id = default
+            obj[1].default = cob_id
+
+    # remove node id from pdo cob ids
+    _remove_pdo_cob_ids(0x1400, od.device_information.nr_of_RXPDO, rpdo_cob_ids)
+    _remove_pdo_cob_ids(0x1800, od.device_information.nr_of_TXPDO, tpdo_cob_ids)
 
     write_canopennode(od, args.dir_path)
