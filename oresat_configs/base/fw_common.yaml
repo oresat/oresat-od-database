@@ -98,7 +98,7 @@ objects:
         scale_factor: 0.001
         unit: V
 
-      # subindex 0x9 reserved for boot_select
+        # subindex 0x9 reserved for boot_select
 
   # index 0x3004 reserved
   # index 0x3005 reserved
