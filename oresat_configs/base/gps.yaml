@@ -57,7 +57,7 @@ objects:
         data_type: int32
         description: latitude
         access_type: ro
-        scale_factor: 0.0000001 # 1e-7
+        scale_factor: 1.0e-7
         unit: deg
         low_limit: -900000000
         high_limit: 900000000
@@ -67,7 +67,7 @@ objects:
         data_type: int32
         description: longitude
         access_type: ro
-        scale_factor: 0.0000001 # 1e-7
+        scale_factor: 1.0e-7
         unit: deg
         low_limit: -1800000000
         high_limit: 1800000000
@@ -78,7 +78,7 @@ objects:
         description: height above ellipsoid
         access_type: ro
         unit: km
-        scale_factor: 0.00001 # cm to km
+        scale_factor: 0.00001  # cm to km
 
       - subindex: 0x8
         name: mean_sea_lvl_alt
@@ -86,7 +86,7 @@ objects:
         description: mean sea level
         access_type: ro
         unit: km
-        scale_factor: 0.00001 # cm to km
+        scale_factor: 0.00001  # cm to km
 
       - subindex: 0x9
         name: gdop
@@ -129,7 +129,7 @@ objects:
         description: ecef x coordinate
         access_type: ro
         unit: km
-        scale_factor: 0.00001 # cm to km
+        scale_factor: 0.00001  # cm to km
 
       - subindex: 0xf
         name: ecef_y
@@ -137,7 +137,7 @@ objects:
         description: ecef y coordinate
         access_type: ro
         unit: km
-        scale_factor: 0.00001 # cm to km
+        scale_factor: 0.00001  # cm to km
 
       - subindex: 0x10
         name: ecef_z
@@ -145,7 +145,7 @@ objects:
         description: ecef z coordinate
         access_type: ro
         unit: km
-        scale_factor: 0.00001 # cm to km
+        scale_factor: 0.00001  # cm to km
 
       - subindex: 0x11
         name: ecef_vx
@@ -153,7 +153,7 @@ objects:
         description: ecef x velocity
         access_type: ro
         unit: km/s
-        scale_factor: 0.00001 # cm/s to km/s
+        scale_factor: 0.00001  # cm/s to km/s
 
       - subindex: 0x12
         name: ecef_vy
@@ -161,7 +161,7 @@ objects:
         description: ecef y velocity
         access_type: ro
         unit: km/s
-        scale_factor: 0.00001 # cm/s to km/s
+        scale_factor: 0.00001  # cm/s to km/s
 
       - subindex: 0x13
         name: ecef_vz
@@ -169,7 +169,7 @@ objects:
         description: ecef z velocity
         access_type: ro
         unit: km/s
-        scale_factor: 0.00001 # cm/s to km/s
+        scale_factor: 0.00001  # cm/s to km/s
 
       - subindex: 0x14
         name: time_since_midnight
@@ -193,7 +193,7 @@ objects:
 tpdos:
   - num: 3
     fields:
-      -  [skytraq, time_since_midnight]
+      - [skytraq, time_since_midnight]
 
   - num: 4
     fields:
@@ -218,7 +218,7 @@ tpdos:
       - [time_syncd]
     event_timer_ms: 1000
 
-  - num: 16 # the time sync TPDO
+  - num: 16  # the time sync TPDO
     fields:
       - [scet]
     sync: 1

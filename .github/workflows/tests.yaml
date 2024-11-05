@@ -46,6 +46,9 @@ jobs:
     - name: Test with Python's unittest
       run: python -m unittest
 
+    - name: Lint Yaml with yamllint
+      run: yamllint oresat_configs
+
     - name: Test building pypi package
       run: python -m build
 
@@ -65,6 +68,6 @@ jobs:
         oresat-configs cards > /dev/null
         oresat-configs pdo c3 --list > /dev/null
         pip uninstall -y oresat-configs
-    
+
     - name: Compile Kaitai
       run: ksc -t python oresat0_5.ksy
