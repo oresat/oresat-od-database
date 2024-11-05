@@ -24,18 +24,17 @@ from ._yaml_to_od import (
 from .base import FW_COMMON_CONFIG_PATH
 from .beacon_config import BeaconConfig
 from .card_info import Card, cards_from_csv
-from .constants import Consts, NodeId, OreSatId, __version__
+from .constants import Consts, __version__
 
-__all__ = ["Card", "Consts", "NodeId", "OreSatId", "__version__"]
+__all__ = ["Card", "Consts", "__version__"]
 
 
 class OreSatConfig:
     """All the configs for an OreSat mission."""
 
-    def __init__(self, mission: Union[OreSatId, Consts, str]):
+    def __init__(self, mission: Union[Consts, str]):
         """The parameter mission may be:
         - a string, either short or long mission name ('0', 'OreSat0.5', ...)
-        - an OreSatId (ORESAT0, ...)
         - a Consts (ORESAT0, ...)
 
         It will be used to derive the appropriate Consts, the collection of
@@ -43,8 +42,6 @@ class OreSatConfig:
         """
         if isinstance(mission, str):
             mission = Consts.from_string(mission)
-        elif isinstance(mission, OreSatId):
-            mission = Consts.from_id(mission)
         elif not isinstance(mission, Consts):
             raise TypeError(f"Unsupported mission type: '{type(mission)}'")
 

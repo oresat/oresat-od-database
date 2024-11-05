@@ -7,15 +7,13 @@ Seperate from __init__.py to avoid cirular imports.
 from __future__ import annotations
 
 from dataclasses import dataclass
-from enum import Enum, IntEnum, unique
+from enum import Enum, unique
 
 from . import oresat0, oresat0_5, oresat1
 from .base import ConfigPaths
 
 __all__ = [
     "__version__",
-    "OreSatId",
-    "NodeId",
     "Mission",
     "Consts",
 ]
@@ -73,49 +71,13 @@ class Consts(Mission, Enum):
         raise ValueError(f"invalid oresat mission: {val}")
 
     @classmethod
-    def from_id(cls, val: OreSatId | int) -> Consts:
-        """Fetches the Mission associated with an integer ID"""
-        if isinstance(val, OreSatId):
-            val = val.value
-        elif not isinstance(val, int):
-            raise TypeError(f"Unsupported val type: '{type(val)}'")
+    def from_id(cls, val: int) -> Consts:
+        """Fetches the Mission associated with an appropriate ID
 
+        Appropriate IDs are integers 1, 2, ... that corespond to the specific
+        mission. Note that these are not the number in the Satellite name.
+        """
         for m in cls:
             if m.id == val:
                 return m
-        raise ValueError(f"invalid OreSatId: {val}")
-
-
-@unique
-class OreSatId(IntEnum):
-    """Unique ID for each OreSat."""
-
-    ORESAT0 = 1
-    ORESAT0_5 = 2
-    ORESAT1 = 3
-
-
-class NodeId(IntEnum):
-    """All the CANopen Node ID for OreSat cards."""
-
-    C3 = 0x01
-    BATTERY_1 = 0x04
-    BATTERY_2 = 0x08
-    SOLAR_MODULE_1 = 0x0C
-    SOLAR_MODULE_2 = 0x10
-    SOLAR_MODULE_3 = 0x14
-    SOLAR_MODULE_4 = 0x18
-    SOLAR_MODULE_5 = 0x1C
-    SOLAR_MODULE_6 = 0x20
-    SOLAR_MODULE_7 = 0x24
-    SOLAR_MODULE_8 = 0x28
-    STAR_TRACKER_1 = 0x2C
-    STAR_TRACKER_2 = 0x30
-    GPS = 0x34
-    ADCS = 0x38
-    REACTION_WHEEL_1 = 0x3C
-    REACTION_WHEEL_2 = 0x40
-    REACTION_WHEEL_3 = 0x44
-    REACTION_WHEEL_4 = 0x48
-    DXWIFI = 0x4C
-    CFC = 0x50
+        raise ValueError(f"invalid oresat mission ID: {val}")
