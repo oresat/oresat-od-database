@@ -1,8 +1,8 @@
 """Convert OreSat configs to ODs."""
 
-import os
 from collections import namedtuple
 from copy import deepcopy
+from importlib import abc, resources
 from typing import Union
 
 import canopen
@@ -17,7 +17,7 @@ from .card_config import CardConfig, ConfigObject, IndexObject, SubindexObject
 from .card_info import Card
 from .constants import Consts, __version__
 
-STD_OBJS_FILE_NAME = f"{os.path.dirname(os.path.abspath(__file__))}/standard_objects.yaml"
+STD_OBJS_FILE_NAME = resources.files("oresat_configs") / "standard_objects.yaml"
 
 RPDO_COMM_START = 0x1400
 RPDO_PARA_START = 0x1600
@@ -474,11 +474,11 @@ def _add_all_rpdo_data(
 
 
 def _load_std_objs(
-    file_path: str, node_ids: dict[str, int]
+    file_path: abc.Traversable, node_ids: dict[str, int]
 ) -> dict[str, Union[Variable, Record, Array]]:
     """Load the standard objects."""
 
-    with open(file_path, "r") as f:
+    with file_path.open() as f:
         std_objs_raw = load(f, Loader=CLoader)
 
     std_objs = {}
@@ -565,8 +565,11 @@ def _load_configs(config_paths: ConfigPaths) -> dict[str, CardConfig]:
         if paths is None:
             continue
 
-        card_config = CardConfig.from_yaml(paths[0])
-        common_config = CardConfig.from_yaml(paths[1])
+        with resources.as_file(paths[0]) as path:
+            card_config = CardConfig.from_yaml(path)
+
+        with resources.as_file(paths[1]) as path:
+            common_config = CardConfig.from_yaml(path)
 
         conf = CardConfig()
         conf.std_objects = list(set(common_config.std_objects + card_config.std_objects))
@@ -579,7 +582,8 @@ def _load_configs(config_paths: ConfigPaths) -> dict[str, CardConfig]:
             conf.tpdos = common_config.tpdos + card_config.tpdos
 
         if len(paths) > 2:
-            overlay_config = CardConfig.from_yaml(paths[2])
+            with resources.as_file(paths[2]) as path:
+                overlay_config = CardConfig.from_yaml(path)
             # because conf is cached by CardConfig, if multiple missions are loaded, the cached
             # version should not be modified because the changes will persist to later loaded
             # missions.

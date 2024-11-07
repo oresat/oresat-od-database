@@ -28,7 +28,7 @@ def cards_from_csv(mission: Consts) -> dict[str, Card]:
     """Turns cards.csv into a dict of names->Cards, filtered by the current mission"""
 
     path = mission.paths.CARDS_CSV_PATH
-    with open(path, "r") as f:
+    with path.open() as f:
         reader = csv.DictReader(f)
         cols = set(reader.fieldnames) if reader.fieldnames else set()
         expect = {f.name for f in fields(Card)}

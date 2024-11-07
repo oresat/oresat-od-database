@@ -1,6 +1,7 @@
 """Unit tests for ensuring yaml config files match up with corresponding dataclasses"""
 
 import unittest
+from importlib.abc import Traversable
 from typing import Any
 
 from dacite import from_dict  # , Config
@@ -20,20 +21,20 @@ class ConfigTypes(unittest.TestCase):
     """
 
     @staticmethod
-    def load_yaml(path: str) -> Any:
+    def load_yaml(path: Traversable) -> Any:
         """Helper that wraps loading yaml from a path"""
-        with open(path) as f:
+        with path.open() as f:
             config = f.read()
         return load(config, Loader=Loader)
 
-    def dtype_subtest(self, path: str, dtype: Any, data: Any) -> None:
+    def dtype_subtest(self, path: Traversable, dtype: Any, data: Any) -> None:
         """The main check that gets done, creates a new subtest for each check"""
         with self.subTest(path=path, dtype=dtype):
             # raises WrongTypeError if the types don't check out
             # when we're ready, use the config below to ensure every yaml field is consumed
             from_dict(dtype, data)  # , Config(strict=True, strict_unions_match=True))
 
-    def check_types(self, path: str, dtype: Any) -> None:
+    def check_types(self, path: Traversable, dtype: Any) -> None:
         """Helper that combines load_yaml() and dtype_subtest()"""
         self.dtype_subtest(path, dtype, self.load_yaml(path))
 

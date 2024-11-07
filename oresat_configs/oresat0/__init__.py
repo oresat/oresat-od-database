@@ -1,6 +1,6 @@
 """OreSat0 object dictionary and beacon constants."""
 
-import os
+from importlib.resources import files
 
 from ..base import (
     ADCS_CONFIG_PATH,
@@ -15,13 +15,10 @@ from ..base import (
     ConfigPaths,
 )
 
-_CONFIGS_DIR = os.path.dirname(os.path.abspath(__file__))
-
-BAT_OVERLAY_CONFIG_PATH = f"{_CONFIGS_DIR}/battery_overlay.yaml"
-
-BEACON_CONFIG_PATH: str = f"{_CONFIGS_DIR}/beacon.yaml"
-
-CARDS_CSV_PATH = f"{_CONFIGS_DIR}/cards.csv"
+_CONFIGS_DIR = files(__name__)
+BAT_OVERLAY_CONFIG_PATH = _CONFIGS_DIR / "battery_overlay.yaml"
+BEACON_CONFIG_PATH = _CONFIGS_DIR / "beacon.yaml"
+CARDS_CSV_PATH = _CONFIGS_DIR / "cards.csv"
 
 CARD_CONFIGS_PATH: ConfigPaths = {
     "c3": (C3_CONFIG_PATH, SW_COMMON_CONFIG_PATH),
