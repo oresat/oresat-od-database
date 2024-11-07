@@ -51,7 +51,7 @@ _SCRIPTS = [
 ]
 
 
-def oresat_configs():
+def oresat_configs() -> None:
     """Entry point for the top level script
 
     Used in pyproject.toml, for generating the oresat-configs installed script

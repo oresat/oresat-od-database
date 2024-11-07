@@ -708,7 +708,7 @@ def _gen_c3_beacon_defs(c3_od: ObjectDictionary, beacon_def: BeaconConfig) -> li
     return beacon_objs
 
 
-def _gen_fw_base_od(mission: Consts, config_path: str) -> canopen.ObjectDictionary:
+def _gen_fw_base_od(mission: Consts) -> canopen.ObjectDictionary:
     """Generate all ODs for a OreSat mission."""
 
     od = canopen.ObjectDictionary()
@@ -730,7 +730,7 @@ def _gen_fw_base_od(mission: Consts, config_path: str) -> canopen.ObjectDictiona
     od.device_information.nr_of_TXPDO = 0
     od.device_information.LSS_supported = False
 
-    config = CardConfig.from_yaml(config_path)
+    config = CardConfig.from_yaml(mission.paths.FW_COMMON_CONFIG_PATH)
 
     _add_objects(od, config.objects, {})
 

@@ -21,7 +21,6 @@ from ._yaml_to_od import (
     _gen_od_db,
     _load_configs,
 )
-from .base import FW_COMMON_CONFIG_PATH
 from .beacon_config import BeaconConfig
 from .card_info import Card, cards_from_csv
 from .constants import Consts, NodeId, OreSatId, __version__
@@ -49,11 +48,11 @@ class OreSatConfig:
             raise TypeError(f"Unsupported mission type: '{type(mission)}'")
 
         self.mission = mission
-        beacon_config = BeaconConfig.from_yaml(mission.beacon_path)
+        beacon_config = BeaconConfig.from_yaml(mission.paths.BEACON_CONFIG_PATH)
         self.cards = cards_from_csv(mission)
-        self.configs = _load_configs(mission.cards_path)
+        self.configs = _load_configs(mission.paths.CARD_CONFIGS_PATH)
         self.od_db = _gen_od_db(mission, self.cards, beacon_config, self.configs)
         c3_od = self.od_db["c3"]
         self.beacon_def = _gen_c3_beacon_defs(c3_od, beacon_config)
         self.fram_def = _gen_c3_fram_defs(c3_od, self.configs["c3"])
-        self.fw_base_od = _gen_fw_base_od(mission, FW_COMMON_CONFIG_PATH)
+        self.fw_base_od = _gen_fw_base_od(mission)

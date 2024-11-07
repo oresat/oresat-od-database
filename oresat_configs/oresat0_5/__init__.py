@@ -22,6 +22,8 @@ _CONFIGS_DIR = os.path.dirname(os.path.abspath(__file__))
 
 BEACON_CONFIG_PATH: str = f"{_CONFIGS_DIR}/beacon.yaml"
 
+CARDS_CSV_PATH = f"{_CONFIGS_DIR}/cards.csv"
+
 CARD_CONFIGS_PATH: ConfigPaths = {
     "c3": (C3_CONFIG_PATH, SW_COMMON_CONFIG_PATH),
     "battery_1": (BAT_CONFIG_PATH, FW_COMMON_CONFIG_PATH),
