@@ -8,7 +8,7 @@ from typing import Any, Optional
 from tabulate import tabulate
 
 from ..card_info import Card, cards_from_csv
-from ..constants import Consts
+from ..constants import Mission
 
 LIST_CARDS = "list oresat cards, suitable as arguments to other commands"
 
@@ -22,8 +22,8 @@ def build_parser(parser: ArgumentParser) -> ArgumentParser:
     parser.formatter_class = RawDescriptionHelpFormatter
     parser.add_argument(
         "--oresat",
-        default=Consts.default().arg,
-        choices=[m.arg for m in Consts],
+        default=Mission.default().arg,
+        choices=[m.arg for m in Mission],
         type=lambda x: x.lower().removeprefix("oresat"),
         help="Oresat Mission. (Default: %(default)s)",
     )
@@ -65,7 +65,7 @@ def list_cards(args: Optional[Namespace] = None) -> None:
     if args is None:
         args = build_parser(ArgumentParser()).parse_args()
 
-    cards = cards_from_csv(Consts.from_string(args.oresat))
+    cards = cards_from_csv(Mission.from_string(args.oresat))
     data: dict[str, list[str]] = defaultdict(list)
     data["name"] = list(cards)
     for card in cards.values():

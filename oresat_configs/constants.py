@@ -14,8 +14,8 @@ from .base import ConfigPaths
 
 __all__ = [
     "__version__",
+    "MissionConsts",
     "Mission",
-    "Consts",
 ]
 
 try:
@@ -25,7 +25,7 @@ except ImportError:
 
 
 @dataclass
-class Mission:
+class MissionConsts:
     """A specific set of constants associated with an OreSat Mission"""
 
     id: int
@@ -35,8 +35,8 @@ class Mission:
 
 
 @unique
-class Consts(Mission, Enum):
-    """Constants associated with each OreSat Mission"""
+class Mission(MissionConsts, Enum):
+    """Each OreSat Mission and constant configuration data associated with them"""
 
     ORESAT0 = 1, "0", oresat0.BEACON_CONFIG_PATH, oresat0.CARD_CONFIGS_PATH
     ORESAT0_5 = 2, "0.5", oresat0_5.BEACON_CONFIG_PATH, oresat0_5.CARD_CONFIGS_PATH
@@ -53,12 +53,12 @@ class Consts(Mission, Enum):
         return str(self).lower().replace(".", "_")
 
     @classmethod
-    def default(cls) -> Consts:
+    def default(cls) -> Mission:
         """Returns the currently active mission"""
         return cls.ORESAT0_5
 
     @classmethod
-    def from_string(cls, val: str) -> Consts:
+    def from_string(cls, val: str) -> Mission:
         """Fetches the Mission associated with an appropriate string
 
         Appropriate strings are the arg (0, 0.5, ...), optionally prefixed with
@@ -71,7 +71,7 @@ class Consts(Mission, Enum):
         raise ValueError(f"invalid oresat mission: {val}")
 
     @classmethod
-    def from_id(cls, val: int) -> Consts:
+    def from_id(cls, val: int) -> Mission:
         """Fetches the Mission associated with an appropriate ID
 
         Appropriate IDs are integers 1, 2, ... that corespond to the specific
