@@ -6,7 +6,7 @@ from typing import Any, Optional
 
 import canopen
 
-from .. import Consts, OreSatConfig
+from .. import Mission, OreSatConfig
 
 PDO = "list or receive PDOs from the specified card"
 
@@ -19,8 +19,8 @@ def build_parser(parser: ArgumentParser) -> ArgumentParser:
     parser.description = PDO
     parser.add_argument(
         "--oresat",
-        default=Consts.default().arg,
-        choices=[m.arg for m in Consts],
+        default=Mission.default().arg,
+        choices=[m.arg for m in Mission],
         type=lambda x: x.lower().removeprefix("oresat"),
         help="Oresat Mission. (Default: %(default)s)",
     )

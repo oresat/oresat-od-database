@@ -5,7 +5,7 @@ import unittest
 
 import canopen
 
-from oresat_configs import Consts, OreSatConfig
+from oresat_configs import Mission, OreSatConfig
 from oresat_configs._yaml_to_od import OD_DATA_TYPES, TPDO_COMM_START, TPDO_PARA_START
 
 INT_MIN_MAX = {
@@ -24,7 +24,7 @@ class TestConfig(unittest.TestCase):
     """Base class to test a OreSat OD databases."""
 
     def setUp(self) -> None:
-        self.oresatid = Consts.ORESAT0
+        self.oresatid = Mission.ORESAT0
         self.config = OreSatConfig(self.oresatid)
 
     def test_tpdo_sizes(self) -> None:
