@@ -47,13 +47,13 @@ objects:
         description: status bits
         access_type: rw
         bit_definitions:
-           DAC_EN: 0
-           GPT_EN: 1
-           ADC_EN: 2
-           MUX_EN: 3
-           MUX_A0: 4
-           MUX_A1: 5
-           MUX_A2: 6
+          DAC_EN: 0
+          GPT_EN: 1
+          ADC_EN: 2
+          MUX_EN: 3
+          MUX_A0: 4
+          MUX_A1: 5
+          MUX_A2: 6
 
       - subindex: 0x5
         name: error
@@ -109,5 +109,3 @@ tpdos:
       - [adcsample, led_swir_pd_current]
       - [adcsample, uv_pd_current]
     event_timer_ms: 10000
-
-

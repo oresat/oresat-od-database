@@ -7,7 +7,7 @@ from typing import Any, Optional
 import canopen
 from canopen.objectdictionary import Variable
 
-from .. import Consts, OreSatConfig
+from .. import Mission, OreSatConfig
 
 GEN_DCF = "generate DCF file for OreSat node(s)"
 
@@ -20,8 +20,8 @@ def build_parser(parser: ArgumentParser) -> ArgumentParser:
     parser.description = GEN_DCF
     parser.add_argument(
         "--oresat",
-        default=Consts.default().arg,
-        choices=[m.arg for m in Consts],
+        default=Mission.default().arg,
+        choices=[m.arg for m in Mission],
         type=lambda x: x.lower().removeprefix("oresat"),
         help="Oresat Mission. (Default: %(default)s)",
     )

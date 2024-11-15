@@ -1,6 +1,6 @@
 objects:
   - index: 0x4000
-    name:  ctrl_stat
+    name: ctrl_stat
     description: reaction wheel controller status
     object_type: record
     subindexes:

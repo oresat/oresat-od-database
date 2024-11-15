@@ -86,7 +86,7 @@ objects:
         name: static_image
         data_type: bool
         description: transmission will send a static image rather than captured images
-        default: True
+        default: true
 
       - subindex: 0x2
         name: bit_rate
@@ -99,7 +99,7 @@ objects:
         name: as_tar
         data_type: bool
         description: transmit image as a gzipped tar file (does not apply to static image)
-        default: True
+        default: true
 
       - subindex: 0x4
         name: images_transmitted
@@ -111,7 +111,7 @@ objects:
         name: enable_pa
         data_type: bool
         description: enables the power amplifier
-        default: False
+        default: false
 
 
 tpdos:

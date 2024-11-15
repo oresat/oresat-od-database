@@ -12,7 +12,7 @@ from typing import Any, Optional, Union
 
 import canopen
 
-from .. import Consts, OreSatConfig
+from .. import Mission, OreSatConfig
 
 SDO_TRANSFER = "read or write value to a node's object dictionary via SDO transfers"
 
@@ -38,8 +38,8 @@ def build_parser(parser: ArgumentParser) -> ArgumentParser:
     )
     parser.add_argument(
         "--oresat",
-        default=Consts.default().arg,
-        choices=[m.arg for m in Consts],
+        default=Mission.default().arg,
+        choices=[m.arg for m in Mission],
         type=lambda x: x.lower().removeprefix("oresat"),
         help="Oresat Mission. (Default: %(default)s)",
     )

@@ -3,7 +3,7 @@
 import csv
 from dataclasses import dataclass, fields
 
-from .constants import Consts
+from .constants import Mission
 
 
 @dataclass
@@ -24,7 +24,7 @@ class Card:
     """Optional child node name. Useful for CFC cards."""
 
 
-def cards_from_csv(mission: Consts) -> dict[str, Card]:
+def cards_from_csv(mission: Mission) -> dict[str, Card]:
     """Turns cards.csv into a dict of names->Cards, filtered by the current mission"""
 
     path = mission.paths.CARDS_CSV_PATH
