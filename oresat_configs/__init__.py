@@ -12,6 +12,7 @@ except ImportError as e:
     ) from e
 
 from dataclasses import dataclass
+from importlib.resources import as_file
 from typing import Union
 
 from ._yaml_to_od import (
@@ -45,9 +46,11 @@ class OreSatConfig:
             raise TypeError(f"Unsupported mission type: '{type(mission)}'")
 
         self.mission = mission
-        beacon_config = BeaconConfig.from_yaml(mission.paths.BEACON_CONFIG_PATH)
-        self.cards = cards_from_csv(mission)
-        self.configs = _load_configs(mission.paths.CARD_CONFIGS_PATH)
+        with as_file(mission.beacon) as path:
+            beacon_config = BeaconConfig.from_yaml(path)
+        with as_file(mission.cards) as path:
+            self.cards = cards_from_csv(path)
+        self.configs = _load_configs(self.cards, mission.overlays)
         self.od_db = _gen_od_db(mission, self.cards, beacon_config, self.configs)
         c3_od = self.od_db["c3"]
         self.beacon_def = _gen_c3_beacon_defs(c3_od, beacon_config)

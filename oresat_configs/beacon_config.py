@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 from dataclasses import dataclass, field
-from importlib.abc import Traversable
+from pathlib import Path
 
 from dacite import from_dict
 from yaml import CLoader, load
@@ -81,7 +81,7 @@ class BeaconConfig:
     """
 
     @classmethod
-    def from_yaml(cls, config_path: Traversable) -> BeaconConfig:
+    def from_yaml(cls, config_path: Path) -> BeaconConfig:
         """Load a beacon YAML config file."""
 
         with config_path.open() as f:

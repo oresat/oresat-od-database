@@ -6,8 +6,9 @@ Seperate from __init__.py to avoid cirular imports.
 
 from __future__ import annotations
 
-from dataclasses import dataclass
+from dataclasses import InitVar, dataclass, field
 from enum import Enum, unique
+from importlib import abc, resources
 from types import ModuleType
 
 from . import oresat0, oresat0_5, oresat1
@@ -30,7 +31,19 @@ class MissionConsts:
 
     id: int
     arg: str
-    paths: ModuleType
+    paths: InitVar[ModuleType]
+    cards: abc.Traversable = field(init=False)
+    beacon: abc.Traversable = field(init=False)
+    overlays: dict[str, abc.Traversable] = field(default_factory=dict, init=False)
+
+    def __post_init__(self, paths):
+        base = resources.files(paths)
+        object.__setattr__(self, "cards", base / "cards.csv")
+        object.__setattr__(self, "beacon", base / "beacon.yaml")
+        for path in base.iterdir():
+            if path.name.endswith("_overlay.yaml"):
+                card = path.name.rsplit(sep="_", maxsplit=1)[0]
+                self.overlays[card] = path
 
 
 @unique

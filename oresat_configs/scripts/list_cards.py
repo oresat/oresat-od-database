@@ -65,7 +65,8 @@ def list_cards(args: Optional[Namespace] = None) -> None:
     if args is None:
         args = build_parser(ArgumentParser()).parse_args()
 
-    cards = cards_from_csv(Mission.from_string(args.oresat))
+    with Mission.from_string(args.oresat).cards as path:
+        cards = cards_from_csv(path)
     data: dict[str, list[str]] = defaultdict(list)
     data["name"] = list(cards)
     for card in cards.values():
@@ -76,5 +77,7 @@ def list_cards(args: Optional[Namespace] = None) -> None:
                 value = f"0x{value:02X}" if value else ""
             elif key == "opd_always_on":
                 value = "True" if value else ""
+            elif key in ("common", "config"):
+                continue
             data[key].append(value)
     print(tabulate(data, headers="keys"))

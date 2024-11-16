@@ -11,7 +11,7 @@ from canopen.objectdictionary import Array, Record, Variable
 from dacite import from_dict
 from yaml import CLoader, load
 
-from .base import ConfigPaths
+from . import base
 from .beacon_config import BeaconConfig
 from .card_config import CardConfig, ConfigObject, IndexObject, SubindexObject
 from .card_info import Card
@@ -478,7 +478,7 @@ def _load_std_objs(
 ) -> dict[str, Union[Variable, Record, Array]]:
     """Load the standard objects."""
 
-    with file_path.open() as f:
+    with resources.as_file(file_path) as path, path.open() as f:
         std_objs_raw = load(f, Loader=CLoader)
 
     std_objs = {}
@@ -556,19 +556,21 @@ def overlay_configs(card_config: CardConfig, overlay_config: CardConfig) -> None
             card_config.rpdos.append(deepcopy(overlay_rpdo))
 
 
-def _load_configs(config_paths: ConfigPaths) -> dict[str, CardConfig]:
+def _load_configs(
+    config_paths: dict[str, Card], overlays: dict[str, abc.Traversable]
+) -> dict[str, CardConfig]:
     """Generate all ODs for a OreSat mission."""
 
     configs: dict[str, CardConfig] = {}
 
-    for name, paths in config_paths.items():
-        if paths is None:
+    for name, card in config_paths.items():
+        if card.config is None:
             continue
 
-        with resources.as_file(paths[0]) as path:
+        with resources.as_file(card.config) as path:
             card_config = CardConfig.from_yaml(path)
 
-        with resources.as_file(paths[1]) as path:
+        with resources.as_file(card.common) as path:
             common_config = CardConfig.from_yaml(path)
 
         conf = CardConfig()
@@ -581,8 +583,8 @@ def _load_configs(config_paths: ConfigPaths) -> dict[str, CardConfig]:
         else:
             conf.tpdos = common_config.tpdos + card_config.tpdos
 
-        if len(paths) > 2:
-            with resources.as_file(paths[2]) as path:
+        if card.base in overlays:
+            with resources.as_file(overlays[card.base]) as path:
                 overlay_config = CardConfig.from_yaml(path)
             # because conf is cached by CardConfig, if multiple missions are loaded, the cached
             # version should not be modified because the changes will persist to later loaded
@@ -734,7 +736,8 @@ def _gen_fw_base_od(mission: Mission) -> canopen.ObjectDictionary:
     od.device_information.nr_of_TXPDO = 0
     od.device_information.LSS_supported = False
 
-    config = CardConfig.from_yaml(mission.paths.FW_COMMON_CONFIG_PATH)
+    with resources.as_file(resources.files(base) / "fw_common.yaml") as path:
+        config = CardConfig.from_yaml(path)
 
     _add_objects(od, config.objects, {})
 
