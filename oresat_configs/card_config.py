@@ -4,6 +4,7 @@ from __future__ import annotations
 
 from dataclasses import dataclass, field
 from functools import cache
+from pathlib import Path
 from typing import Any, Optional, Union
 
 from dacite import from_dict
@@ -269,9 +270,9 @@ class CardConfig:
 
     @classmethod
     @cache
-    def from_yaml(cls, config_path: str) -> CardConfig:
+    def from_yaml(cls, config_path: Path) -> CardConfig:
         """Load a card YAML config file."""
 
-        with open(config_path, "r") as f:
+        with config_path.open() as f:
             config_raw = load(f, Loader=CLoader)
         return from_dict(data_class=cls, data=config_raw)
