@@ -59,7 +59,7 @@
     can_id: "10-0"
   data_type: uint32
   access_type: rw
-  default: "0x80+$NODE_ID"
+  default: 0x80
 
 - index: 0x1015
   name: inhibit_time_emcy
@@ -162,10 +162,12 @@
       default: 0x80000000
 
     - subindex: 0x3
-      name: node_id_od_sdo_client
-      data_type: uint32
+      name: node_id_of_sdo_server
+      data_type: uint8
       access_type: rw
-      default: 1
+      low_limit: 0x1
+      high_limit: 0x7F
+      default: 0x1
 
 - index: 0x1023
   name: os_command
