@@ -26,6 +26,7 @@
   object_type: array
   description: emcy history for device
   generate_subindexes:
+    name: error
     subindexes: fixed_length
     length: 8  # can be up to 127
     data_type: uint32
