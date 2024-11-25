@@ -174,8 +174,7 @@ def _make_arr(obj: IndexObject, node_ids: dict[str, int]) -> Array:
             var = canopen.objectdictionary.Variable(name, index, subindex)
             var.access_type = gen_sub.access_type
             var.data_type = STR_2_OD_DATA_TYPE[gen_sub.data_type]
-            for name, bits in gen_sub.bit_definitions.items():
-                var.add_bit_definition(name, bits)
+            var.bit_definitions = _parse_bit_definitions(gen_sub)
             for name, value in gen_sub.value_descriptions.items():
                 var.add_value_description(value, name)
             var.unit = gen_sub.unit
