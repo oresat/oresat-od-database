@@ -32,7 +32,7 @@
     data_type: uint32
     access_type: ro
     bit_definitions:
-      additional_info: "32-16"
+      additional_info: "31-16"
       error_code: "15-0"
 
 - index: 0x1005
