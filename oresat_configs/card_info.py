@@ -9,7 +9,7 @@ from typing import Optional
 from . import base
 
 
-@dataclass(frozen=True)
+@dataclass
 class Card:
     """Card info."""
 
