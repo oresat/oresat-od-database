@@ -390,67 +390,42 @@ def write_canopennode_c(od: canopen.ObjectDictionary, dir_path: str = ".") -> No
             f.write(i + "\n")
 
 
+def decl_type(obj: canopen.objectdictionary.Variable, name: str) -> list[str]:
+    """Generates a type declaration for an ODVariable"""
+
+    ctype = DATA_TYPE_C_TYPES
+    if obj.data_type == canopen.objectdictionary.datatypes.DOMAIN:
+        return []  # skip domains
+    if obj.data_type in DATA_TYPE_STR:
+        return [f"{INDENT4}{ctype[obj.data_type]} {name}[{len(obj.default) + 1}];"]  # + 1 for '\0'
+    if obj.data_type == canopen.objectdictionary.datatypes.OCTET_STRING:
+        return [f"{INDENT4}{ctype[obj.data_type]} {name}[{len(obj.default)}];"]
+    return [f"{INDENT4}{ctype[obj.data_type]} {name};"]
+
+
 def _canopennode_h_lines(od: canopen.ObjectDictionary, index: int) -> list[str]:
     """Generate struct lines for OD.h for a sepecific index"""
 
-    lines = []
+    if index in _SKIP_INDEXES:
+        return []
 
     obj = od[index]
-    name = obj.name
+    name = f"x{index:X}_{obj.name}"
 
     if isinstance(obj, canopen.objectdictionary.Variable):
-        c_name = DATA_TYPE_C_TYPES[obj.data_type]
-
-        if obj.data_type == canopen.objectdictionary.datatypes.DOMAIN:
-            pass  # skip domains
-        elif obj.data_type in DATA_TYPE_STR:
-            length = len(obj.default) + 1  # add 1 for '\0'
-            lines.append(f"{INDENT4}{c_name} x{index:X}_{name}[{length}];")
-        elif obj.data_type == canopen.objectdictionary.datatypes.OCTET_STRING:
-            length = len(obj.default.replace(" ", "")) // 2  # aka number of uint8s
-            lines.append(f"{INDENT4}{c_name} x{index:X}_{name}[{length}];")
-        else:
-            lines.append(f"{INDENT4}{c_name} x{index:X}_{name};")
-    elif isinstance(obj, canopen.objectdictionary.Array):
-        first_obj = obj[list(obj.subindices)[1]]
-        c_name = DATA_TYPE_C_TYPES[first_obj.data_type]
-        length_str = f"OD_CNT_ARR_{index:X}"
-        lines.append(f"{INDENT4}uint8_t x{index:X}_{name}_sub0;")
-
-        if first_obj.data_type == canopen.objectdictionary.datatypes.DOMAIN:
-            pass  # skip domains
-        elif index in _SKIP_INDEXES:
-            pass
-        elif first_obj.data_type in DATA_TYPE_STR:
-            sub_length = len(first_obj.default) + 1  # add 1 for '\0'
-            lines.append(f"{INDENT4}{c_name} x{index:X}_{name}[{length_str}][{sub_length}];")
-        elif first_obj.data_type == canopen.objectdictionary.datatypes.OCTET_STRING:
-            sub_length = m.ceil(len(first_obj.default.replace(" ", "")) / 2)
-            lines.append(f"{INDENT4}{c_name} x{index:X}_{name}[{length_str}][{sub_length}];")
-        else:
-            lines.append(f"{INDENT4}{c_name} x{index:X}_{name}[{length_str}];")
-    else:
-        lines.append(INDENT4 + "struct {")
-        for i in obj:
-            data_type = obj[i].data_type
-            c_name = DATA_TYPE_C_TYPES[data_type]
-            sub_name = obj[i].name
-
-            if data_type == canopen.objectdictionary.datatypes.DOMAIN:
-                continue  # skip domains
-
-            if data_type in DATA_TYPE_STR:
-                length = len(obj[i].default) + 1  # add 1 for '\0'
-                lines.append(f"{INDENT8}{c_name} {sub_name}[{length}];")
-            elif data_type == canopen.objectdictionary.datatypes.OCTET_STRING:
-                sub_length = len(obj[list(obj.subindices)[1]].default)
-                lines.append(f"{INDENT8}{c_name} {sub_name}[{sub_length}];")
-            else:
-                lines.append(f"{INDENT8}{c_name} {sub_name};")
-
-        lines.append(INDENT4 + "}" + f" x{index:X}_{name};")
-
-    return lines
+        return decl_type(obj, name)
+    if isinstance(obj, canopen.objectdictionary.Array):
+        sub = obj[list(obj.subindices)[1]]
+        lines = [f"{INDENT4}uint8_t {name}_sub0;"]
+        lines.extend(decl_type(sub, f"{name}[OD_CNT_ARR_{index:X}]"))
+        return lines
+    if isinstance(obj, canopen.objectdictionary.Record):
+        lines = [f"{INDENT4}struct {{"]
+        for sub in obj.values():
+            lines.extend(INDENT4 + s for s in decl_type(sub, sub.name))
+        lines.append(f"{INDENT4}}} {name};")
+        return lines
+    raise TypeError(f"Invalid object {obj.name} type: {type(obj)}")
 
 
 def write_canopennode_h(od: canopen.ObjectDictionary, dir_path: str = ".") -> None:
