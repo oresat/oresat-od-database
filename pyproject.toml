@@ -76,7 +76,7 @@ path = "*/__init__.py"
 ignore = "W0611,R0903"
 
 [[tool.mypy.overrides]]
-module = "canopen,canopen.objectdictionary"
+module = "canopen,canopen.objectdictionary,canopen.objectdictionary.datatypes"
 ignore_missing_imports = true
 
 [tool.isort]
