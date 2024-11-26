@@ -539,6 +539,17 @@ def write_canopennode_h(od: canopen.ObjectDictionary, dir_path: str = ".") -> No
     lines.append("")
     lines.append("#include <assert.h>")
     lines.append("")
+    lines.append("#ifdef __cplusplus")
+    lines.append("#ifndef _Static_assert")
+    lines.append("#define _Static_assert static_assert")
+    lines.append("#endif")
+    lines.append("#endif")
+    lines.append("")
+    lines.append(
+        "#define STATIC_ASSERT(expression) "
+        '_Static_assert((expression), "(" #expression ") failed")'
+    )
+    lines.append("")
 
     lines.append("#define OD_CNT_NMT 1")
     lines.append("#define OD_CNT_HB_PROD 1")
@@ -685,10 +696,7 @@ def _make_bitfields_lines(obj: canopen.objectdictionary.Variable) -> list[str]:
         lines.append(f"{INDENT8}{data_type} unused{total_bits} : {unused_bits};")
     lines.append(INDENT4 + "} fields;")
     lines.append("} " + f"{bitfield_name}_t;")
-    lines.append(
-        f"_Static_assert(sizeof({bitfield_name}_t) == sizeof({data_type}), "
-        '"packed size did not match value size");'
-    )
+    lines.append(f"STATIC_ASSERT(sizeof({bitfield_name}_t) == sizeof({data_type}));")
     lines.append("")
 
     return lines
