@@ -17,7 +17,7 @@ class ConfigObject:
 
     data_type: str = "uint32"
     """Data type of the object."""
-    length: int = 0
+    length: int = 1
     """Length of an octet string object (only used when `data_type` is set to ``"octet_str"``)."""
     access_type: str = "rw"
     """

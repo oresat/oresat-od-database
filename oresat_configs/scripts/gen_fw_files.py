@@ -136,7 +136,7 @@ def attr_lines(od: canopen.ObjectDictionary, index: int) -> list[str]:
             line += "0}, "
         elif obj.data_type == canopen.objectdictionary.datatypes.OCTET_STRING:
             line += "{"
-            value = obj.default.replace("  ", " ")
+            value = obj.default.hex(sep=" ")
             for i in value.split(" "):
                 line += f"0x{i}, "
             line = line[:-2]  # remove last ', '
@@ -172,7 +172,7 @@ def attr_lines(od: canopen.ObjectDictionary, index: int) -> list[str]:
                 line += "0}, "
             elif obj[i].data_type == canopen.objectdictionary.datatypes.OCTET_STRING:
                 line += "{"
-                value = obj[i].default.replace("  ", " ")
+                value = obj[i].default.hex(sep=" ")
                 for i in value.split(" "):
                     line += f"0x{i}, "
                 line = line[:-2]  # remove trailing ', '
