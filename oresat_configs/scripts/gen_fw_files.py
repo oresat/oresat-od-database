@@ -1,12 +1,13 @@
 """Generate a OreSat card's CANopenNode OD.[c/h] files"""
 
-import math as m
 import os
 import sys
 from argparse import ArgumentParser, Namespace
+from itertools import chain
 from typing import Any, Optional
 
 import canopen
+from canopen.objectdictionary.datatypes import DOMAIN, OCTET_STRING, UNICODE_STRING, VISIBLE_STRING
 
 from .. import Mission, OreSatConfig
 
@@ -59,11 +60,6 @@ INDENT12 = " " * 12
 
 _SKIP_INDEXES = [0x1F81, 0x1F82, 0x1F89]
 """CANopenNode skips the data (it just set to NULL) for these indexes for some reason"""
-
-DATA_TYPE_STR = [
-    canopen.objectdictionary.datatypes.VISIBLE_STRING,
-    canopen.objectdictionary.datatypes.UNICODE_STRING,
-]
 
 DATA_TYPE_C_TYPES = {
     canopen.objectdictionary.datatypes.BOOLEAN: "bool_t",
@@ -120,251 +116,160 @@ def write_canopennode(od: canopen.ObjectDictionary, dir_path: str = ".") -> None
     write_canopennode_h(od, dir_path)
 
 
+def initializer(obj: canopen.objectdictionary.Variable) -> str:
+    """Generates a default value initializer for a given ODVariable"""
+
+    if obj.data_type == canopen.objectdictionary.datatypes.VISIBLE_STRING:
+        return "{" + ", ".join(f"'{c}'" for c in chain(obj.default, ["\\0"])) + "}"
+    if obj.data_type == canopen.objectdictionary.datatypes.OCTET_STRING:
+        return "{" + ", ".join(f"0x{b:02X}" for b in obj.default) + "}"
+    if obj.data_type == canopen.objectdictionary.datatypes.UNICODE_STRING:
+        return "{" + ", ".join(f"0x{ord(c):04X}" for c in chain(obj.default, "\0")) + "}"
+    if obj.data_type in canopen.objectdictionary.datatypes.INTEGER_TYPES:
+        return f"0x{obj.default:X}"
+    if obj.data_type == canopen.objectdictionary.datatypes.BOOLEAN:
+        return f"{int(obj.default)}"
+    if obj.data_type in canopen.objectdictionary.datatypes.FLOAT_TYPES:
+        return str(obj.default)
+    raise TypeError(f"Unhandled object {obj.name} datatype: {obj.data_type}")
+
+
 def attr_lines(od: canopen.ObjectDictionary, index: int) -> list[str]:
     """Generate attr lines for OD.c for a sepecific index"""
 
-    lines = []
+    if index in _SKIP_INDEXES:
+        return []
 
     obj = od[index]
     if isinstance(obj, canopen.objectdictionary.Variable):
-        line = f"{INDENT4}.x{index:X}_{obj.name} = "
+        return [f"{INDENT4}.x{index:X}_{obj.name} = {initializer(obj)},"]
 
-        if obj.data_type == canopen.objectdictionary.datatypes.VISIBLE_STRING:
-            line += "{"
-            for i in obj.default:
-                line += f'"{i}", '
-            line += "0}, "
-        elif obj.data_type == canopen.objectdictionary.datatypes.OCTET_STRING:
-            line += "{"
-            value = obj.default.hex(sep=" ")
-            for i in value.split(" "):
-                line += f"0x{i}, "
-            line = line[:-2]  # remove last ', '
-            line += "},"
-        elif obj.data_type == canopen.objectdictionary.datatypes.UNICODE_STRING:
-            line += "{"
-            for i in obj.default:
-                line += f"0x{ord(i):04X}, "
-            line += f"0x{0:04X}"  # add the '\0'
-            line += "},"
-        elif obj.data_type in canopen.objectdictionary.datatypes.INTEGER_TYPES:
-            line += f"0x{obj.default:X},"
-        elif obj.data_type == canopen.objectdictionary.datatypes.BOOLEAN:
-            line += f"{int(obj.default)},"
-        else:
-            line += f"{obj.default},"
-
-        if index not in _SKIP_INDEXES:
-            lines.append(line)
-    elif isinstance(obj, canopen.objectdictionary.Array):
-        name = obj.name
-        lines.append(f"{INDENT4}.x{index:X}_{name}_sub0 = {obj[0].default},")
-        line = f"{INDENT4}.x{index:X}_{name} = " + "{"
-
-        if obj[list(obj.subindices)[1]].data_type == canopen.objectdictionary.datatypes.DOMAIN:
+    if isinstance(obj, canopen.objectdictionary.Array):
+        lines = [f"{INDENT4}.x{index:X}_{obj.name}_sub0 = {obj[0].default},"]
+        if obj[list(obj.subindices)[1]].data_type == DOMAIN:
             return lines  # skip domains
 
-        for i in list(obj.subindices)[1:]:
-            if obj[i].data_type == canopen.objectdictionary.datatypes.VISIBLE_STRING:
-                line += "{"
-                for i in obj[i].default:
-                    line += f'"{i}", '
-                line += "0}, "
-            elif obj[i].data_type == canopen.objectdictionary.datatypes.OCTET_STRING:
-                line += "{"
-                value = obj[i].default.hex(sep=" ")
-                for i in value.split(" "):
-                    line += f"0x{i}, "
-                line = line[:-2]  # remove trailing ', '
-                line += "}, "
-            elif obj[i].data_type == canopen.objectdictionary.datatypes.UNICODE_STRING:
-                line += "{"
-                for i in obj[i].default:
-                    line += f"0x{ord(i):04X}, "
-                line += f"0x{0:04X}"  # add the '\0'
-                line += "}, "
-            elif obj[i].data_type in canopen.objectdictionary.datatypes.INTEGER_TYPES:
-                line += f"0x{obj[i].default:X}, "
-            elif obj[i].data_type == canopen.objectdictionary.datatypes.BOOLEAN:
-                line += f"{int(obj[i].default)}, "
-            else:
-                line += f"{obj[i].default}, "
+        lines.append(
+            f"{INDENT4}.x{index:X}_{obj.name} = {{"
+            + ", ".join(initializer(obj[i]) for i in list(obj.subindices)[1:])
+            + "},"
+        )
+        return lines
 
-        line = line[:-2]  # remove trailing ', '
-        line += "},"
+    if isinstance(obj, canopen.objectdictionary.Record):
+        lines = [f"{INDENT4}.x{index:X}_{obj.name} = {{"]
 
-        if index not in _SKIP_INDEXES:
-            lines.append(line)
-    else:  # ObjectType.Record
-        lines.append(f"{INDENT4}.x{index:X}_{obj.name} = " + "{")
-
-        for i in obj:
-            name = obj[i].name
-            if obj[i].data_type == canopen.objectdictionary.datatypes.DOMAIN:
+        for sub in obj.values():
+            if sub.data_type == DOMAIN:
                 continue  # skip domains
-
-            if obj[i].data_type == canopen.objectdictionary.datatypes.VISIBLE_STRING:
-                line = f"{INDENT8}.{name} = " + "{"
-                for i in obj[i].default:
-                    line += f"'{i}', "
-                line += "0}, "
-                lines.append(line)
-            elif obj[i].data_type == canopen.objectdictionary.datatypes.OCTET_STRING:
-                value = obj[i].default.hex(sep=" ")
-                line = f"{INDENT8}.{name} = " + "{"
-                for i in value.split(" "):
-                    line += f"0x{i}, "
-                line = line[:-2]  # remove trailing ', '
-                line += "},"
-                lines.append(line)
-            elif obj[i].data_type == canopen.objectdictionary.datatypes.UNICODE_STRING:
-                line = f"{INDENT8}.{name} = " + "{"
-                for i in obj[i].default:
-                    line += f"0x{ord(i):04X}, "
-                line += f"0x{0:04X}"  # add the '\0'
-                line += "},"
-                lines.append(line)
-            elif obj[i].data_type in canopen.objectdictionary.datatypes.INTEGER_TYPES:
-                lines.append(f"{INDENT8}.{name} = 0x{obj[i].default:X},")
-            elif obj[i].data_type == canopen.objectdictionary.datatypes.BOOLEAN:
-                lines.append(f"{INDENT8}.{name} = {int(obj[i].default)},")
-            else:
-                lines.append(f"{INDENT8}.{name} = {obj[i].default},")
-
+            lines.append(f"{INDENT8}.{sub.name} = {initializer(sub)},")
         lines.append(INDENT4 + "},")
+        return lines
 
-    return lines
+    raise TypeError(f"Invalid object {obj.name} type: {type(obj)}")
 
 
 def _var_data_type_len(var: canopen.objectdictionary.Variable) -> int:
     """Get the length of the variable's data in bytes"""
 
-    if var.data_type in [
-        canopen.objectdictionary.datatypes.VISIBLE_STRING,
-        canopen.objectdictionary.datatypes.OCTET_STRING,
-    ]:
-        length = len(var.default)  # char
-    elif var.data_type == canopen.objectdictionary.datatypes.UNICODE_STRING:
-        length = len(var.default) * 2  # uint16_t
-    elif var.data_type == canopen.objectdictionary.datatypes.DOMAIN:
-        length = 0
-    else:
-        length = DATA_TYPE_C_SIZE[var.data_type] // 8
-
-    return length
+    if var.data_type in (VISIBLE_STRING, OCTET_STRING):
+        return len(var.default)  # char
+    if var.data_type == UNICODE_STRING:
+        return len(var.default) * 2  # uint16_t
+    if var.data_type == DOMAIN:
+        return 0
+    return DATA_TYPE_C_SIZE[var.data_type] // 8
 
 
 def _var_attr_flags(var: canopen.objectdictionary.Variable) -> str:
     """Generate the variable attribute flags str"""
 
-    attr_str = ""
+    attrs = []
 
     if var.access_type in ["ro", "const"]:
-        attr_str += "ODA_SDO_R"
+        attrs.append("ODA_SDO_R")
         if var.pdo_mappable:
-            attr_str += " | ODA_TPDO"
+            attrs.append("ODA_TPDO")
     elif var.access_type == "wo":
-        attr_str += "ODA_SDO_W"
+        attrs.append("ODA_SDO_W")
         if var.pdo_mappable:
-            attr_str += " | ODA_RPDO"
+            attrs.append("ODA_RPDO")
     else:
-        attr_str += "ODA_SDO_RW"
+        attrs.append("ODA_SDO_RW")
         if var.pdo_mappable:
-            attr_str += " | ODA_TRPDO"
+            attrs.append("ODA_TRPDO")
 
-    bytes_types = [
-        canopen.objectdictionary.DOMAIN,
-        canopen.objectdictionary.OCTET_STRING,
-    ]
-    if var.data_type in DATA_TYPE_STR:
-        attr_str += " | ODA_STR"
-    elif var.data_type in bytes_types or (DATA_TYPE_C_SIZE[var.data_type] // 8) > 1:
-        attr_str += " | ODA_MB"
+    if var.data_type in (VISIBLE_STRING, UNICODE_STRING):
+        attrs.append("ODA_STR")
+    elif var.data_type in (DOMAIN, OCTET_STRING) or (DATA_TYPE_C_SIZE[var.data_type] // 8) > 1:
+        attrs.append("ODA_MB")
 
-    return attr_str
+    return " | ".join(attrs)
+
+
+def data_orig(index: int, obj: canopen.objectdictionary.Variable, name: str, arr: str = "") -> str:
+    """Generates the dataOrig field for an OD_obj_*_t"""
+
+    if index in _SKIP_INDEXES or obj.data_type == DOMAIN:
+        return "NULL,"
+    if obj.data_type in (VISIBLE_STRING, OCTET_STRING, UNICODE_STRING):
+        return f"&OD_RAM.x{index:X}_{name}[0]{arr},"
+    return f"&OD_RAM.x{index:X}_{name}{arr},"
+
+
+def obj_entry_body(index: int, obj: canopen.objectdictionary.Variable) -> list[str]:
+    """Generates the body of an OD_obj_*_t entry"""
+
+    if isinstance(obj, canopen.objectdictionary.Variable):
+        return [
+            ".dataOrig = " + data_orig(index, obj, obj.name),
+            f".attribute = {_var_attr_flags(obj)},",
+            f".dataLength = {_var_data_type_len(obj)}",
+        ]
+    if isinstance(obj, canopen.objectdictionary.Array):
+        first_obj = obj[list(obj.subindices)[1]]
+        c_name = DATA_TYPE_C_TYPES[first_obj.data_type]
+        if first_obj.data_type == DOMAIN:
+            size = "0"
+        elif first_obj.data_type in (VISIBLE_STRING, UNICODE_STRING):
+            size = f"sizeof({c_name}[{len(first_obj.default) + 1}])"  # add 1 for '\0'
+        elif first_obj.data_type == OCTET_STRING:
+            size = f"sizeof({c_name}[{len(first_obj.default)}])"
+        else:
+            size = f"sizeof({c_name})"
+
+        return [
+            f".dataOrig0 = &OD_RAM.x{index:X}_{obj.name}_sub0,",
+            ".dataOrig = " + data_orig(index, first_obj, obj.name, "[0]"),
+            ".attribute0 = ODA_SDO_R,",
+            f".attribute = {_var_attr_flags(first_obj)},",
+            f".dataElementLength = {_var_data_type_len(first_obj)},",
+            f".dataElementSizeof = {size},",
+        ]
+    if isinstance(obj, canopen.objectdictionary.Record):
+        return [
+            line
+            for i, sub in obj.items()
+            for line in [
+                "{",
+                f"{INDENT4}.dataOrig = " + data_orig(index, sub, f"{obj.name}.{sub.name}"),
+                f"{INDENT4}.subIndex = {i},",
+                f"{INDENT4}.attribute = {_var_attr_flags(sub)},",
+                f"{INDENT4}.dataLength = {_var_data_type_len(sub)}",
+                "},",
+            ]
+        ]
+    raise TypeError(f"Invalid object {obj.name} type: {type(obj)}")
 
 
 def obj_lines(od: canopen.ObjectDictionary, index: int) -> list[str]:
-    """Generate  lines for OD.c for a sepecific index"""
+    """Generate lines for OD.c for a specific index"""
 
-    lines = []
-
-    obj = od[index]
-    name = obj.name
-    lines.append(f"{INDENT4}.o_{index:X}_{name} = " + "{")
-
-    if isinstance(obj, canopen.objectdictionary.Variable):
-        if index in _SKIP_INDEXES or obj.data_type == canopen.objectdictionary.datatypes.DOMAIN:
-            lines.append(f"{INDENT8}.dataOrig = NULL,")
-        elif (
-            obj.data_type in DATA_TYPE_STR
-            or obj.data_type == canopen.objectdictionary.datatypes.OCTET_STRING
-        ):
-            lines.append(f"{INDENT8}.dataOrig = &OD_RAM.x{index:X}_{name}[0],")
-        else:
-            lines.append(f"{INDENT8}.dataOrig = &OD_RAM.x{index:X}_{name},")
-
-        lines.append(f"{INDENT8}.attribute = {_var_attr_flags(obj)},")
-        lines.append(f"{INDENT8}.dataLength = {_var_data_type_len(obj)}")
-    elif isinstance(obj, canopen.objectdictionary.Array):
-        lines.append(f"{INDENT8}.dataOrig0 = &OD_RAM.x{index:X}_{name}_sub0,")
-
-        first_obj = obj[list(obj.subindices)[1]]
-        if (
-            index in _SKIP_INDEXES
-            or first_obj.data_type == canopen.objectdictionary.datatypes.DOMAIN
-        ):
-            lines.append(f"{INDENT8}.dataOrig = NULL,")
-        elif first_obj.data_type in [
-            canopen.objectdictionary.datatypes.VISIBLE_STRING,
-            canopen.objectdictionary.datatypes.OCTET_STRING,
-            canopen.objectdictionary.datatypes.UNICODE_STRING,
-        ]:
-            lines.append(f"{INDENT8}.dataOrig = &OD_RAM.x{index:X}_{name}[0][0],")
-        else:
-            lines.append(f"{INDENT8}.dataOrig = &OD_RAM.x{index:X}_{name}[0],")
-
-        lines.append(f"{INDENT8}.attribute0 = ODA_SDO_R,")
-        lines.append(f"{INDENT8}.attribute = {_var_attr_flags(first_obj)},")
-        length = _var_data_type_len(first_obj)
-        lines.append(f"{INDENT8}.dataElementLength = {length},")
-
-        c_name = DATA_TYPE_C_TYPES[first_obj.data_type]
-        if first_obj.data_type == canopen.objectdictionary.datatypes.DOMAIN:
-            lines.append(f"{INDENT8}.dataElementSizeof = 0,")
-        elif first_obj.data_type in DATA_TYPE_STR:
-            sub_length = len(first_obj.default) + 1  # add 1 for '\0'
-            lines.append(f"{INDENT8}.dataElementSizeof = sizeof({c_name}[{sub_length}]),")
-        elif first_obj.data_type == canopen.objectdictionary.datatypes.OCTET_STRING:
-            sub_length = m.ceil(len(first_obj.default.replace(" ", "")) / 2)
-            lines.append(f"{INDENT8}.dataElementSizeof = sizeof({c_name}[{sub_length}]),")
-        else:
-            lines.append(f"{INDENT8}.dataElementSizeof = sizeof({c_name}),")
-    else:  # ObjectType.DOMAIN
-        for i in obj:
-            name_sub = obj[i].name
-            lines.append(INDENT8 + "{")
-
-            if obj[i].data_type == canopen.objectdictionary.datatypes.DOMAIN:
-                lines.append(f"{INDENT12}.dataOrig = NULL,")
-            elif obj[i].data_type in [
-                canopen.objectdictionary.datatypes.VISIBLE_STRING,
-                canopen.objectdictionary.datatypes.OCTET_STRING,
-                canopen.objectdictionary.datatypes.UNICODE_STRING,
-            ]:
-                line = f"{INDENT12}.dataOrig = &OD_RAM.x{index:X}_{name}.{name_sub}[0],"
-                lines.append(line)
-            else:
-                lines.append(f"{INDENT12}.dataOrig = &OD_RAM.x{index:X}_{name}.{name_sub},")
-
-            lines.append(f"{INDENT12}.subIndex = {i},")
-            lines.append(f"{INDENT12}.attribute = {_var_attr_flags(obj[i])},")
-            lines.append(f"{INDENT12}.dataLength = {_var_data_type_len(obj[i])}")
-            lines.append(INDENT8 + "},")
-
-    lines.append(INDENT4 + "},")
-
-    return lines
+    return [
+        f"{INDENT4}.o_{index:X}_{od[index].name} = {{",
+        *(INDENT8 + line for line in obj_entry_body(index, od[index])),
+        f"{INDENT4}}},",
+    ]
 
 
 def write_canopennode_c(od: canopen.ObjectDictionary, dir_path: str = ".") -> None:
@@ -452,67 +357,43 @@ def write_canopennode_c(od: canopen.ObjectDictionary, dir_path: str = ".") -> No
             f.write(i + "\n")
 
 
+def decl_type(obj: canopen.objectdictionary.Variable, name: str) -> list[str]:
+    """Generates a type declaration for an ODVariable"""
+
+    ctype = DATA_TYPE_C_TYPES
+    if obj.data_type == DOMAIN:
+        return []  # skip domains
+    if obj.data_type in (VISIBLE_STRING, UNICODE_STRING):
+        return [f"{INDENT4}{ctype[obj.data_type]} {name}[{len(obj.default) + 1}];"]  # + 1 for '\0'
+    if obj.data_type == OCTET_STRING:
+        return [f"{INDENT4}{ctype[obj.data_type]} {name}[{len(obj.default)}];"]
+    return [f"{INDENT4}{ctype[obj.data_type]} {name};"]
+
+
 def _canopennode_h_lines(od: canopen.ObjectDictionary, index: int) -> list[str]:
     """Generate struct lines for OD.h for a sepecific index"""
 
-    lines = []
+    if index in _SKIP_INDEXES:
+        return []
 
     obj = od[index]
-    name = obj.name
+    name = f"x{index:X}_{obj.name}"
 
     if isinstance(obj, canopen.objectdictionary.Variable):
-        c_name = DATA_TYPE_C_TYPES[obj.data_type]
-
-        if obj.data_type == canopen.objectdictionary.datatypes.DOMAIN:
-            pass  # skip domains
-        elif obj.data_type in DATA_TYPE_STR:
-            length = len(obj.default) + 1  # add 1 for '\0'
-            lines.append(f"{INDENT4}{c_name} x{index:X}_{name}[{length}];")
-        elif obj.data_type == canopen.objectdictionary.datatypes.OCTET_STRING:
-            length = len(obj.default.replace(" ", "")) // 2  # aka number of uint8s
-            lines.append(f"{INDENT4}{c_name} x{index:X}_{name}[{length}];")
-        else:
-            lines.append(f"{INDENT4}{c_name} x{index:X}_{name};")
-    elif isinstance(obj, canopen.objectdictionary.Array):
-        first_obj = obj[list(obj.subindices)[1]]
-        c_name = DATA_TYPE_C_TYPES[first_obj.data_type]
-        length_str = f"OD_CNT_ARR_{index:X}"
-        lines.append(f"{INDENT4}uint8_t x{index:X}_{name}_sub0;")
-
-        if first_obj.data_type == canopen.objectdictionary.datatypes.DOMAIN:
-            pass  # skip domains
-        elif index in _SKIP_INDEXES:
-            pass
-        elif first_obj.data_type in DATA_TYPE_STR:
-            sub_length = len(first_obj.default) + 1  # add 1 for '\0'
-            lines.append(f"{INDENT4}{c_name} x{index:X}_{name}[{length_str}][{sub_length}];")
-        elif first_obj.data_type == canopen.objectdictionary.datatypes.OCTET_STRING:
-            sub_length = m.ceil(len(first_obj.default.replace(" ", "")) / 2)
-            lines.append(f"{INDENT4}{c_name} x{index:X}_{name}[{length_str}][{sub_length}];")
-        else:
-            lines.append(f"{INDENT4}{c_name} x{index:X}_{name}[{length_str}];")
-    else:
-        lines.append(INDENT4 + "struct {")
-        for i in obj:
-            data_type = obj[i].data_type
-            c_name = DATA_TYPE_C_TYPES[data_type]
-            sub_name = obj[i].name
-
-            if data_type == canopen.objectdictionary.datatypes.DOMAIN:
-                continue  # skip domains
-
-            if data_type in DATA_TYPE_STR:
-                length = len(obj[i].default) + 1  # add 1 for '\0'
-                lines.append(f"{INDENT8}{c_name} {sub_name}[{length}];")
-            elif data_type == canopen.objectdictionary.datatypes.OCTET_STRING:
-                sub_length = len(obj[list(obj.subindices)[1]].default)
-                lines.append(f"{INDENT8}{c_name} {sub_name}[{sub_length}];")
-            else:
-                lines.append(f"{INDENT8}{c_name} {sub_name};")
-
-        lines.append(INDENT4 + "}" + f" x{index:X}_{name};")
-
-    return lines
+        return decl_type(obj, name)
+    if isinstance(obj, canopen.objectdictionary.Array):
+        sub = obj[list(obj.subindices)[1]]
+        return [
+            f"{INDENT4}uint8_t {name}_sub0;",
+            *decl_type(sub, f"{name}[OD_CNT_ARR_{index:X}]"),
+        ]
+    if isinstance(obj, canopen.objectdictionary.Record):
+        lines = [f"{INDENT4}struct {{"]
+        for sub in obj.values():
+            lines.extend(INDENT4 + s for s in decl_type(sub, sub.name))
+        lines.append(f"{INDENT4}}} {name};")
+        return lines
+    raise TypeError(f"Invalid object {obj.name} type: {type(obj)}")
 
 
 def write_canopennode_h(od: canopen.ObjectDictionary, dir_path: str = ".") -> None:
