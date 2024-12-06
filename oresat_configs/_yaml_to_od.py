@@ -96,7 +96,7 @@ def _parse_bit_definitions(obj: Union[IndexObject, SubindexObject]) -> dict[str,
         if isinstance(bits, int):
             bit_defs[name] = [bits]
         elif isinstance(bits, list):
-            bit_defs[name] = list(sorted(bits))
+            bit_defs[name] = bits
         elif isinstance(bits, str) and "-" in bits:
             low, high = sorted([int(i) for i in bits.split("-")])
             bit_defs[name] = list(range(low, high + 1))
@@ -121,8 +121,8 @@ def _make_var(obj: Union[IndexObject, SubindexObject], index: int, subindex: int
         var.max = obj.high_limit or max(obj.value_descriptions.values())
         var.min = obj.low_limit or min(obj.value_descriptions.values())
     else:
-        var.max = obj.high_limit or OD_DATA_TYPES[var.data_type].high_limit
-        var.min = obj.low_limit or OD_DATA_TYPES[var.data_type].low_limit
+        var.max = obj.high_limit
+        var.min = obj.low_limit
     return var
 
 
@@ -183,8 +183,8 @@ def _make_arr(obj: IndexObject, node_ids: dict[str, int]) -> Array:
                 var.max = gen_sub.high_limit or max(gen_sub.value_descriptions.values())
                 var.min = gen_sub.low_limit or min(gen_sub.value_descriptions.values())
             else:
-                var.max = gen_sub.high_limit or OD_DATA_TYPES[var.data_type].high_limit
-                var.min = gen_sub.low_limit or OD_DATA_TYPES[var.data_type].low_limit
+                var.max = gen_sub.high_limit
+                var.min = gen_sub.low_limit
             _set_var_default(gen_sub, var)
             if var.data_type not in DYNAMIC_LEN_DATA_TYPES:
                 var.pdo_mappable = True
