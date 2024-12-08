@@ -72,7 +72,7 @@ class OreSatConfig:
             try:
                 self._load_cache()
                 gen_cache = False
-            except Exception:
+            except Exception:  # pylint: disable=W0718
                 pass
 
         with as_file(self.mission.cards) as path:
@@ -90,7 +90,7 @@ class OreSatConfig:
         if use_cache and gen_cache:
             try:
                 self._cache()
-            except Exception:
+            except Exception:  # pylint: disable=W0718
                 pass
 
     def _load_cache(self):

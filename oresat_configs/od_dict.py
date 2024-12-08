@@ -1,3 +1,5 @@
+"""Convert an canopen.ObjectDictionary into a dictionary and vice versa."""
+
 from canopen import ObjectDictionary
 from canopen.objectdictionary import OCTET_STRING, Array, Record, Variable
 
