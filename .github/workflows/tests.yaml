@@ -44,7 +44,10 @@ jobs:
       run: isort --check --diff .
 
     - name: Test with Python's unittest
-      run: python -m unittest
+      run: |
+        python -m unittest
+        oresat-configs-cache generate
+        python -m unittest
 
     - name: Lint Yaml with yamllint
       run: yamllint oresat_configs
