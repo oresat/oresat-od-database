@@ -386,5 +386,5 @@ def gen_xtce(args: Optional[Namespace] = None) -> None:
     if args is None:
         args = build_parser(ArgumentParser()).parse_args()
 
-    config = OreSatConfig(args.oresat)
+    config = OreSatConfig(args.oresat, False)
     write_xtce(config, args.dir_path)

@@ -245,7 +245,7 @@ def gen_dcf(args: Optional[Namespace] = None) -> None:
     if args is None:
         args = build_parser(ArgumentParser()).parse_args()
 
-    config = OreSatConfig(args.oresat)
+    config = OreSatConfig(args.oresat, False)
 
     if args.card.lower() == "all":
         for od in config.od_db.values():

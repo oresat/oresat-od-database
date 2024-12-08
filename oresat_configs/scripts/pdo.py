@@ -138,7 +138,7 @@ def pdo_main(args: Optional[Namespace] = None) -> None:
     if args is None:
         args = build_parser(ArgumentParser()).parse_args()
 
-    config = OreSatConfig(args.oresat)
+    config = OreSatConfig(args.oresat, False)
     node_id = config.cards[args.card].node_id
     od = config.od_db[args.card]
 

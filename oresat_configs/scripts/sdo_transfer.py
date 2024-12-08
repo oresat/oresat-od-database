@@ -65,7 +65,7 @@ def sdo_transfer(args: Optional[Namespace] = None) -> None:
     if args is None:
         args = build_parser(ArgumentParser()).parse_args()
 
-    config = OreSatConfig(args.oresat)
+    config = OreSatConfig(args.oresat, False)
 
     if args.value.startswith("file:"):
         if not os.path.isfile(args.value[5:]):

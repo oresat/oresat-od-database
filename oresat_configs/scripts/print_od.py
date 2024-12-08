@@ -56,7 +56,7 @@ def print_od(args: Optional[Namespace] = None) -> None:
     if args is None:
         args = build_parser(ArgumentParser()).parse_args()
 
-    config = OreSatConfig(args.oresat)
+    config = OreSatConfig(args.oresat, False)
 
     inverted_od_data_types = {}
     for key, value in STR_2_OD_DATA_TYPE.items():

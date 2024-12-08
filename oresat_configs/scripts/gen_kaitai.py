@@ -245,5 +245,5 @@ def gen_kaitai(args: Optional[Namespace] = None) -> None:
     if args is None:
         args = build_parser(ArgumentParser()).parse_args()
 
-    config = OreSatConfig(args.oresat)
+    config = OreSatConfig(args.oresat, False)
     write_kaitai(config, args.dir_path)

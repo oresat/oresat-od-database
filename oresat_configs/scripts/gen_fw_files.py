@@ -588,7 +588,7 @@ def gen_fw_files(args: Optional[Namespace] = None) -> None:
     if args is None:
         args = build_parser(ArgumentParser()).parse_args()
 
-    config = OreSatConfig(args.oresat)
+    config = OreSatConfig(args.oresat, False)
 
     arg_card = args.card.lower().replace("-", "_")
     if arg_card == "c3":
