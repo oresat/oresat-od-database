@@ -199,6 +199,8 @@ def _variable_lines(variable: Variable, index: int, subindex: Optional[int] = No
         if variable.data_type == canopen.objectdictionary.OCTET_STRING:
             tmp = variable.default.hex(sep=" ")
             lines.append(f"DefaultValue={tmp}")
+        elif variable.data_type == canopen.objectdictionary.BOOLEAN:
+            lines.append(f"DefaultValue={int(variable.default)}")
         else:
             lines.append(f"DefaultValue={variable.default}")
     if variable.pdo_mappable:  # optional
