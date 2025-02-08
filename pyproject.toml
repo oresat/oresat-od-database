@@ -32,6 +32,7 @@ oresat-print-od = "oresat_configs.scripts.print_od:print_od"
 oresat-sdo-transfer = "oresat_configs.scripts.sdo_transfer:sdo_transfer"
 oresat-gen-kaitai = "oresat_configs.scripts.gen_kaitai:gen_kaitai"
 oresat-gen-xtce = "oresat_configs.scripts.gen_xtce:gen_xtce"
+oresat-gen-canopend = "oresat_configs.scripts.gen_xtce:gen_canopend"
 
 [tool.setuptools.packages.find]
 exclude = ["docs*", "tests*"]

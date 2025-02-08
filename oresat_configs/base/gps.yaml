@@ -24,9 +24,9 @@ objects:
         data_type: uint8
         value_descriptions:
           no_fix: 0
-          2d: 1
-          3d: 2
-          3d_dgps: 3
+          fix_2d: 1
+          fix_3d: 2
+          fix_3d_dgps: 3
         access_type: ro
 
       - subindex: 0x2

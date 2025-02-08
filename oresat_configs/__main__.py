@@ -19,6 +19,7 @@ import argparse
 
 from .constants import __version__
 from .scripts import (
+    gen_canopend,
     gen_dbc,
     gen_dcf,
     gen_fw_files,
@@ -48,6 +49,7 @@ _SCRIPTS = [
     gen_xtce,
     gen_fw_files,
     gen_dbc,
+    gen_canopend,
 ]
 
 
