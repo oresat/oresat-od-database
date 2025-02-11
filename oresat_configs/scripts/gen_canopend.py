@@ -49,6 +49,7 @@ def write_canopend(card: str, od: canopen.ObjectDictionary, dir_path: str = ".")
     enums = {}
     bitfields = {}
     entries = {}
+    tpdos = []
 
     def snake_to_camel(name):
         return "".join(word.title() for word in name.split("_"))
@@ -57,6 +58,10 @@ def write_canopend(card: str, od: canopen.ObjectDictionary, dir_path: str = ".")
 
     for index in sorted(od.indices):
         obj = od[index]
+
+        if 0x1800 <= index < 0x1A00:
+            tpdos.append(index - 0x1800 + 1)
+
         if index < 0x4000:
             continue
 
@@ -129,12 +134,18 @@ def write_canopend(card: str, od: canopen.ObjectDictionary, dir_path: str = ".")
         line += "\n"
         lines.append(line)
 
+    lines.append("\n")
+    lines.append("\n")
+    lines.append(f"class {node_name}Tpdo(Enum):\n")
+    for i in range(len(tpdos)):
+        lines.append(f"    TPDO_{tpdos[i]} = {i}\n")
+
     if dir_path:
         os.makedirs(dir_path, exist_ok=True)
 
     output_file = os.path.join(dir_path, "od.py")
     with open(output_file, "w") as f:
-        f.writelines(lines[:-1])
+        f.writelines(lines)
 
 
 def gen_canopend(args: Optional[Namespace] = None):
