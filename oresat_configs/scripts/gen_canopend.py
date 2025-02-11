@@ -149,5 +149,23 @@ def gen_canopend(args: Optional[Namespace] = None):
         args = build_parser(ArgumentParser()).parse_args()
 
     config = OreSatConfig(args.oresat)
-    od = config.od_db[args.card.lower()]
-    write_canopend(args.card.lower(), od, args.dir_path)
+
+    arg_card = args.card.lower().replace("-", "_")
+    name = arg_card
+    if arg_card == "c3":
+        od = config.od_db["c3"]
+    elif arg_card == "gps":
+        od = config.od_db["gps"]
+    elif arg_card in ["star_tracker"]:
+        od = config.od_db["star_tracker_1"]
+        name = "star_tracker"
+    elif arg_card in ["cfc", "cfc_processor"]:
+        od = config.od_db["cfc_processor"]
+        name = "cfc"
+    elif arg_card == "dxwifi":
+        od = config.od_db["dxwifi"]
+    else:
+        print(f"invalid oresat linux card: {args.card}")
+        sys.exit()
+
+    write_canopend(name, od, args.dir_path)

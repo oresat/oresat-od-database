@@ -172,6 +172,7 @@ cython_debug/
 
 # CANopenNode
 OD.*
+od.py
 
 # generated docs
 **/gen/*.rst
