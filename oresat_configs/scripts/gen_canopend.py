@@ -65,12 +65,8 @@ def write_canopend(card: str, od: canopen.ObjectDictionary, dir_path: str = ".")
         if index < 0x4000:
             continue
 
-        base_name = ""
-        if 0x4000 > index > 0x5000:
-            base_name = card + "_"
-
         if isinstance(obj, canopen.objectdictionary.Variable):
-            name = base_name + obj.name
+            name = obj.name
             if obj.value_descriptions:
                 enums[name] = obj.value_descriptions
             if obj.bit_definitions:
@@ -81,8 +77,7 @@ def write_canopend(card: str, od: canopen.ObjectDictionary, dir_path: str = ".")
                 if sub_obj.subindex == 0:
                     continue
 
-                name = f"{base_name}{obj.name}_{sub_obj.name}"
-
+                name = f"{obj.name}_{sub_obj.name}"
                 if sub_obj.value_descriptions:
                     enums[name] = sub_obj.value_descriptions
                 if sub_obj.bit_definitions:
@@ -104,7 +99,7 @@ def write_canopend(card: str, od: canopen.ObjectDictionary, dir_path: str = ".")
         lines.append("\n")
         lines.append("\n")
         c_name = snake_to_camel(e_name)
-        lines.append(f"class {c_name}(Enum):\n")
+        lines.append(f"class {node_name}{c_name}(Enum):\n")
         for value, name in values.items():
             lines.append(f"    {name.upper()} = {value}\n")
 
@@ -112,7 +107,7 @@ def write_canopend(card: str, od: canopen.ObjectDictionary, dir_path: str = ".")
         lines.append("\n")
         lines.append("\n")
         c_name = snake_to_camel(b_name)
-        lines.append(f"class {c_name}BitField(EntryBitField):\n")
+        lines.append(f"class {node_name}{c_name}BitField(EntryBitField):\n")
         for name, value in values.items():
             lines.append(f"    {name.upper()} = {value}\n")
 
@@ -122,8 +117,8 @@ def write_canopend(card: str, od: canopen.ObjectDictionary, dir_path: str = ".")
     for name, obj in entries.items():
         dt = DATATYPE_NAMES[obj.data_type]
         c_name = snake_to_camel(name)
-        e_enum = c_name if obj.value_descriptions else "None"
-        bitfield = f"{c_name}BitField" if obj.bit_definitions else "None"
+        e_enum = f"{node_name}{c_name}" if obj.value_descriptions else "None"
+        bitfield = f"{node_name}{c_name}BitField" if obj.bit_definitions else "None"
         line = f"    {name.upper()} = 0x{obj.index:X}, 0x{obj.subindex:X}, DataType.{dt}"
         default = obj.value
         if isinstance(default, str):
